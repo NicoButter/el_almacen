@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Administrador{% endblock %}
+
+{% block header %}Dashboard Administrador{% endblock %}
+
+{% block content %}
+    <p>Aquí puedes gestionar usuarios y otras configuraciones del sistema.</p>
+    <nav>
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'register' %}">Registrar Usuario</a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}

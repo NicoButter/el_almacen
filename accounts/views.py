@@ -1,5 +1,3 @@
-# views.py en la aplicación accounts
-
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -14,8 +12,7 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')  # Redirigir al inicio de sesión después del registro
-    else:
+            return redirect('login')  
         form = UserCreationForm()
         
     return render(request, 'accounts/register.html', {'form': form})
@@ -30,13 +27,12 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                # Redirigir al dashboard correspondiente
                 if user.is_admin:
-                    return redirect('admin_dashboard')  # Cambia esto según la URL de tu dashboard
+                    return redirect('admin_dashboard')  
                 elif user.is_cashier:
                     return redirect('cashier_dashboard')
                 else:
-                    return redirect('user_dashboard')  # Cambia según sea necesario
+                    return redirect('user_dashboard')  
     else:
         form = AuthenticationForm()
 

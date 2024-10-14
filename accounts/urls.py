@@ -1,6 +1,8 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from .views import register, user_login
+from dashboards.views import admin_dashboard, cashier_dashboard, user_dashboard
+
 
 urlpatterns = [
     path('login/', user_login, name='login'), 
