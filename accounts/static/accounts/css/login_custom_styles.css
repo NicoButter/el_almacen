@@ -1,0 +1,57 @@
+body {
+    background-image: url('../images/fiambreria_login_background.png');
+    /* Ruta relativa a tu imagen */
+    background-size: cover;
+    /* Asegura que la imagen cubra toda la pantalla */
+    background-position: center;
+    /* Centra la imagen */
+    background-repeat: no-repeat;
+    /* Evita que la imagen se repita */
+    height: 100vh;
+    /* Asegura que el fondo ocupe toda la altura de la ventana */
+}
+
+.login-container {
+    margin-top: 100px;
+}
+
+.login-form {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.floating-label {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.floating-label input {
+    height: 30px;
+    padding: 12px 12px 12px 0;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+
+.floating-label label {
+    position: absolute;
+    top: 50%;
+    /* Cambiar a un valor negativo más alto en la parte de enfoque */
+    left: 12px;
+    transform: translateY(-70%);
+    color: #6c757d;
+    pointer-events: none;
+    /* Evita que el label interfiera con el clic en el input */
+    transition: all 0.2s ease;
+    /* Transición suave */
+}
+
+.floating-label input:focus+label,
+.floating-label input:not(:placeholder-shown)+label {
+    top: 0;
+    left: 12px;
+    font-size: 12px;
+    color: #007bff;
+}
