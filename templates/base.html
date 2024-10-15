@@ -28,12 +28,13 @@
                         <a class="nav-link" href="#">Otras Funcionalidades</a>
                     </li>
                 </ul>
-                <!-- Alinear el botón de cerrar sesión a la derecha -->
                 <ul class="navbar-nav ml-auto">
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
-                    </li>
+                    <form id="logout-form" method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
+                    </form>
+
                 </ul>
             </div>
         </nav>
@@ -50,11 +51,10 @@
     <footer class="footer bg-light py-3">
         <div class="container d-flex justify-content-between">
             <span>Usuario: {{ user.username }}</span>
-            <span id="datetime"></span> <!-- Donde aparecerán la fecha y la hora -->
+            <span id="datetime"></span> 
         </div>
     </footer>
 
-    <!-- Script para mostrar la fecha y la hora en tiempo real -->
     <script>
         function updateDateTime() {
             const now = new Date();
@@ -62,7 +62,6 @@
             document.getElementById('datetime').textContent = dateTimeString;
         }
 
-        // Actualiza la fecha y la hora al cargar la página y cada segundo
         updateDateTime();
         setInterval(updateDateTime, 1000);
     </script>
