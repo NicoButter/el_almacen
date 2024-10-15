@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'accounts/css/dashboard_styles.css' %}" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">La Señora del Saláme</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        {% comment %} <a class="nav-link" href="{% url 'stock_control' %}">Control de Stock</a> {% endcomment %}
+                    </li>
+                    <li class="nav-item">
+                        {% comment %} <a class="nav-link" href="{% url 'add_product' %}">Cargar Productos</a> {% endcomment %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Otras Funcionalidades</a>
+                    </li>
+                </ul>
+                <!-- Alinear el botón de cerrar sesión a la derecha -->
+                <ul class="navbar-nav ml-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesión</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <h1 class="text-center">{% block header %}Bienvenido{% endblock %}</h1>
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer bg-light py-3">
+        <div class="container d-flex justify-content-between">
+            <span>Usuario: {{ user.username }}</span>
+            <span id="datetime"></span> <!-- Donde aparecerán la fecha y la hora -->
+        </div>
+    </footer>
+
+    <!-- Script para mostrar la fecha y la hora en tiempo real -->
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const dateTimeString = now.toLocaleString('es-ES', { dateStyle: 'full', timeStyle: 'short' });
+            document.getElementById('datetime').textContent = dateTimeString;
+        }
+
+        // Actualiza la fecha y la hora al cargar la página y cada segundo
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+
+</body>
+</html>
