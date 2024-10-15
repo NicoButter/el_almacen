@@ -1,0 +1,27 @@
+<h2>Ticket History</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cashier</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets %}
+        <tr>
+            <td>{{ ticket.id }}</td>
+            <td>{{ ticket.cashier.username }}</td>
+            <td>{{ ticket.date }}</td>
+            <td>{{ ticket.total }}</td>
+            <td>
+                <a href="{% url 'ticket_detail' ticket.id %}">Details</a> |
+                <a href="{% url 'reprint_ticket' ticket.id %}">Reprint</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

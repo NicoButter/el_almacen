@@ -1,0 +1,25 @@
+<h2>Ticket Details</h2>
+
+<p>Cashier: {{ ticket.cashier.username }}</p>
+<p>Date: {{ ticket.date }}</p>
+<p>Total: {{ ticket.total }}</p>
+
+<h3>Products:</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for line_item in line_items %}
+        <tr>
+            <td>{{ line_item.product.name }}</td>
+            <td>{{ line_item.quantity }}</td>
+            <td>{{ line_item.subtotal }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

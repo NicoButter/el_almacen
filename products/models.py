@@ -12,7 +12,6 @@ class Producto(models.Model):
     qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        # Genera y guarda el código QR cuando se guarda el producto
         if not self.qr_code:
             self.qr_code = self.generar_qr_code()
         super().save(*args, **kwargs)
@@ -31,4 +30,4 @@ class Producto(models.Model):
         # Guarda la imagen en un archivo
         buffer = BytesIO()
         img.save(buffer, format='PNG')
-        return ContentFile(buffer.getvalue(), name=f'producto_{self.id}.png')
+        return ContentFile(buffer.getvalue(), name=f'product_{self.id}.png')

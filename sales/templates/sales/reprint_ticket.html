@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reprint Ticket</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 300px;
+            margin: 0 auto;
+        }
+        .ticket {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .header, .footer {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="ticket">
+        <div class="header">
+            <h3>Store XYZ</h3>
+            <p>Ticket #{{ ticket.id }}</p>
+        </div>
+
+        <p>Cashier: {{ ticket.cashier.username }}</p>
+        <p>Date: {{ ticket.date }}</p>
+
+        <h4>Products:</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line_item in line_items %}
+                <tr>
+                    <td>{{ line_item.product.name }}</td>
+                    <td>{{ line_item.quantity }}</td>
+                    <td>{{ line_item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p><strong>Total: {{ ticket.total }}</strong></p>
+
+        <div class="footer">
+            <p>Thanks for your purchase!</p>
+        </div>
+    </div>
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
