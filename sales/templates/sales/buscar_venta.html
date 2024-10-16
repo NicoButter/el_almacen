@@ -1,0 +1,7 @@
+<!-- sales/templates/sales/buscar_venta.html -->
+<h1>Buscar Venta</h1>
+<form method="GET" action="{% url 'sales:buscar_venta' %}">
+    <!-- Formulario para buscar una venta -->
+    <input type="text" name="search" placeholder="ID de la venta o nombre del cliente">
+    <button type="submit">Buscar</button>
+</form>

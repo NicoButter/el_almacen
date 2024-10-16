@@ -1,16 +1,33 @@
 {% extends 'base.html' %}
+{% block title %}Listado de Productos{% endblock %}
 {% block content %}
 <h1>Listado de Productos</h1>
-<a href="{% url 'agregar_producto' %}">Agregar Producto</a>
-<ul>
-    {% for producto in productos %}
-        <li>
-            {{ producto.nombre }} - {{ producto.precio }} - 
-            <a href="{% url 'editar_producto' producto.pk %}">Editar</a> - 
-            <a href="{% url 'eliminar_producto' producto.pk %}">Eliminar</a>
-            <br>
-            <img src="{{ producto.qr_code.url }}" alt="QR Code" width="100" />
-        </li>
-    {% endfor %}
-</ul>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Cantidad en Stock</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.descripcion }}</td>
+            <td>${{ producto.precio }}</td>
+            <td>{{ producto.cantidad_stock }}</td>
+            <td>
+                <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-warning">Editar</a>
+                <form action="{% url 'eliminar_producto' producto.pk %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

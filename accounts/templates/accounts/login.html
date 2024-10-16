@@ -13,7 +13,7 @@
     <!-- Bootstrap CSS -->
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     
-    <link href="{% static 'accounts/css/login_custom_styles.css' %}" rel="stylesheet">  <!-- Tu archivo personalizado -->
+    <link href="{% static 'accounts/css/login_custom_styles.css' %}" rel="stylesheet">  
 
     
 </head>
@@ -25,7 +25,6 @@
                     <h2 class="text-center">Iniciar Sesión</h2>
                     <form method="post">
                         {% csrf_token %}
-                        <!-- Django form rendering with Bootstrap form-control class -->
                         <div class="form-group floating-label">
                             <input type="text" id="username" name="username" class="form-control" required placeholder=" ">
                             <label for="username">Usuario</label>
@@ -42,7 +41,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS (Opcional si no necesitas componentes JS de Bootstrap) -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
 </body>
 </html>

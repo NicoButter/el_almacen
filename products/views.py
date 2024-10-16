@@ -4,6 +4,7 @@ from .forms import ProductForm
 
 def listar_productos(request):
     productos = Product.objects.all()
+    # Retornar los productos al template
     return render(request, 'productos/listar_productos.html', {'productos': productos})
 
 def agregar_producto(request):

@@ -5,9 +5,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}Dashboard{% endblock %}</title>
+
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'accounts/css/dashboard_styles.css' %}" rel="stylesheet">
+
 </head>
 <body>
     <header>
@@ -55,6 +57,8 @@
         </div>
     </footer>
 
+    {% comment %} <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> {% endcomment %}
+
     <script>
         function updateDateTime() {
             const now = new Date();
@@ -65,6 +69,5 @@
         updateDateTime();
         setInterval(updateDateTime, 1000);
     </script>
-
 </body>
 </html>

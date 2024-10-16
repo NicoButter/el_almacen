@@ -6,4 +6,10 @@
 
 {% block content %}
     <p>Aquí puedes gestionar ventas y otras tareas relacionadas.</p>
+
+    <!-- Botón para iniciar una nueva venta -->
+    <a href="{% url 'sales:new_sale' %}" class="btn btn-primary">Nueva Venta</a>
+
+    <!-- Aquí podrías añadir más funcionalidades como buscar ventas o gestionar clientes -->
+    <a href="{% url 'sales:buscar_venta' %}" class="btn btn-secondary">Buscar Venta</a>
 {% endblock %}

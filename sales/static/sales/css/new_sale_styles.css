@@ -1,0 +1,24 @@
+#qr-scanner-container{
+    width: 100%; 
+    height: 400px; 
+    border: 1px solid #ccc;
+    position: relative;
+}
+
+
+
+#qr-reader {
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.list-group-item {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+
+#scan-status {
+    margin-top: 15px;
+}

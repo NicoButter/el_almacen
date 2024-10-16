@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Nueva Venta{% endblock %}
+{% block header %}Nueva Venta{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static '/sales/css/new_sale_styles.css' %}" />
+
+<div class="row">
+  <!-- Lista de productos escaneados -->
+  <div class="col-md-6">
+    <h2>Productos Agregados</h2>
+    <ul id="product-list" class="list-group">
+      <!-- Aquí se irán mostrando los productos agregados -->
+    </ul>
+    <h4>Total de la compra: <span id="total-compra">$0</span></h4>
+  </div>
+
+  <!-- Escáner QR a la derecha -->
+  <div class="col-md-6">
+    <h2>Escáner QR</h2>
+    <video id="video" width="250" height="250" autoplay></video>
+    <canvas id="canvas" style="display: none"></canvas>
+    <p id="scan-status" class="text-muted">Esperando código QR...</p>
+  </div>
+</div>
+
+<!-- Incluye la biblioteca jsQR -->
+<script src="{% static 'js/jsQR.js' %}"></script>
+
+<script>
+  // Sonido de confirmación
+  const confirmSound = new Audio("{% static 'sounds/confirm.mp3' %}");
+
+  const productosEscaneados = new Map();
+  const video = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  const context = canvas.getContext("2d");
+  const scanStatus = document.getElementById("scan-status");
+  const totalCompraElement = document.getElementById("total-compra");
+
+  // Almacena productos desde la base de datos
+  const productosData = {
+    {% for producto in productos %}
+      "{{ producto.id }}": { nombre: "{{ producto.nombre }}", precio: {{ producto.precio }} },
+    {% endfor %}
+  };
+
+  // Acceder a la cámara del usuario
+  navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+    video.srcObject = stream;
+    requestAnimationFrame(scanQRCode);
+  });
+
+  function scanQRCode() {
+    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+      canvas.height = video.videoHeight;
+      canvas.width = video.videoWidth;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+      if (code) {
+        if (code.data) {
+          scanStatus.textContent = `Producto escaneado: ${code.data}`;
+          agregarProductoALista(code.data);
+          confirmSound.play();
+        }
+      } else {
+        scanStatus.textContent = "Esperando código QR...";
+      }
+    }
+
+    requestAnimationFrame(scanQRCode);
+  }
+
+  function agregarProductoALista(productId) {
+    const productList = document.getElementById("product-list");
+
+    // Verificar si el producto ya existe
+    if (productosEscaneados.has(productId)) {
+      const item = productosEscaneados.get(productId);
+      item.cantidad += 1; // Aumentar la cantidad en 1
+      actualizarLista(item);
+    } else {
+      // Obtener datos del producto
+      const producto = productosData[productId];
+      if (!producto) return; // Si el producto no existe en los datos, salir
+
+      // Crear nuevo elemento de producto
+      const li = document.createElement("li");
+      li.className = "list-group-item";
+      li.dataset.productId = productId;
+
+      // Mostrar nombre, precio y cantidad
+      li.innerHTML = `
+        ${producto.nombre} - $${producto.precio} <span class="cantidad"> (x1)</span> = $${producto.precio} 
+        <button class="btn btn-success btn-sm float-end" onclick="aumentarCantidad('${productId}')">+</button>
+        <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productId}')">Eliminar</button>
+      `;
+
+      productList.appendChild(li);
+
+      // Guardar el producto y su cantidad
+      productosEscaneados.set(productId, { elemento: li, cantidad: 1, precio: producto.precio });
+    }
+
+    // Actualizar total de la compra
+    actualizarTotalCompra();
+  }
+
+  // Función para aumentar la cantidad del producto
+  function aumentarCantidad(productId) {
+    const item = productosEscaneados.get(productId);
+    if (item) {
+      item.cantidad += 1; // Aumentar la cantidad
+      actualizarLista(item);
+      // Actualizar total de la compra
+      actualizarTotalCompra();
+    }
+  }
+
+  // Función para actualizar la lista de productos
+  function actualizarLista(item) {
+    const cantidad = item.cantidad;
+    const total = cantidad * item.precio;
+    item.elemento.querySelector('.cantidad').textContent = ` (x${cantidad})`;
+    item.elemento.innerHTML = item.elemento.innerHTML.split('=')[0] + ` = $${total}`;
+  }
+
+  // Función para eliminar productos de la lista
+  function eliminarProducto(id) {
+    productosEscaneados.delete(id);
+    const productList = document.getElementById("product-list");
+    const items = productList.getElementsByTagName("li");
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].dataset.productId === id) {
+        productList.removeChild(items[i]);
+        break;
+      }
+    }
+    // Actualizar total de la compra
+    actualizarTotalCompra();
+  }
+
+  // Función para actualizar el total de la compra
+  function actualizarTotalCompra() {
+    let totalCompra = 0;
+    productosEscaneados.forEach(item => {
+      totalCompra += item.cantidad * item.precio;
+    });
+    totalCompraElement.textContent = `$${totalCompra}`;
+  }
+</script>
+{% endblock %}
