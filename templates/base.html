@@ -9,7 +9,11 @@
     <title>{% block title %}Dashboard{% endblock %}</title>
 
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/base_styles.css' %}" rel="stylesheet">
+    <link href="{% static '/dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+    <link href="{% static '/sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
 
+    
 </head>
 <body>
     <header>
@@ -31,12 +35,10 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
-
                     <form id="logout-form" method="post" action="{% url 'accounts:logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
                     </form>
-
                 </ul>
             </div>
         </nav>

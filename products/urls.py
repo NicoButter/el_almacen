@@ -3,7 +3,8 @@ from .views import listar_productos, agregar_producto, editar_producto, eliminar
 
 urlpatterns = [
     path('', listar_productos, name='listar_productos'),
-    path('agregar/', agregar_producto, name='add_product'),
-    path('editar/<int:pk>/', editar_producto, name='edit_product'),
+    path('agregar/', agregar_producto, name='add_products'),
+    path('listar/', listar_productos, name='list_products'),
+    path('editar/<int:pk>/', editar_producto, name='edit_products'),
     path('eliminar/<int:pk>/', eliminar_producto, name='delete_product'),
 ]

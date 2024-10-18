@@ -22,3 +22,89 @@
 #scan-status {
     margin-top: 15px;
 }
+
+/* General */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  h2 {
+    color: #343a40;
+    margin-bottom: 20px;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .col-md-6 {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  /* Botón para volver al dashboard */
+  #back-to-dashboard {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  #back-to-dashboard:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Lista de productos */
+  .list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+  }
+  
+  .list-group-item .btn {
+    margin-left: 10px;
+  }
+  
+  /* Escáner QR */
+  #video {
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #343a40;
+    border-radius: 8px;
+  }
+  
+  #scan-status {
+    text-align: center;
+    margin-top: 10px;
+    color: #6c757d;
+    font-style: italic;
+  }
+  
+  /* Total de la compra */
+  #total-compra {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+  }
+  
+  @media (max-width: 768px) {
+    .row {
+      flex-direction: column;
+    }
+  }
+  

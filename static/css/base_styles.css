@@ -1,0 +1,26 @@
+/* Estilos para hacer que el footer esté fijo en la parte inferior */
+html, body {
+    height: 100%; /* Asegura que el html y el body ocupen toda la altura */
+    margin: 0; /* Elimina márgenes */
+}
+
+body {
+    display: flex;
+    flex-direction: column; /* Coloca los elementos en columna */
+}
+
+header {
+    flex: 0 0 auto; /* El header no crecerá ni se encogerá */
+}
+
+.content {
+    flex: 1; /* El contenido ocupará el espacio restante */
+    padding: 20px; /* Espaciado interno */
+}
+
+footer {
+    flex: 0 0 auto; /* El footer no crecerá ni se encogerá */
+    background-color: #f8f9fa; /* Color de fondo del footer */
+    padding: 10px 0; /* Espaciado interno del footer */
+    margin-top: auto; /* Empuja el footer hacia abajo */
+}

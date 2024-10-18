@@ -1,0 +1,51 @@
+body {
+    background-color: #f8f9fa; /* Color de fondo claro */
+}
+
+h2 {
+    color: #343a40; /* Color del título */
+    text-align: center; /* Centrar el título */
+    margin-bottom: 20px; /* Espaciado inferior */
+}
+
+/* Estilos de las tarjetas */
+.card {
+    border: none; /* Sin borde */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    transition: transform 0.3s; /* Transición para efecto hover */
+}
+
+.card:hover {
+    transform: translateY(-5px); /* Efecto de elevación al pasar el ratón */
+}
+
+/* Botones */
+.btn {
+    font-size: 16px; /* Tamaño de fuente */
+    padding: 10px 20px; /* Espaciado interno */
+    border-radius: 20px; /* Bordes redondeados */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Color principal */
+    border: none; /* Sin borde */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+}
+
+.btn-secondary {
+    background-color: #6c757d; /* Color secundario */
+    border: none; /* Sin borde */
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268; /* Color más oscuro al pasar el ratón */
+}
+
+/* Container */
+.container {
+    margin-top: 30px; /* Margen superior */
+}

@@ -5,12 +5,31 @@
 {% block header %}Dashboard Administrador{% endblock %}
 
 {% block content %}
-    <p>Aquí puedes gestionar usuarios y otras configuraciones del sistema.</p>
-    <nav>
-        <ul class="nav nav-pills">
-            {% comment %} <li class="nav-item">
-                <a class="nav-link" href="{% url 'register' %}">Registrar Usuario</a>
-            </li> {% endcomment %}
-        </ul>
-    </nav>
+
+    <h2>Panel de Gestión de Productos</h2>
+
+    <p class="text-center">Selecciona una opción para gestionar los productos en el sistema:</p>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Agregar Producto</h5>
+                        <p class="card-text">Añade un nuevo producto a la tienda.</p>
+                        <a href="{% url 'add_products' %}" class="btn btn-primary">Agregar Producto</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Listar Productos</h5>
+                        <p class="card-text">Revisa, edita o elimina los productos existentes.</p>
+                        <a href="{% url 'list_products' %}" class="btn btn-secondary">Listar Productos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
