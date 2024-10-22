@@ -123,13 +123,16 @@
 
         // Configurar el HTML del producto
         li.innerHTML = `
-          ${producto.nombre} ($${precio.toFixed(2)}) -> 
-          <span class="cantidad">(x${cantidad})</span> -> 
-          $<span class="costo">${(precio * cantidad).toFixed(2)}</span> 
-          <input type="number" min="1" value="${cantidad}" onchange="actualizarCantidad('${productIdStr}', this.value)">
-          <button class="btn btn-success btn-sm float-end" onclick="aumentarCantidad('${productIdStr}')">+</button>
-          <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productIdStr}')">Eliminar</button>
-        `;
+        <div>
+          <span class="product-name">${producto.nombre}</span>
+          <span class="product-price" style="font-size: 0.8em;">($${precio.toFixed(2)})</span>
+        </div>
+        <span class="cantidad">(x${cantidad})</span> -> 
+        $<span class="costo">${(precio * cantidad).toFixed(2)}</span> 
+        <input type="number" min="1" value="${cantidad}" onchange="actualizarCantidad('${productIdStr}', this.value)">
+        <button class="btn btn-success btn-sm float-end" onclick="aumentarCantidad('${productIdStr}')">+</button>
+        <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productIdStr}', 1)">Eliminar</button>
+      `;
 
         productList.appendChild(li);
         productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio: precio });
@@ -166,6 +169,27 @@
     }
   }
 
+  function eliminarProducto(id, cantidad) {
+    const item = productosEscaneados.get(id);
+    if (item) {
+      if (item.cantidad > 1) {
+        item.cantidad -= cantidad;
+        actualizarLista(item);
+      } else {
+        productosEscaneados.delete(id);
+        const productList = document.getElementById("product-list");
+        const items = productList.getElementsByTagName("li");
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].dataset.productId === id) {
+            productList.removeChild(items[i]);
+            break;
+          }
+        }
+      }
+      actualizarTotalCompra();
+    }
+  }
+
   function actualizarLista(item) {
     const cantidad = item.cantidad;
     const total = cantidad * item.precio;
@@ -180,19 +204,6 @@
     } else {
         console.error("Elemento de cantidad o costo no encontrado");
     }
-  }
-
-  function eliminarProducto(id) {
-    productosEscaneados.delete(id);
-    const productList = document.getElementById("product-list");
-    const items = productList.getElementsByTagName("li");
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].dataset.productId === id) {
-        productList.removeChild(items[i]);
-        break;
-      }
-    }
-    actualizarTotalCompra();
   }
 
   function actualizarTotalCompra() {
