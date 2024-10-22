@@ -1,9 +1,10 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block title %}Nueva Venta{% endblock %}
-{% block header %}Nueva Venta{% endblock %}
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Nueva Venta{% endblock %} 
+{% block header %}Nueva Venta{% endblock %} 
 {% block content %}
-<link rel="stylesheet" href="{% static '/sales/css/new_sale_styles.css' %}" />
+
+<link rel="stylesheet" href="{% static 'sales/css/new_sale_styles.css' %}" />
 
 <div class="row">
   <!-- Lista de productos escaneados -->
@@ -41,7 +42,7 @@
 <script src="{% static 'js/jsQR.js' %}"></script>
 
 <script>
-  const confirmSound = new Audio("{% static 'sounds/confirm.mp3' %}");
+  const confirmSound = new Audio("/static/sounds/confirm.wav");
   const productosEscaneados = new Map();
   const video = document.getElementById("video");
   const canvas = document.getElementById("canvas");
@@ -49,11 +50,7 @@
   const scanStatus = document.getElementById("scan-status");
   const totalCompraElement = document.getElementById("total-compra");
 
-  const productosData = {
-    {% for producto in productos %}
-      "{{ producto.id }}": { nombre: "{{ producto.nombre }}", precio: {{ producto.precio }} },
-    {% endfor %}
-  };
+  let scanningEnabled = true; // Variable para controlar el escaneo
 
   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
     video.srcObject = stream;
@@ -61,19 +58,25 @@
   });
 
   function scanQRCode() {
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    if (video.readyState === video.HAVE_ENOUGH_DATA && scanningEnabled) {
       canvas.height = video.videoHeight;
       canvas.width = video.videoWidth;
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(imageData.data, canvas.width, canvas.height);
 
-      if (code) {
-        if (code.data) {
-          scanStatus.textContent = `Producto escaneado: ${code.data}`;
-          agregarProductoALista(code.data);
-          confirmSound.play();
-        }
+      if (code && code.data) {
+        console.log("Código escaneado:", code.data); // Muestra el código QR escaneado
+
+        scanStatus.textContent = `Producto escaneado: ${code.data}`;
+        agregarProductoALista(code.data);
+        confirmSound.play();
+
+        // Deshabilitar escaneo por 3 segundos
+        scanningEnabled = false;
+        setTimeout(() => {
+          scanningEnabled = true; // Rehabilitar escaneo después de 3 segundos
+        }, 3000);
       } else {
         scanStatus.textContent = "Esperando código QR...";
       }
@@ -83,32 +86,75 @@
   }
 
   function agregarProductoALista(productId) {
+    const productIdStr = String(productId);
+    console.log("Producto escaneado ID:", productIdStr);
+  
     const productList = document.getElementById("product-list");
 
-    if (productosEscaneados.has(productId)) {
-      const item = productosEscaneados.get(productId);
-      item.cantidad += 1;
-      actualizarLista(item);
-    } else {
-      const producto = productosData[productId];
-      if (!producto) return;
-
-      const li = document.createElement("li");
-      li.className = "list-group-item";
-      li.dataset.productId = productId;
-
-      li.innerHTML = `
-        ${producto.nombre} - $${producto.precio} <span class="cantidad"> (x1)</span> = $${producto.precio} 
-        <button class="btn btn-success btn-sm float-end" onclick="aumentarCantidad('${productId}')">+</button>
-        <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productId}')">Eliminar</button>
-      `;
-
-      productList.appendChild(li);
-
-      productosEscaneados.set(productId, { elemento: li, cantidad: 1, precio: producto.precio });
+    // Si el producto ya fue escaneado, no hacer nada
+    if (productosEscaneados.has(productIdStr)) {
+      console.log("El producto ya está en la lista.");
+      return; // Detener la ejecución si el producto ya existe
     }
 
-    actualizarTotalCompra();
+    // Si el producto no ha sido escaneado, hacer la solicitud al API
+    fetch(`http://127.0.0.1:8001/sales/api/productos/${productIdStr}/`)  
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Error al obtener el producto");
+        }
+        return response.json();
+      })
+      .then(producto => {
+        console.log("Producto encontrado:", producto);
+        if (!producto || !producto.nombre || !producto.precio) {
+          console.error("Producto no válido:", producto);
+          return; // Detener ejecución si el producto es inválido
+        }
+
+        // Crear el elemento de lista para el producto
+        const li = document.createElement("li");
+        li.className = "list-group-item";
+        li.dataset.productId = productIdStr;
+
+        // Inicializar la cantidad en 1
+        const cantidad = 1;
+        const precio = parseFloat(producto.precio.replace(',', '.'));
+
+        // Configurar el HTML del producto
+        li.innerHTML = `
+          ${producto.nombre} ($${precio.toFixed(2)}) -> 
+          <span class="cantidad">(x${cantidad})</span> -> 
+          $<span class="costo">${(precio * cantidad).toFixed(2)}</span> 
+          <input type="number" min="1" value="${cantidad}" onchange="actualizarCantidad('${productIdStr}', this.value)">
+          <button class="btn btn-success btn-sm float-end" onclick="aumentarCantidad('${productIdStr}')">+</button>
+          <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productIdStr}')">Eliminar</button>
+        `;
+
+        productList.appendChild(li);
+        productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio: precio });
+        
+        actualizarTotalCompra();
+  
+        // Agregar el ID del producto escaneado a un campo oculto del formulario
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'scanned_products[]';
+        hiddenInput.value = JSON.stringify([...productosEscaneados.entries()]);
+        document.querySelector('form').appendChild(hiddenInput);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+  }
+
+  function actualizarCantidad(productId, nuevaCantidad) {
+      const item = productosEscaneados.get(productId);
+      if (item) {
+          item.cantidad = parseInt(nuevaCantidad);
+          actualizarLista(item);
+          actualizarTotalCompra();
+      }
   }
 
   function aumentarCantidad(productId) {
@@ -123,8 +169,17 @@
   function actualizarLista(item) {
     const cantidad = item.cantidad;
     const total = cantidad * item.precio;
-    item.elemento.querySelector('.cantidad').textContent = ` (x${cantidad})`;
-    item.elemento.innerHTML = item.elemento.innerHTML.split('=')[0] + ` = $${total}`;
+
+    // Actualiza los elementos en la lista
+    const cantidadElement = item.elemento.querySelector('.cantidad');
+    const costoElement = item.elemento.querySelector('.costo');
+
+    if (cantidadElement && costoElement) {
+        cantidadElement.textContent = `(x${cantidad})`;
+        costoElement.textContent = total.toFixed(2);
+    } else {
+        console.error("Elemento de cantidad o costo no encontrado");
+    }
   }
 
   function eliminarProducto(id) {
@@ -145,7 +200,8 @@
     productosEscaneados.forEach(item => {
       totalCompra += item.cantidad * item.precio;
     });
-    totalCompraElement.textContent = `$${totalCompra}`;
+    totalCompraElement.textContent = `$${totalCompra.toFixed(2)}`;
   }
 </script>
+
 {% endblock %}

@@ -9,6 +9,5 @@ urlpatterns = [
     path('tickets/reprint/<int:ticket_id>/', views.reprint_ticket, name='reprint_ticket'),
     path('nueva-venta/', views.new_sale, name='new_sale'),
     path('buscar/', views.buscar_venta, name='buscar_venta'),
-
-
+    path('api/productos/<int:product_id>/', views.product_detail, name='product_detail')
 ]
