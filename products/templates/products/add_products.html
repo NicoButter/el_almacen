@@ -6,32 +6,78 @@
     <h1 class="text-center">Agregar Producto</h1>
     <form method="post" enctype="multipart/form-data" class="mt-4">
         {% csrf_token %}
-        <div class="form-group">
-            {% for field in form %}
-                <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
-                {{ field|add_class:"form-control" }}  <!-- Clase adicional para los inputs -->
-                {% if field.help_text %}
-                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                {% endif %}
-                <div class="mb-3"></div>  <!-- Espaciado entre inputs -->
-            {% endfor %}
-            
-            <!-- Campo para seleccionar si el producto se vende fraccionado -->
-            <div class="form-check mt-3 mb-3">
-                {{ form.es_fraccionado|add_class:"form-check-input" }}  <!-- Checkbox para fraccionado -->
-                <label class="form-check-label ml-2" for="{{ form.es_fraccionado.id_for_label }}">¿El producto se vende fraccionado?</label>
+        
+        <div class="d-flex">
+            <!-- Detalles del producto (Columna izquierda) -->
+            <div class="w-50 d-flex flex-column">
+                <fieldset class="border p-3 flex-grow-1">
+                    <legend class="font-weight-bold">Detalles del Producto</legend>
+                    
+                    {% for field in form %}
+                        {% if field.name != "se_vende_fraccionado" and field.name != "imagen" %}
+                            <div class="form-group">
+                                <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
+                                {% if field.name == "descripcion" %}
+                                    {{ field|add_class:"form-control descripcion" }}  <!-- Clase para descripción -->
+                                {% else %}
+                                    {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="text-danger">{{ field.errors|striptags }}</div>
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </fieldset>
+            </div>
+
+            <!-- Opciones adicionales e Imagen del producto (Columna derecha) -->
+            <div class="w-50 d-flex flex-column">
+                <fieldset class="border p-3 flex-grow-1">
+                    <legend class="font-weight-bold">Opciones adicionales</legend>
+                    <div class="form-group">
+                        <label for="{{ form.se_vende_fraccionado.id_for_label }}" class="font-weight-bold">¿El producto se vende fraccionado?</label>
+                        {{ form.se_vende_fraccionado|add_class:"custom-checkbox" }}  <!-- Checkbox -->
+                    </div>
+                </fieldset>
+
+                <fieldset class="border p-3 mt-4 flex-grow-1">
+                    <legend class="font-weight-bold">Imagen del Producto</legend>
+                    <div class="form-group">
+                        <label for="{{ form.imagen.id_for_label }}" class="font-weight-bold">Subir Imagen</label>
+                        {{ form.imagen|add_class:"form-control-file" }}  <!-- Clase para campo de imagen -->
+                        {% if form.imagen.errors %}
+                            <div class="text-danger">{{ form.imagen.errors|striptags }}</div>
+                        {% endif %}
+                        {% if form.imagen.help_text %}
+                            <small class="form-text text-muted">{{ form.imagen.help_text }}</small>
+                        {% endif %}
+                    </div>
+                </fieldset>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-success btn-block">Agregar Producto</button>
+        <!-- Botones -->
+        <div class="d-flex justify-content-end mt-4">
+            <button type="submit" class="btn btn-success mx-2">Agregar Producto</button>
+            <a href="{% url 'listar_productos' %}" class="btn btn-secondary mx-2">Volver al listado</a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mx-2">Volver al Dashboard</a>
+        </div>
     </form>
-    
-    <div class="mt-3 text-center">
-        <a href="{% url 'listar_productos' %}" class="btn btn-secondary">Volver al listado</a>
-    </div>
-
-    <div class="mt-2 text-center">
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
-    </div>
 </div>
+
+<!-- Script para previsualizar la imagen -->
+<script>
+    document.getElementById("imagen").onchange = function (event) {
+        const [file] = event.target.files;
+        if (file) {
+            const preview = document.getElementById("preview");
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+        }
+    };
+</script>
 {% endblock %}

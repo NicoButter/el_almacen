@@ -63,14 +63,6 @@
   padding: 5px; /* Espacio interno */
 }
 
-/* General */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
-  margin: 0;
-  padding: 20px;
-}
-
 h2 {
   color: #343a40;
   margin-bottom: 20px;

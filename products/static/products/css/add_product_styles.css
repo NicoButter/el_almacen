@@ -7,3 +7,36 @@
     font-size: 16px;
     margin-left: 8px;
 }
+
+.btn {
+    min-width: 150px;  
+    text-align: center; 
+}
+
+.form-control-file {
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+    width: 100%;  
+}
+
+.custom-checkbox {
+    border: 2px solid #007BFF; /* Color del borde */
+    background-color: rgba(0, 123, 255, 0.1); /* Fondo ligero */
+    padding: 10px;
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Estilo para el campo de descripción */
+.form-control.descripcion {
+    max-width: 100%; /* Ajustar el ancho al 50% */
+    max-height: 180px;
+}
+
+.w-50 {
+    width: 48%; /* Para permitir un pequeño margen */
+}
+
+.flex-grow-1 {
+    flex-grow: 1; /* Asegura que las columnas se expandan igualmente */
+}

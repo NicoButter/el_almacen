@@ -16,8 +16,11 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <a class="navbar-brand" href="#">La Señora del Saláme</a>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">  <!-- Cambié a navbar-dark y bg-dark para mejor contraste -->
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'images/logo.png' %}" alt="Logo" style="width: 40px; height: auto;" class="mr-2"> <!-- Logo -->
+                La Señora del Salame
+            </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -44,21 +47,19 @@
     </header>
     
     <div class="container">
-        <h1 class="text-center">{% block header %}Bienvenido{% endblock %}</h1>
+        {% comment %} <h1 class="text-center">{% block header %}Bienvenido{% endblock %}</h1> {% endcomment %}
         <div class="content">
             {% block content %}{% endblock %}
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="footer bg-light py-3">
+    <footer class="footer py-3">
         <div class="container d-flex justify-content-between">
             <span>Usuario: {{ user.username }}</span>
             <span id="datetime"></span> 
         </div>
     </footer>
-
-    {% comment %} <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> {% endcomment %}
 
     <script>
         function updateDateTime() {
