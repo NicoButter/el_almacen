@@ -14,6 +14,7 @@ class Product(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad_stock = models.PositiveIntegerField()
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
+    se_vende_fraccionado = models.BooleanField(default=False)
     qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
 
     def save(self, *args, **kwargs):

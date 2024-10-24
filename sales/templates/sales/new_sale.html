@@ -88,77 +88,82 @@
   function agregarProductoALista(productId) {
     const productIdStr = String(productId);
     console.log("Producto escaneado ID:", productIdStr);
-  
+
     const productList = document.getElementById("product-list");
 
-    // Si el producto ya fue escaneado, no hacer nada
     if (productosEscaneados.has(productIdStr)) {
-      console.log("El producto ya está en la lista.");
-      return; // Detener la ejecución si el producto ya existe
+        console.log("El producto ya está en la lista.");
+        return;
     }
 
-    // Si el producto no ha sido escaneado, hacer la solicitud al API
-    fetch(`http://127.0.0.1:8001/sales/api/productos/${productIdStr}/`)  
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Error al obtener el producto");
-        }
-        return response.json();
-      })
-      .then(producto => {
-        console.log("Producto encontrado:", producto);
-        if (!producto || !producto.nombre || !producto.precio) {
-          console.error("Producto no válido:", producto);
-          return; // Detener ejecución si el producto es inválido
-        }
+    fetch(`http://127.0.0.1:8001/sales/api/productos/${productIdStr}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener el producto");
+            }
+            return response.json();
+        })
+        .then(producto => {
+            console.log("Producto encontrado:", producto);
+            if (!producto || !producto.nombre || !producto.precio) {
+                console.error("Producto no válido:", producto);
+                return;
+            }
 
-        // Crear el elemento de lista para el producto
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.dataset.productId = productIdStr;
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            li.dataset.productId = productIdStr;
 
-        // Inicializar la cantidad en 1
-        const cantidad = 1;
-        const precio = parseFloat(producto.precio.replace(',', '.'));
+            const precio = parseFloat(producto.precio.replace(',', '.'));
+            const cantidad = 1;  // Inicializar con 1 unidad o 1000g si es fraccionado
 
-        // Configurar el HTML del producto
-        li.innerHTML = `
-        <div>
-          <span class="product-name">${producto.nombre}</span>
-          <span class="product-price" style="font-size: 0.8em;">($${precio.toFixed(2)})</span>
-        </div>
-        <span class="cantidad">(x${cantidad})</span> -> 
-        $<span class="costo">${(precio * cantidad).toFixed(2)}</span> 
-        <input type="number" min="1" value="${cantidad}" onchange="actualizarCantidad('${productIdStr}', this.value)">
-        <button class="btn btn-success btn-sm float-end" onclick="aumentarCantidad('${productIdStr}')">+</button>
-        <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productIdStr}', 1)">Eliminar</button>
-      `;
+            let inputCantidad;
+            if (producto.fraccionado) {
+                inputCantidad = `
+                    <input type="number" min="1" value="${cantidad}" 
+                           onchange="actualizarCantidad('${productIdStr}', this.value, true)">
+                    gramos -> 
+                `;
+            } else {
+                inputCantidad = `
+                    <input type="number" min="1" value="${cantidad}" 
+                           onchange="actualizarCantidad('${productIdStr}', this.value, false)">
+                    (x${cantidad}) -> 
+                `;
+            }
 
-        productList.appendChild(li);
-        productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio: precio });
-        
-        actualizarTotalCompra();
-  
-        // Agregar el ID del producto escaneado a un campo oculto del formulario
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'scanned_products[]';
-        hiddenInput.value = JSON.stringify([...productosEscaneados.entries()]);
-        document.querySelector('form').appendChild(hiddenInput);
-      })
-      .catch(error => {
-        console.error("Error:", error);
-      });
-  }
+            li.innerHTML = `
+            <div>
+              <span class="product-name">${producto.nombre}</span>
+              <span class="product-price" style="font-size: 0.8em;">($${precio.toFixed(2)})</span>
+            </div>
+            ${inputCantidad}
+            $<span class="costo">${(precio * cantidad).toFixed(2)}</span>
+            <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productIdStr}', 1)">Eliminar</button>
+            `;
 
-  function actualizarCantidad(productId, nuevaCantidad) {
-      const item = productosEscaneados.get(productId);
-      if (item) {
-          item.cantidad = parseInt(nuevaCantidad);
-          actualizarLista(item);
-          actualizarTotalCompra();
+            productList.appendChild(li);
+            productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio: precio, fraccionado: producto.fraccionado });
+            actualizarTotalCompra();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
+function actualizarCantidad(productId, nuevaCantidad, esFraccionado) {
+  const item = productosEscaneados.get(productId);
+  if (item) {
+      if (esFraccionado) {
+          const gramos = parseFloat(nuevaCantidad);  // Consideramos los gramos
+          item.cantidad = gramos / 1000;  // Convertimos gramos a kilos
+      } else {
+          item.cantidad = parseInt(nuevaCantidad);  // Para productos no fraccionados
       }
+      actualizarLista(item);
+      actualizarTotalCompra();
   }
+}
 
   function aumentarCantidad(productId) {
     const item = productosEscaneados.get(productId);
@@ -194,17 +199,18 @@
     const cantidad = item.cantidad;
     const total = cantidad * item.precio;
 
-    // Actualiza los elementos en la lista
     const cantidadElement = item.elemento.querySelector('.cantidad');
     const costoElement = item.elemento.querySelector('.costo');
 
     if (cantidadElement && costoElement) {
-        cantidadElement.textContent = `(x${cantidad})`;
+        if (item.fraccionado) {
+            cantidadElement.textContent = `${(cantidad * 1000).toFixed(0)} gramos`;  // Mostrar gramos
+        } else {
+            cantidadElement.textContent = `(x${cantidad})`;
+        }
         costoElement.textContent = total.toFixed(2);
-    } else {
-        console.error("Elemento de cantidad o costo no encontrado");
     }
-  }
+}
 
   function actualizarTotalCompra() {
     let totalCompra = 0;
