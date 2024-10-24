@@ -1,14 +1,13 @@
 body {
+    font-family: "Raleway", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 100;
+    font-style: normal;
     background-image: url('../images/fiambreria_login_background.png');
-    /* Ruta relativa a tu imagen */
     background-size: cover;
-    /* Asegura que la imagen cubra toda la pantalla */
     background-position: center;
-    /* Centra la imagen */
     background-repeat: no-repeat;
-    /* Evita que la imagen se repita */
     height: 100vh;
-    /* Asegura que el fondo ocupe toda la altura de la ventana */
 }
 
 .login-container {
@@ -38,14 +37,11 @@ body {
 .floating-label label {
     position: absolute;
     top: 50%;
-    /* Cambiar a un valor negativo más alto en la parte de enfoque */
     left: 12px;
     transform: translateY(-70%);
     color: #6c757d;
     pointer-events: none;
-    /* Evita que el label interfiera con el clic en el input */
     transition: all 0.2s ease;
-    /* Transición suave */
 }
 
 .floating-label input:focus+label,

@@ -8,6 +8,10 @@
 
     <title>{% block title %}Dashboard{% endblock %}</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=SUSE:wght@100..800&display=swap" rel="stylesheet">
+
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'css/base_styles.css' %}" rel="stylesheet">
     <link href="{% static '/dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
@@ -16,9 +20,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">  <!-- Cambié a navbar-dark y bg-dark para mejor contraste -->
+        <nav class="navbar navbar-expand-lg">
             <a class="navbar-brand" href="#">
-                <img src="{% static 'images/logo.png' %}" alt="Logo" style="width: 40px; height: auto;" class="mr-2"> <!-- Logo -->
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="Logo" style="width: 180px; height: auto;" class="mr-2">
                 La Señora del Salame
             </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -27,22 +31,16 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        {% comment %} <a class="nav-link" href="{% url 'stock_control' %}">Control de Stock</a> {% endcomment %}
-                    </li>
-                    <li class="nav-item">
-                        {% comment %} <a class="nav-link" href="{% url 'add_product' %}">Cargar Productos</a> {% endcomment %}
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="#">Otras Funcionalidades</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav ml-auto">
-                    <form id="logout-form" method="post" action="{% url 'accounts:logout' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
-                    </form>
-                </ul>
             </div>
+            <ul class="navbar-nav ml-auto"> <!-- Cambiar esta parte -->
+                <form id="logout-form" method="post" action="{% url 'accounts:logout' %}" class="form-inline"> <!-- Añadir clase form-inline -->
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-link nav-link">Cerrar sesión</button>
+                </form>
+            </ul>
         </nav>
     </header>
     

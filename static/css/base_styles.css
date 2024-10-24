@@ -5,11 +5,27 @@ html, body {
     display: grid; 
     min-height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
     grid-template-rows: auto 1fr auto; /* Fila para header, contenido y footer */
+    font-family: "Raleway", sans-serif;
+    font-optical-sizing: auto;
+    font-weight:200;
+    font-style: normal;
 }
 
 header {
-    background-color: #343a40; /* Color gris oscuro */
-    color: white; 
+    background-color: #0B0704; /* Color gris oscuro */
+    color: white !important;
+}
+
+nav.navbar .navbar-brand {
+    color: white; /* Asegúrate de que el texto sea blanco */
+}
+
+.nav-link{
+    color: white;
+}
+
+.navbar-toggler-icon{
+    color: white;
 }
 
 .content {
@@ -17,8 +33,9 @@ header {
 }
 
 footer {
+    /* max-height: 50px; */
     padding: 10px 0; 
-    background-color: #343a40; /* Mismo color que el header */
+    background-color: #0B0704; /* Mismo color que el header */
     color: white; 
     text-align: center; /* Centra el texto */
 }

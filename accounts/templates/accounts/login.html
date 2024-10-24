@@ -1,46 +1,68 @@
-{% load static %}
+{% load static %} }
 
 {% load custom_filters %}
 
-
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - El Almacenero</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    
-    <link href="{% static 'accounts/css/login_custom_styles.css' %}" rel="stylesheet">  
 
-    
-</head>
-<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&family=SUSE:wght@100..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Bootstrap CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+
+    <link
+      href="{% static 'accounts/css/login_custom_styles.css' %}"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="container login-container">
-        <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="login-form">
-                    <h2 class="text-center">Iniciar Sesión</h2>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="form-group floating-label">
-                            <input type="text" id="username" name="username" class="form-control" required placeholder=" ">
-                            <label for="username">Usuario</label>
-                        </div>
-                        <div class="form-group floating-label">
-                            <input type="password" id="password" name="password" class="form-control" required placeholder=" ">
-                            <label for="password">Contraseña</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
-                    </form>
-                    
-                </div>
-            </div>
+      <div class="row justify-content-center">
+        <div class="col-md-4">
+          <div class="login-form">
+            <h2 class="text-center">Iniciar Sesión</h2>
+            <form method="post">
+              {% csrf_token %}
+              <div class="form-group floating-label">
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  class="form-control"
+                  required
+                  placeholder=" "
+                />
+                <label for="username">Usuario</label>
+              </div>
+              <div class="form-group floating-label">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  required
+                  placeholder=" "
+                />
+                <label for="password">Contraseña</label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">
+                Iniciar Sesión
+              </button>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
 
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-</body>
+  </body>
 </html>
