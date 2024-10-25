@@ -31,5 +31,27 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Nueva sección para gestionar categorías -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Crear Categoría</h5>
+                        <p class="card-text">Crea una nueva categoría para los productos.</p>
+                        <a href="{% url 'add_category' %}" class="btn btn-success">Crear Categoría</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Listar Categorías</h5>
+                        <p class="card-text">Revisa y gestiona las categorías existentes.</p>
+                        <a href="{% url 'listar_categorias' %}" class="btn btn-secondary">Listar Categorías</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

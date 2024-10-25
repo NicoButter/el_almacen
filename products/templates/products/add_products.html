@@ -19,6 +19,8 @@
                                 <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
                                 {% if field.name == "descripcion" %}
                                     {{ field|add_class:"form-control descripcion" }}  <!-- Clase para descripción -->
+                                {% elif field.name == "categoria" %}
+                                    {{ field|add_class:"form-control" }}
                                 {% else %}
                                     {{ field|add_class:"form-control" }}
                                 {% endif %}

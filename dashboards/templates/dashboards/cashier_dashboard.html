@@ -5,15 +5,19 @@
 {% block header %}Dashboard Cajero{% endblock %}
 
 {% block content %}
-    <p>Aquí puedes gestionar ventas y otras tareas relacionadas.</p>
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Gestión de Ventas</h2>
+    <p class="text-center mb-4">Aquí puedes gestionar ventas y otras tareas relacionadas.</p>
 
-    <!-- Botón para iniciar una nueva venta -->
-    <a href="{% url 'sales:new_sale' %}" class="btn btn-primary">Nueva Venta</a>
+    <div class="d-flex justify-content-center flex-wrap">
+        <!-- Botón para iniciar una nueva venta -->
+        <a href="{% url 'sales:new_sale' %}" class="btn btn-executive mx-2">Nueva Venta</a>
 
-    <!-- Aquí podrías añadir más funcionalidades como buscar ventas o gestionar clientes -->
-    <a href="{% url 'sales:buscar_venta' %}" class="btn btn-secondary">Buscar Venta</a>
+        <!-- Botón para buscar ventas -->
+        <a href="{% url 'sales:buscar_venta' %}" class="btn btn-executive mx-2">Buscar Venta</a>
 
-    <!-- Botón para listar productos -->
-    <a href="{% url 'listar_productos' %}" class="btn btn-info">Listar Productos</a> <!-- Enlace al listado de productos -->
-     
+        <!-- Botón para listar productos -->
+        <a href="{% url 'listar_productos' %}" class="btn btn-executive mx-2">Listar Productos</a>
+    </div>
+</div>
 {% endblock %}

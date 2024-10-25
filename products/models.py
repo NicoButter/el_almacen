@@ -8,6 +8,12 @@ from pathlib import Path
 from django.conf import settings
 
 
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.nombre
+
 class Product(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
@@ -16,6 +22,8 @@ class Product(models.Model):
     imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
     se_vende_fraccionado = models.BooleanField(default=False)
     qr_code = models.ImageField(upload_to='qr_codes/', null=True, blank=True)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='productos', null=True, blank=True)
+
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Guardamos primero el producto para asegurarnos de que tiene un ID
@@ -50,3 +58,5 @@ class Product(models.Model):
 
         # Devolver el nombre del archivo para almacenarlo en la base de datos
         return f'qr_codes/{filename}_qr.png'
+
+

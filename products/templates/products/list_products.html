@@ -1,8 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Listado de Productos{% endblock %}
 {% block content %}
+
 <div class="container mt-4">
     <h1>Listado de Productos</h1>
+
+    <!-- Filtro de Categoría -->
+    <form method="GET" action="{% url 'listar_productos' %}" class="mb-4">
+        <label for="categoria">Filtrar por Categoría:</label>
+        <select name="categoria" id="categoria" class="form-control" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            {% for categoria in categorias %}
+                <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == request.GET.categoria %}selected{% endif %}>
+                    {{ categoria.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
     <table class="table">
         <thead>
             <tr>
@@ -10,9 +25,10 @@
                 <th>Descripción</th>
                 <th>Precio</th>
                 <th>Cantidad en Stock</th>
-                <th>Fraccionado</th> 
+                <th>Fraccionado</th>
+                <th>Categoría</th> <!-- Nueva columna de categoría -->
                 <th>QR</th>
-                {% if es_administrador %}  <!-- Mostrar columna de acciones solo si es administrador -->
+                {% if es_administrador %}
                     <th>Acciones</th>
                 {% endif %}
             </tr>
@@ -24,17 +40,12 @@
                 <td>{{ producto.descripcion }}</td>
                 <td>${{ producto.precio }}</td>
                 <td>{{ producto.cantidad_stock }}</td>
-                <td>
-                    {% if producto.es_fraccionado %}
-                        Sí
-                    {% else %}
-                        No
-                    {% endif %}
-                </td>
+                <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
+                <td>{{ producto.categoria.nombre }}</td> <!-- Mostrar nombre de la categoría -->
                 <td>
                     <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" width="100">
                 </td>
-                {% if es_administrador %}  <!-- Mostrar acciones solo si es administrador -->
+                {% if es_administrador %}
                     <td>
                         <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-warning">Editar</a>
                         <form action="{% url 'eliminar_producto' producto.pk %}" method="post" style="display:inline;">
@@ -53,4 +64,5 @@
         <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
     </div>
 </div>
+
 {% endblock %}

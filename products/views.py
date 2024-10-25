@@ -1,19 +1,23 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
-
-from .models import Product
-from .forms import ProductForm
+from .models import Product, Categoria
+from .forms import ProductForm, CategoriaForm
 
 def listar_productos(request):
-    productos = Product.objects.all()
+    categoria_id = request.GET.get('categoria')
+    if categoria_id:
+        productos = Product.objects.filter(categoria_id=categoria_id)
+    else:
+        productos = Product.objects.all()
 
-    # Verificar si el usuario es administrador o cajero
+    categorias = Categoria.objects.all()  # Obtener todas las categorías
+
     es_administrador = request.user.is_admin
     es_cajero = request.user.is_cashier
 
-    # Retornar los productos al template junto con los roles
     return render(request, 'products/list_products.html', {
         'productos': productos,
+        'categorias': categorias,  # Enviar categorías al template
         'es_administrador': es_administrador,
         'es_cajero': es_cajero
     })
@@ -55,3 +59,18 @@ def eliminar_producto(request, pk):
         return redirect('listar_productos')
 
     return render(request, 'products/delete_product.html', {'producto': producto})
+
+def crear_categoria(request):
+    if request.method == 'POST':
+        form = CategoriaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('products/list_category')  # Redirigir a una vista de listado de categorías o donde desees
+    else:
+        form = CategoriaForm()
+    return render(request, 'products/add_category.html', {'form': form})
+
+
+def listar_categorias(request):
+    categorias = Categoria.objects.all()
+    return render(request, 'products/list_category.html', {'categorias': categorias})

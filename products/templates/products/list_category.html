@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Listar Categorías{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Listado de Categorías</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for categoria in categorias %}
+            <tr>
+                <td>{{ categoria.nombre }}</td>
+                <td>
+                    <a href="{% url 'edit_category' categoria.id %}" class="btn btn-warning">Editar</a>
+                    <form action="{% url 'delete_category' categoria.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="text-center">No hay categorías disponibles.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-end">
+        <a href="{% url 'add_category' %}" class="btn btn-success">Agregar Nueva Categoría</a>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mx-2">Volver al Dashboard</a> <!-- Botón para volver al dashboard -->
+    </div>
+</div>
+{% endblock %}
