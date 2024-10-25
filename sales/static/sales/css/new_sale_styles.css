@@ -13,16 +13,47 @@
 }
 
 .list-group-item {
-  font-size: 1.2em;
-  margin-bottom: 10px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Espacia los elementos */
+  align-items: center; /* Centra verticalmente los elementos */
   padding: 10px;
-  margin-bottom: 10px;
-  background-color: #f1f1f1;
+  background-color: #f9f9f9; /* Color de fondo para diferenciar */
+  border: 1px solid #ccc; /* Borde para mayor definición */
   border-radius: 5px;
+  margin-bottom: 10px; /* Espacio entre los items */
 }
+
+.product-info {
+  flex-grow: 1; /* Permite que esta sección ocupe el espacio disponible */
+}
+
+.product-name {
+  font-size: 1.2em; /* Tamaño de fuente normal para el nombre */
+}
+
+.product-price {
+  font-size: 0.9em; /* Tamaño de fuente para el precio */
+  color: #555; /* Color más suave para el precio */
+}
+
+.product-quantity {
+  display: flex; /* Para alinear el input y el texto */
+  align-items: center; /* Centra verticalmente */
+}
+
+.product-quantity input {
+  width: 60px; /* Ancho del input para las cantidades */
+  margin-right: 5px; /* Espacio entre el input y la etiqueta */
+}
+
+.unit-label {
+  font-size: 0.9em; /* Tamaño de fuente para la etiqueta de unidad */
+}
+
+.product-total {
+  font-weight: bold; /* Resalta el total */
+}
+
 
 .list-group-item .product-name {
   font-size: 1.2em; /* Tamaño de fuente normal para el nombre */

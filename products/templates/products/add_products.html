@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="text-center">Agregar Producto</h1>
-    <form method="post" enctype="multipart/form-data" class="mt-4">
+    <form method="post" enctype="multipart/form-data" class="mt-4" id="product-form">
         {% csrf_token %}
         
         <div class="d-flex">
@@ -14,7 +14,7 @@
                     <legend class="font-weight-bold">Detalles del Producto</legend>
                     
                     {% for field in form %}
-                        {% if field.name != "se_vende_fraccionado" and field.name != "imagen" %}
+                        {% if field.name not in "se_vende_fraccionado imagen" %}
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
                                 {% if field.name == "descripcion" %}
@@ -33,6 +33,12 @@
                             </div>
                         {% endif %}
                     {% endfor %}
+                    
+                    <!-- Campo para Precio de Venta -->
+                    <div class="form-group">
+                        <label for="precio_venta" class="font-weight-bold">Precio de Venta al Público</label>
+                        <input type="text" id="precio_venta" class="form-control" readonly>
+                    </div>
                 </fieldset>
             </div>
 
@@ -70,6 +76,26 @@
         </div>
     </form>
 </div>
+
+<!-- Script para calcular el precio de venta -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const costoInput = document.getElementById('{{ form.costo.id_for_label }}');
+        const porcentajeInput = document.getElementById('{{ form.porcentaje_ganancia.id_for_label }}');
+        const precioVentaInput = document.getElementById('precio_venta');
+
+        function calcularPrecioVenta() {
+            const costo = parseFloat(costoInput.value) || 0;
+            const porcentaje = parseFloat(porcentajeInput.value) || 0;
+            const precioVenta = costo * (1 + (porcentaje / 100));
+            precioVentaInput.value = precioVenta.toFixed(2);  // Formatear a dos decimales
+        }
+
+        // Escuchar cambios en los campos de costo y porcentaje
+        costoInput.addEventListener('input', calcularPrecioVenta);
+        porcentajeInput.addEventListener('input', calcularPrecioVenta);
+    });
+</script>
 
 <!-- Script para previsualizar la imagen -->
 <script>

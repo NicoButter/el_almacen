@@ -12,14 +12,14 @@ def listar_productos(request):
 
     categorias = Categoria.objects.all()  # Obtener todas las categorías
 
-    es_administrador = request.user.is_admin
-    es_cajero = request.user.is_cashier
+    is_admin = request.user.is_admin
+    is_cashier = request.user.is_cashier
 
     return render(request, 'products/list_products.html', {
         'productos': productos,
         'categorias': categorias,  # Enviar categorías al template
-        'es_administrador': es_administrador,
-        'es_cajero': es_cajero
+        'is_admin': is_admin,
+        'is_cashier': is_cashier
     })
 
 def agregar_producto(request):

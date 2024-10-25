@@ -14,7 +14,7 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = ['nombre', 'descripcion', 'precio', 'cantidad_stock', 'imagen', 'se_vende_fraccionado', 'categoria']
+        fields = ['nombre', 'descripcion', 'costo', 'porcentaje_ganancia', 'cantidad_stock', 'imagen', 'se_vende_fraccionado', 'categoria']
 
     def __init__(self, *args, **kwargs):
         super(ProductForm, self).__init__(*args, **kwargs)

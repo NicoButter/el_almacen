@@ -57,6 +57,81 @@
     requestAnimationFrame(scanQRCode);
   });
 
+  function agregarProductoALista(productId) {
+    const productIdStr = String(productId);
+    const productList = document.getElementById("product-list");
+
+    if (productosEscaneados.has(productIdStr)) {
+        return;
+    }
+
+    fetch(`http://127.0.0.1:8001/sales/api/productos/${productIdStr}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener el producto");
+            }
+            return response.json();
+        })
+        .then(producto => {
+            console.log("Producto recibido:", producto);
+            if (!producto || !producto.nombre || !producto.precio_venta) {
+                console.error("Producto no válido:", producto);
+                return;
+            }
+
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            li.dataset.productId = productIdStr;
+
+            const precio = parseFloat(producto.precio_venta.replace(',', '.'));
+            const cantidad = 1;
+            const totalInicial = precio * cantidad;
+
+            // Determina el texto del precio según la unidad de venta
+            const precioTexto = producto.se_vende_fraccionado ? "Precio x Kg" : "Precio x unidad";
+            const unidadTexto = producto.se_vende_fraccionado ? "grs" : "unidades";
+
+            let inputCantidad;
+            if (producto.se_vende_fraccionado) {
+                inputCantidad = `
+                    <input type="number" min="10" max="5000" step="10" value="${cantidad}" 
+                        onchange="actualizarCantidad('${productIdStr}', this.value, true)">
+                    ${unidadTexto}
+                `;
+            } else {
+                inputCantidad = `
+                    <input type="number" min="1" value="${cantidad}" 
+                        onchange="actualizarCantidad('${productIdStr}', this.value, false)">
+                    unidades
+                `;
+            }
+
+            li.innerHTML = `
+                <div class="product-info">
+                    <span class="product-name">${producto.nombre}</span>
+                    <span class="product-price">${precioTexto}: $${precio.toFixed(2)}</span>
+                </div>
+                <div class="product-quantity">
+                    ${inputCantidad}
+                </div>
+                <div class="product-total">
+                    $<span class="costo">${totalInicial.toFixed(2)}</span>
+                </div>
+                <button class="btn btn-danger btn-sm eliminar" 
+                        onclick="eliminarProducto('${productIdStr}', 1)">Eliminar</button>
+            `;
+
+            productList.appendChild(li);
+            productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio_venta: precio, fraccionado: producto.se_vende_fraccionado, total: totalInicial });
+            actualizarTotalCompra();
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
+}
+
+
+
   function scanQRCode() {
     if (video.readyState === video.HAVE_ENOUGH_DATA && scanningEnabled) {
       canvas.height = video.videoHeight;
@@ -85,84 +160,45 @@
     requestAnimationFrame(scanQRCode);
   }
 
-  function agregarProductoALista(productId) {
-    const productIdStr = String(productId);
-    console.log("Producto escaneado ID:", productIdStr);
+  function actualizarLista(item) {
+    const cantidad = item.cantidad;
+    const total = cantidad * item.precio_venta;
+  
+    const cantidadElement = item.elemento.querySelector('.cantidad');
+    const costoElement = item.elemento.querySelector('.costo');
+  
+    if (cantidadElement && costoElement) {
+      if (item.fraccionado) {
+        cantidadElement.textContent = `${(cantidad * 1000).toFixed(0)} gramos`; // Mostrar gramos
+      } else {
+        cantidadElement.textContent = `(x${cantidad})`;
+      }
+      costoElement.textContent = total.toFixed(2);
+    }
+  }
+  
 
-    const productList = document.getElementById("product-list");
+  function actualizarCantidad(productIdStr, nuevaCantidad, esFraccionado) {
+    const producto = productosEscaneados.get(productIdStr);
+    if (!producto) return;
 
-    if (productosEscaneados.has(productIdStr)) {
-        console.log("El producto ya está en la lista.");
-        return;
+    const precio = producto.precio_venta;
+    let costoTotal;
+
+    if (esFraccionado) {
+        // Si se vende fraccionado, convierte gramos a kilos y calcula el precio total
+        const cantidadEnKilos = nuevaCantidad / 1000; // Convertir gramos a kilos
+        costoTotal = precio * cantidadEnKilos; // Precio por kilo multiplicado por kilos
+    } else {
+        // Si se vende por unidad
+        costoTotal = precio * nuevaCantidad; // Precio por unidad multiplicado por la cantidad
     }
 
-    fetch(`http://127.0.0.1:8001/sales/api/productos/${productIdStr}/`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error al obtener el producto");
-            }
-            return response.json();
-        })
-        .then(producto => {
-            console.log("Producto encontrado:", producto);
-            if (!producto || !producto.nombre || !producto.precio) {
-                console.error("Producto no válido:", producto);
-                return;
-            }
-
-            const li = document.createElement("li");
-            li.className = "list-group-item";
-            li.dataset.productId = productIdStr;
-
-            const precio = parseFloat(producto.precio.replace(',', '.'));
-            const cantidad = 1;  // Inicializar con 1 unidad o 1000g si es fraccionado
-
-            let inputCantidad;
-            if (producto.fraccionado) {
-                inputCantidad = `
-                    <input type="number" min="1" value="${cantidad}" 
-                           onchange="actualizarCantidad('${productIdStr}', this.value, true)">
-                    gramos -> 
-                `;
-            } else {
-                inputCantidad = `
-                    <input type="number" min="1" value="${cantidad}" 
-                           onchange="actualizarCantidad('${productIdStr}', this.value, false)">
-                    (x${cantidad}) -> 
-                `;
-            }
-
-            li.innerHTML = `
-            <div>
-              <span class="product-name">${producto.nombre}</span>
-              <span class="product-price" style="font-size: 0.8em;">($${precio.toFixed(2)})</span>
-            </div>
-            ${inputCantidad}
-            $<span class="costo">${(precio * cantidad).toFixed(2)}</span>
-            <button class="btn btn-danger btn-sm float-end" onclick="eliminarProducto('${productIdStr}', 1)">Eliminar</button>
-            `;
-
-            productList.appendChild(li);
-            productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio: precio, fraccionado: producto.fraccionado });
-            actualizarTotalCompra();
-        })
-        .catch(error => {
-            console.error("Error:", error);
-        });
-}
-
-function actualizarCantidad(productId, nuevaCantidad, esFraccionado) {
-  const item = productosEscaneados.get(productId);
-  if (item) {
-      if (esFraccionado) {
-          const gramos = parseFloat(nuevaCantidad);  // Consideramos los gramos
-          item.cantidad = gramos / 1000;  // Convertimos gramos a kilos
-      } else {
-          item.cantidad = parseInt(nuevaCantidad);  // Para productos no fraccionados
-      }
-      actualizarLista(item);
-      actualizarTotalCompra();
-  }
+    // Actualiza el elemento del costo en la lista
+    producto.elemento.querySelector('.costo').textContent = costoTotal.toFixed(2);
+    producto.cantidad = nuevaCantidad; // Actualiza la cantidad almacenada
+    producto.total = costoTotal; // Actualiza el total almacenado
+    actualizarTotalCompra(); // Actualiza el total de compra general
 }
 
   function aumentarCantidad(productId) {
@@ -196,29 +232,27 @@ function actualizarCantidad(productId, nuevaCantidad, esFraccionado) {
   }
 
   function actualizarLista(item) {
-    const cantidad = item.cantidad;
-    const total = cantidad * item.precio;
-
     const cantidadElement = item.elemento.querySelector('.cantidad');
     const costoElement = item.elemento.querySelector('.costo');
 
     if (cantidadElement && costoElement) {
         if (item.fraccionado) {
-            cantidadElement.textContent = `${(cantidad * 1000).toFixed(0)} gramos`;  // Mostrar gramos
+            cantidadElement.textContent = `${(item.cantidad * 1000).toFixed(0)} gramos`; // Mostrar gramos
         } else {
-            cantidadElement.textContent = `(x${cantidad})`;
+            cantidadElement.textContent = `(x${item.cantidad})`;
         }
-        costoElement.textContent = total.toFixed(2);
+        costoElement.textContent = `$${item.total.toFixed(2)}`; // Mostrar el total calculado de ese producto
     }
 }
+  
 
-  function actualizarTotalCompra() {
-    let totalCompra = 0;
-    productosEscaneados.forEach(item => {
-      totalCompra += item.cantidad * item.precio;
-    });
-    totalCompraElement.textContent = `$${totalCompra.toFixed(2)}`;
-  }
+function actualizarTotalCompra() {
+  let total = 0;
+  productosEscaneados.forEach(item => {
+      total += item.total; // Aquí se suma el total de cada producto
+  });
+  totalCompraElement.textContent = `Total de la compra: $${total.toFixed(2)}`; // Actualizar el elemento del total
+}
 </script>
 
 {% endblock %}

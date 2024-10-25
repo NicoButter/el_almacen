@@ -70,7 +70,8 @@ def get_product(request, product_id):
         product = Product.objects.get(id=product_id)
         data = {
             "nombre": product.nombre,
-            "precio": str(product.precio),  # Asegúrate de que el precio se envíe como string
+            "precio_venta": str(product.precio_venta),
+            "se_vende_fraccionado": product.se_vende_fraccionado
         }
         return JsonResponse(data)
     except Product.DoesNotExist:

@@ -38,14 +38,14 @@
             <tr>
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.descripcion }}</td>
-                <td>${{ producto.precio }}</td>
+                <td>${{ producto.precio_venta }}</td>
                 <td>{{ producto.cantidad_stock }}</td>
                 <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
                 <td>{{ producto.categoria.nombre }}</td> <!-- Mostrar nombre de la categoría -->
                 <td>
                     <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" width="100">
                 </td>
-                {% if es_administrador %}
+                {% if is_admin %}
                     <td>
                         <a href="{% url 'editar_producto' producto.pk %}" class="btn btn-warning">Editar</a>
                         <form action="{% url 'eliminar_producto' producto.pk %}" method="post" style="display:inline;">
@@ -61,7 +61,13 @@
 
     <!-- Botón para volver al dashboard -->
     <div class="mt-4 text-center">
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+        {% if is_admin %}
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard Admin</a>
+        {% elif is_cashier %}
+            <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard Cajero</a>
+        {% else %}
+            <a href="{% url 'user_dashboard' %}" class="btn btn-primary">Volver al Dashboard Usuario</a>
+        {% endif %}
     </div>
 </div>
 
