@@ -1,0 +1,19 @@
+.form-inline input.form-control {
+    width: 250px;
+    margin-right: 10px;
+}
+
+.table thead th {
+    text-align: center;
+    background-color: #343a40;
+    color: white;
+}
+
+.table tbody td {
+    vertical-align: middle;
+}
+
+.pagination .btn {
+    padding: 5px 10px;
+    margin: 2px;
+}
