@@ -7,9 +7,8 @@
 {% block content %}
 
     <h2>Panel de Gestión de Productos</h2>
-
     <p class="text-center">Selecciona una opción para gestionar los productos en el sistema:</p>
-
+    
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-6">
@@ -32,26 +31,27 @@
             </div>
         </div>
         
-        <!-- Nueva sección para gestionar categorías -->
         <div class="row mt-4">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Crear Categoría</h5>
-                        <p class="card-text">Crea una nueva categoría para los productos.</p>
-                        <a href="{% url 'add_category' %}" class="btn btn-success">Crear Categoría</a>
+                        <h5 class="card-title">Agregar Cliente</h5>
+                        <p class="card-text">Añade un nuevo cliente al sistema.</p>
+                        <a href="{% url 'agregar_cliente' %}" class="btn btn-primary">Agregar Cliente</a>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-body text-center">
-                        <h5 class="card-title">Listar Categorías</h5>
-                        <p class="card-text">Revisa y gestiona las categorías existentes.</p>
-                        <a href="{% url 'listar_categorias' %}" class="btn btn-secondary">Listar Categorías</a>
+                        <h5 class="card-title">Listar Clientes</h5>
+                        <p class="card-text">Revisa, edita o elimina los clientes existentes.</p>
+                        <a href="{% url 'listar_clientes' %}" class="btn btn-secondary">Listar Clientes</a>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Puedes agregar más secciones según sea necesario -->
     </div>
 {% endblock %}

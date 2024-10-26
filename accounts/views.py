@@ -38,7 +38,3 @@ def user_login(request):
 
     return render(request, 'accounts/login.html', {'form': form})
 
-# @login_required
-# def user_logout(request):
-#     logout(request)  
-#     return redirect('login')  
