@@ -1,27 +1,73 @@
 {% extends 'base.html' %}
+{% block title %}Lista de Clientes{% endblock %}
+
 {% block content %}
-<h2>Lista de Clientes</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Dirección</th>
-            <th>Teléfono</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for cliente in clientes %}
-        <tr>
-            <td>{{ cliente.nombre }}</td>
-            <td>{{ cliente.direccion }}</td>
-            <td>{{ cliente.telefono }}</td>
-            <td>
-                <a href="{% url 'editar_cliente' cliente.pk %}" class="btn btn-warning">Editar</a>
-                <a href="{% url 'eliminar_cliente' cliente.pk %}" class="btn btn-danger">Eliminar</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <h2 class="my-4 text-center">Lista de Clientes</h2>
+
+    <!-- Barra de búsqueda -->
+    <div class="d-flex justify-content-start mb-3">
+        <form method="GET" action="{% url 'listar_clientes' %}" class="form-inline position-relative">
+            <input type="text" name="query" class="form-control" 
+                placeholder="Buscar por nombre, teléfono, email, dirección" 
+                value="{{ request.GET.query }}" style="padding-right: 40px; width: 300px;">
+            
+            <!-- Ícono de lupa -->
+            <button type="submit" class="btn p-0 position-absolute" style="right: -45px; top: 50%; transform: translateY(-50%); background: transparent; border: none;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Tabla de clientes -->
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Teléfono</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.direccion }}</td>
+                <td>{{ cliente.telefono }}</td>
+                <td>
+                    <a href="{% url 'editar_cliente' cliente.pk %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="{% url 'eliminar_cliente' cliente.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No hay clientes registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación y botones de navegación -->
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            Mostrando {{ clientes.paginator.count }} resultados en total
+        </div>
+        <div>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mr-2">Volver al Dashboard</a>
+            <a href="{% url 'agregar_cliente' %}" class="btn btn-primary">Agregar Cliente</a>
+        </div>
+    </div>
+
+    <!-- Links de paginación -->
+    <div class="d-flex justify-content-end mt-3">
+        {% if clientes.has_previous %}
+            <a href="?page={{ clientes.previous_page_number }}&query={{ request.GET.query }}" class="btn btn-light">Anterior</a>
+        {% endif %}
+        <span class="mx-2">Página {{ clientes.number }} de {{ clientes.paginator.num_pages }}</span>
+        {% if clientes.has_next %}
+            <a href="?page={{ clientes.next_page_number }}&query={{ request.GET.query }}" class="btn btn-light">Siguiente</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

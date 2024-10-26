@@ -1,6 +1,5 @@
 from django.urls import path, include
 from .views import admin_dashboard, cashier_dashboard, user_dashboard
-from django.conf.urls.static import static
 
 
 

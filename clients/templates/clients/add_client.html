@@ -1,9 +1,17 @@
 {% extends 'base.html' %}
+
+{% block title %}Agregar Cliente{% endblock %}
+
 {% block content %}
-<h2>Agregar Cliente</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Guardar Cliente</button>
-</form>
+<div class="container mt-4">
+    <h2>Agregar Cliente</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al Panel de Administración</a>
+    </form>
+</div>
 {% endblock %}
