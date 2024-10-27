@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 
-@login_required
+
 def register(request):
     if not request.user.is_staff:  
         return redirect('login')  
@@ -16,7 +17,6 @@ def register(request):
         form = UserCreationForm()
         
     return render(request, 'accounts/register.html', {'form': form})
-
 
 def user_login(request):
     if request.method == 'POST':

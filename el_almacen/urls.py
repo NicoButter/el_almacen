@@ -20,10 +20,11 @@ from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
-
+from accounts.views import user_login 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('', user_login, name='login'), 
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),  
     path('dashboard/', include('dashboards.urls')),
     path('products/', include('products.urls')),

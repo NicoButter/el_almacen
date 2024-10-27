@@ -1,21 +1,49 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from accounts.models import Cliente
-from .forms import ClienteForm  
+from accounts.forms import ClienteForm, TelefonoForm, DireccionForm, EmailForm
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.contrib import messages
+
 
 
 @login_required
 def agregar_cliente(request):
     if request.method == 'POST':
-        form = ClienteForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('list_clients')
+        cliente_form = ClienteForm(request.POST)
+        telefono_form = TelefonoForm(request.POST)
+        direccion_form = DireccionForm(request.POST)
+        email_form = EmailForm(request.POST)
+
+        if cliente_form.is_valid() and telefono_form.is_valid() and direccion_form.is_valid() and email_form.is_valid():
+            cliente = cliente_form.save()
+            telefono = telefono_form.save(commit=False)
+            telefono.cliente = cliente  # Asocia el teléfono al cliente
+            telefono.save()
+            direccion = direccion_form.save(commit=False)
+            direccion.cliente = cliente  # Asocia la dirección al cliente
+            direccion.save()
+            email = email_form.save(commit=False)
+            email.cliente = cliente  # Asocia el email al cliente
+            email.save()
+
+            # Agregar un mensaje de éxito
+            messages.success(request, 'Cliente agregado correctamente.')
+            return redirect('admin_dashboard')  # Redirigir a donde quieras (a tu panel de administración)
     else:
-        form = ClienteForm()
-    return render(request, 'clients/add_client.html', {'form': form})
+        cliente_form = ClienteForm()
+        telefono_form = TelefonoForm()
+        direccion_form = DireccionForm()
+        email_form = EmailForm()
+
+    context = {
+        'cliente_form': cliente_form,
+        'telefono_form': telefono_form,
+        'direccion_form': direccion_form,
+        'email_form': email_form,
+    }
+    return render(request, 'clients/add_client.html', context)
 
 @login_required
 def listar_clientes(request):
