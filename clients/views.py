@@ -1,11 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from accounts.models import CustomUser
 from accounts.models import Cliente
+from django.db.models import Q
 from accounts.forms import ClienteForm, TelefonoForm, DireccionForm, EmailForm
 from django.core.paginator import Paginator
-from django.db.models import Q
-from django.contrib import messages
-
+from django.utils.crypto import get_random_string
 
 
 @login_required
@@ -17,20 +18,31 @@ def agregar_cliente(request):
         email_form = EmailForm(request.POST)
 
         if cliente_form.is_valid() and telefono_form.is_valid() and direccion_form.is_valid() and email_form.is_valid():
-            cliente = cliente_form.save()
+            # Crear un usuario provisional
+            username = get_random_string(8)  # Genera un nombre de usuario único de 8 caracteres
+            user = CustomUser.objects.create_user(username=username)
+
+            # Ahora crea el cliente asociado al usuario
+            cliente = cliente_form.save(commit=False)
+            cliente.user = user  # Asocia el cliente con el usuario recién creado
+            cliente.save()
+
+            # Guardar el resto de la información
             telefono = telefono_form.save(commit=False)
-            telefono.cliente = cliente  # Asocia el teléfono al cliente
+            telefono.cliente = cliente  
             telefono.save()
+
             direccion = direccion_form.save(commit=False)
-            direccion.cliente = cliente  # Asocia la dirección al cliente
+            direccion.cliente = cliente  
             direccion.save()
+
             email = email_form.save(commit=False)
-            email.cliente = cliente  # Asocia el email al cliente
+            email.cliente = cliente  
             email.save()
 
             # Agregar un mensaje de éxito
             messages.success(request, 'Cliente agregado correctamente.')
-            return redirect('admin_dashboard')  # Redirigir a donde quieras (a tu panel de administración)
+            return redirect('admin_dashboard')
     else:
         cliente_form = ClienteForm()
         telefono_form = TelefonoForm()
@@ -44,6 +56,8 @@ def agregar_cliente(request):
         'email_form': email_form,
     }
     return render(request, 'clients/add_client.html', context)
+
+# ---------------------------------------------------------------------------------------------------------------
 
 @login_required
 def listar_clientes(request):
@@ -61,6 +75,8 @@ def listar_clientes(request):
     clientes_page = paginator.get_page(page_number)
     return render(request, 'clients/list_clients.html', {'clientes': clientes_page})
 
+# --------------------------------------------------------------------------------------------------------------
+
 @login_required
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
@@ -73,6 +89,7 @@ def editar_cliente(request, pk):
         form = ClienteForm(instance=cliente)
     return render(request, 'clients/edit_client.html', {'form': form, 'cliente': cliente})
 
+# --------------------------------------------------------------------------------------------------------------
 
 @login_required
 def eliminar_cliente(request, pk):
