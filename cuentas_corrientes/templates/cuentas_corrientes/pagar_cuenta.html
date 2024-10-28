@@ -1,0 +1,7 @@
+<h2>Pagar Cuenta de {{ cuenta.cliente.nombre }}</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label for="monto">Monto a pagar:</label>
+    <input type="number" name="monto" step="0.01" required>
+    <button type="submit">Registrar Pago</button>
+</form>

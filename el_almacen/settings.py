@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "dashboards",
     "products",
     "sales",
-    "clients"
+    "clients",
+    "cuentas_corrientes"
 ]
 
 MIDDLEWARE = [

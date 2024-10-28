@@ -1,0 +1,7 @@
+<h2>Agregar Saldo a la Cuenta de {{ cuenta.cliente.nombre }}</h2>
+<form method="POST">
+    {% csrf_token %}
+    <label for="monto">Monto a agregar:</label>
+    <input type="number" name="monto" step="0.01" required>
+    <button type="submit">Agregar Saldo</button>
+</form>
