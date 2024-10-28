@@ -26,6 +26,7 @@
                 <th>Nombre</th>
                 <th>Dirección</th>
                 <th>Teléfono</th>
+                <th>Email</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -33,11 +34,28 @@
             {% for cliente in clientes %}
             <tr>
                 <td>{{ cliente.nombre }}</td>
-                <td>{{ cliente.direccion }}</td>
-                <td>{{ cliente.telefono }}</td>
                 <td>
-                    <a href="{% url 'editar_cliente' cliente.pk %}" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="{% url 'eliminar_cliente' cliente.pk %}" class="btn btn-danger btn-sm">Eliminar</a>
+                    {% for direccion in cliente.direcciones.all %}
+                        {{ direccion.direccion }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for telefono in cliente.telefonos.all %}
+                        {{ telefono.numero }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for email in cliente.emails.all %}
+                        {{ email.email }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{% url 'editar_cliente' cliente.pk %}" class="text-warning mx-2" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'eliminar_cliente' cliente.pk %}" class="text-danger mx-2" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
                 </td>
             </tr>
             {% empty %}

@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from django.utils.crypto import get_random_string
 
 
+
 @login_required
 def agregar_cliente(request):
     if request.method == 'POST':
@@ -57,7 +58,7 @@ def agregar_cliente(request):
     }
     return render(request, 'clients/add_client.html', context)
 
-# ---------------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------
 
 @login_required
 def listar_clientes(request):
@@ -66,11 +67,12 @@ def listar_clientes(request):
     if query:
         clientes = clientes.filter(
             Q(nombre__icontains=query) |
-            Q(direccion__icontains=query) |
-            Q(telefono__icontains=query) |
-            Q(email__icontains=query)
-        )
-    paginator = Paginator(clientes, 10)  # 10 clientes por página
+            Q(direcciones__direccion__icontains=query) |
+            Q(telefonos__numero__icontains=query) |
+            Q(emails__email__icontains=query)
+        ).distinct()  # `distinct` evita duplicados si hay múltiples coincidencias en relaciones
+
+    paginator = Paginator(clientes, 10)
     page_number = request.GET.get('page')
     clientes_page = paginator.get_page(page_number)
     return render(request, 'clients/list_clients.html', {'clientes': clientes_page})
@@ -84,7 +86,7 @@ def editar_cliente(request, pk):
         form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            return redirect('list_clients')
+            return redirect('listar_clientes')
     else:
         form = ClienteForm(instance=cliente)
     return render(request, 'clients/edit_client.html', {'form': form, 'cliente': cliente})
@@ -97,6 +99,7 @@ def eliminar_cliente(request, pk):
     
     if request.method == 'POST':
         cliente.delete()  # Elimina el cliente
-        return redirect('list_clients')  # Redirige a la lista de clientes
+        messages.success(request, 'Cliente eliminado correctamente.')  # Agregar un mensaje de éxito
+        return redirect('listar_clientes')  # Redirige a la lista de clientes
     
-    return render(request, 'clients/eliminar_cliente.html', {'cliente': cliente})
+    return render(request, 'clients/delete_client.html', {'cliente': cliente})
