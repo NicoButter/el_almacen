@@ -2,7 +2,7 @@
 {% block title %}Lista de Clientes{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-4">
     <h2 class="my-4 text-center">Lista de Clientes</h2>
 
     <!-- Barra de búsqueda -->
@@ -21,18 +21,33 @@
 
     <!-- Tabla de clientes -->
     <table class="table table-bordered table-striped">
-        <thead class="thead-dark">
+        <thead>
             <tr>
+                {% if is_admin %}
+                    <th>Acciones</th>
+                {% endif %}
                 <th>Nombre</th>
                 <th>Dirección</th>
                 <th>Teléfono</th>
                 <th>Email</th>
-                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for cliente in clientes %}
             <tr>
+                {% if is_admin %}
+                <td>
+                    <a href="{% url 'editar_cliente' cliente.pk %}" class="text-warning mx-2" title="Editar">
+                        <i class="fa-regular fa-pen-to-square"></i> <!-- Icono de editar -->
+                    </a>
+                    <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="text-danger" style="border: none; background: none; padding: 0;" title="Eliminar">
+                            <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
+                        </button>
+                    </form>
+                </td>
+                {% endif %}
                 <td>{{ cliente.nombre }}</td>
                 <td>
                     {% for direccion in cliente.direcciones.all %}
@@ -49,18 +64,10 @@
                         {{ email.email }}<br>
                     {% endfor %}
                 </td>
-                <td>
-                    <a href="{% url 'editar_cliente' cliente.pk %}" class="text-warning mx-2" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a href="{% url 'eliminar_cliente' cliente.pk %}" class="text-danger mx-2" title="Eliminar">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
-                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4" class="text-center">No hay clientes registrados.</td>
+                <td colspan="5" class="text-center">No hay clientes registrados.</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -72,8 +79,10 @@
             Mostrando {{ clientes.paginator.count }} resultados en total
         </div>
         <div>
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mr-2">Volver al Dashboard</a>
-            <a href="{% url 'agregar_cliente' %}" class="btn btn-primary">Agregar Cliente</a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al Dashboard</a>
+            {% if is_admin %}
+                <a href="{% url 'agregar_cliente' %}" class="btn btn-primary">Agregar Cliente</a>
+            {% endif %}
         </div>
     </div>
 

@@ -2,7 +2,7 @@
 {% load custom_tags %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="mt-4 mb-5"> <!-- Clase mb-5 para dar margen inferior -->
     <h1 class="text-center">Agregar Producto</h1>
     <form method="post" enctype="multipart/form-data" class="mt-4" id="product-form">
         {% csrf_token %}
@@ -18,7 +18,7 @@
                             <div class="form-group">
                                 <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
                                 {% if field.name == "descripcion" %}
-                                    {{ field|add_class:"form-control descripcion" }}  <!-- Clase para descripción -->
+                                    {{ field|add_class:"form-control descripcion" }}
                                 {% elif field.name == "categoria" %}
                                     {{ field|add_class:"form-control" }}
                                 {% else %}
@@ -34,7 +34,6 @@
                         {% endif %}
                     {% endfor %}
                     
-                    <!-- Campo para Precio de Venta -->
                     <div class="form-group">
                         <label for="precio_venta" class="font-weight-bold">Precio de Venta al Público</label>
                         <input type="text" id="precio_venta" class="form-control" readonly>
@@ -48,7 +47,7 @@
                     <legend class="font-weight-bold">Opciones adicionales</legend>
                     <div class="form-group">
                         <label for="{{ form.se_vende_fraccionado.id_for_label }}" class="font-weight-bold">¿El producto se vende fraccionado?</label>
-                        {{ form.se_vende_fraccionado|add_class:"custom-checkbox" }}  <!-- Checkbox -->
+                        {{ form.se_vende_fraccionado|add_class:"custom-checkbox" }}
                     </div>
                 </fieldset>
 
@@ -56,7 +55,7 @@
                     <legend class="font-weight-bold">Imagen del Producto</legend>
                     <div class="form-group">
                         <label for="{{ form.imagen.id_for_label }}" class="font-weight-bold">Subir Imagen</label>
-                        {{ form.imagen|add_class:"form-control-file" }}  <!-- Clase para campo de imagen -->
+                        {{ form.imagen|add_class:"form-control-file" }}
                         {% if form.imagen.errors %}
                             <div class="text-danger">{{ form.imagen.errors|striptags }}</div>
                         {% endif %}
@@ -69,15 +68,15 @@
         </div>
 
         <!-- Botones -->
-        <div class="d-flex justify-content-end mt-4">
-            <button type="submit" class="btn btn-success mx-2">Agregar Producto</button>
-            <a href="{% url 'listar_productos' %}" class="btn btn-secondary mx-2">Volver al listado</a>
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mx-2">Volver al Dashboard</a>
+        <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-success mx-2 btn-lg">Agregar Producto</button>
+            <a href="{% url 'listar_productos' %}" class="btn btn-secondary mx-2 btn-lg">Volver al listado</a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mx-2 btn-lg">Volver al Dashboard</a>
         </div>
     </form>
 </div>
 
-<!-- Script para calcular el precio de venta -->
+<!-- Scripts para el precio de venta y previsualización de imagen -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const costoInput = document.getElementById('{{ form.costo.id_for_label }}');
@@ -88,16 +87,14 @@
             const costo = parseFloat(costoInput.value) || 0;
             const porcentaje = parseFloat(porcentajeInput.value) || 0;
             const precioVenta = costo * (1 + (porcentaje / 100));
-            precioVentaInput.value = precioVenta.toFixed(2);  // Formatear a dos decimales
+            precioVentaInput.value = precioVenta.toFixed(2);
         }
 
-        // Escuchar cambios en los campos de costo y porcentaje
         costoInput.addEventListener('input', calcularPrecioVenta);
         porcentajeInput.addEventListener('input', calcularPrecioVenta);
     });
 </script>
 
-<!-- Script para previsualizar la imagen -->
 <script>
     document.getElementById("imagen").onchange = function (event) {
         const [file] = event.target.files;

@@ -2,6 +2,16 @@
 {% block title %}Listado de Productos{% endblock %}
 {% block content %}
 
+<style>
+.table tbody tr:nth-child(odd) {
+    background-color: #f9f9f9; /* Color gris claro para filas impares */
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #ffffff; /* Color blanco para filas pares */
+}
+</style>
+
 <div class="container mt-4">
     <h1>Listado de Productos</h1>
 
@@ -21,21 +31,34 @@
     <table class="table">
         <thead>
             <tr>
+                {% if is_admin %}
+                    <th>Acciones</th>
+                {% endif %}
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Precio</th>
                 <th>Cantidad en Stock</th>
                 <th>Fraccionado</th>
                 <th>Categoría</th> <!-- Nueva columna de categoría -->
-                <th>QR</th>
-                {% if es_administrador %}
-                    <th>Acciones</th>
-                {% endif %}
+                <th>QR</th>    
             </tr>
         </thead>
         <tbody>
             {% for producto in productos %}
             <tr>
+                {% if is_admin %}
+                    <td>
+                        <a href="{% url 'edit_products' producto.pk %}" class="text-warning me-2">
+                            <i class="fa-regular fa-pen-to-square"></i> <!-- Icono de editar -->
+                        </a>
+                        <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="text-danger" style="border: none; background: none; padding: 0;">
+                                <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
+                            </button>
+                        </form>
+                    </td>
+                {% endif %}
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.descripcion }}</td>
                 <td>${{ producto.precio_venta }}</td>
@@ -45,15 +68,6 @@
                 <td>
                     <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" width="100">
                 </td>
-                {% if is_admin %}
-                    <td>
-                        <a href="{% url 'edit_products' producto.pk %}" class="btn btn-warning">Editar</a>
-                        <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
-                    </td>
-                {% endif %}
             </tr>
             {% endfor %}
         </tbody>

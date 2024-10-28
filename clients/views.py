@@ -64,6 +64,7 @@ def agregar_cliente(request):
 def listar_clientes(request):
     query = request.GET.get('query')
     clientes = Cliente.objects.all()
+    
     if query:
         clientes = clientes.filter(
             Q(nombre__icontains=query) |
@@ -75,7 +76,13 @@ def listar_clientes(request):
     paginator = Paginator(clientes, 10)
     page_number = request.GET.get('page')
     clientes_page = paginator.get_page(page_number)
-    return render(request, 'clients/list_clients.html', {'clientes': clientes_page})
+    
+    is_admin = request.user.is_admin  
+
+    return render(request, 'clients/list_clients.html', {
+        'clientes': clientes_page,
+        'is_admin': is_admin
+    })
 
 # --------------------------------------------------------------------------------------------------------------
 

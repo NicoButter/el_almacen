@@ -1,10 +1,78 @@
 {% extends 'base.html' %}
+{% load custom_tags %}
+
 {% block content %}
-<h1>Editar Producto: {{ producto.nombre }}</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar Cambios</button>
-</form>
-<a href="{% url 'listar_productos' %}">Volver al listado</a>
+<div class="container mt-5 mb-5">
+    <h1 class="text-center">Editar Producto</h1>
+    <form method="post" enctype="multipart/form-data" class="mt-4" id="product-form">
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Detalles del producto (Columna izquierda) -->
+            <div class="col-md-6">
+                <fieldset class="border p-4 rounded bg-light">
+                    <legend class="font-weight-bold">Detalles del Producto</legend>
+                    
+                    {% for field in form %}
+                        {% if field.name not in "se_vende_fraccionado imagen" %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {% if field.name == "descripcion" %}
+                                    {{ field|add_class:"form-control descripcion" }}
+                                {% elif field.name == "categoria" %}
+                                    {{ field|add_class:"form-control" }}
+                                {% else %}
+                                    {{ field|add_class:"form-control" }}
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div class="text-danger">{{ field.errors|striptags }}</div>
+                                {% endif %}
+                                {% if field.help_text %}
+                                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <div class="mb-3">
+                        <label for="precio_venta" class="form-label">Precio de Venta al Público</label>
+                        <input type="text" id="precio_venta" class="form-control" readonly>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Opciones adicionales e Imagen del producto (Columna derecha) -->
+            <div class="col-md-6">
+                <fieldset class="border p-4 rounded bg-light">
+                    <legend class="font-weight-bold">Opciones adicionales</legend>
+                    <div class="form-check">
+                        {{ form.se_vende_fraccionado|add_class:"form-check-input" }}
+                        <label for="{{ form.se_vende_fraccionado.id_for_label }}" class="form-check-label">¿El producto se vende fraccionado?</label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="border p-4 rounded bg-light mt-4">
+                    <legend class="font-weight-bold">Imagen del Producto</legend>
+                    <div class="mb-3">
+                        <label for="{{ form.imagen.id_for_label }}" class="form-label">Subir Imagen</label>
+                        {{ form.imagen|add_class:"form-control-file" }}
+                        {% if form.imagen.errors %}
+                            <div class="text-danger">{{ form.imagen.errors|striptags }}</div>
+                        {% endif %}
+                        {% if form.imagen.help_text %}
+                            <small class="form-text text-muted">{{ form.imagen.help_text }}</small>
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center mt-4 gap-2">
+            <button type="submit" class="btn btn-success btn-lg">Guardar Cambios</button>
+            <a href="{% url 'listar_productos' %}" class="btn btn-secondary btn-lg">Volver al listado</a>
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary btn-lg">Volver al Dashboard</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
