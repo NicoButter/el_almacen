@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Asignar Cuenta Corriente{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="my-4 text-center">Asignar Cuenta Corriente</h2>
+
+    <form method="POST" action="{% url 'asignar_cuenta_corriente' cliente.pk %}" class="form-inline">
+        {% csrf_token %}
+
+        <!-- Alinear el label y el nombre del cliente -->
+        <div class="form-group row align-items-center mb-3">
+            <label class="col-form-label col-sm-2 font-weight-bold text-right">Cliente:</label>
+            <div class="col-sm-10">
+                <p class="form-control-plaintext">{{ cliente.nombre }}</p>
+            </div>
+        </div>
+
+        <!-- Campos de cuenta corriente -->
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+
+        <!-- Botones alineados a la derecha -->
+        <div class="form-group d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-primary mr-2">Crear Cuenta Corriente</button>
+            <a href="{% url 'listar_clientes' %}" class="btn btn-secondary">Volver a la lista de clientes</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

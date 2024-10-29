@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import CuentaCorriente
 from .forms import CuentaCorrienteForm
 from django.contrib import messages
+from accounts.models import Cliente
+
 
 
 def crear_cuenta_corriente(request):
@@ -42,3 +44,21 @@ def pagar_cuenta(request, cuenta_id):
             messages.error(request, str(e))
     return render(request, 'cuentas_corrientes/pagar_cuenta.html', {'cuenta': cuenta})
 
+# --------------------------------------------------------------------------------------------------------------------
+
+def asignar_cuenta_corriente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, pk=cliente_id)  # Obtén el cliente por ID
+
+    if request.method == 'POST':
+        form = CuentaCorrienteForm(request.POST)  # Crea un formulario con los datos enviados
+        if form.is_valid():
+            cuenta_corriente = form.save(commit=False)  # No guardes aún
+            cuenta_corriente.cliente = cliente  # Asigna el cliente a la cuenta corriente
+            cuenta_corriente.saldo = 0  # Establece el saldo inicial a 0
+            cuenta_corriente.save()  # Guarda la cuenta corriente
+            return redirect('listar_clientes')  # Redirige a la lista de clientes
+
+    else:
+        form = CuentaCorrienteForm()  # Si no es POST, crea un formulario vacío
+
+    return render(request, 'cuentas_corrientes/asignar_cuenta_corriente.html', {'form': form, 'cliente': cliente})

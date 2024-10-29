@@ -30,6 +30,7 @@
                 <th>Dirección</th>
                 <th>Teléfono</th>
                 <th>Email</th>
+                <th>Cuenta Corriente</th> <!-- Nueva columna para la cuenta corriente -->
             </tr>
         </thead>
         <tbody>
@@ -46,6 +47,10 @@
                             <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
                         </button>
                     </form>
+                    <!-- Enlace para asignar cuenta corriente -->
+                    <a href="{% url 'asignar_cuenta_corriente' cliente.pk %}" class="text-primary mx-2" title="Asignar Cuenta Corriente">
+                        <i class="fa-solid fa-wallet"></i> <!-- Icono de cuenta corriente -->
+                    </a>
                 </td>
                 {% endif %}
                 <td>{{ cliente.nombre }}</td>
@@ -64,10 +69,17 @@
                         {{ email.email }}<br>
                     {% endfor %}
                 </td>
+                <td>
+                    {% if cliente.cuenta_corriente %}
+                        ${{ cliente.cuenta_corriente.saldo }}  <!-- Muestra el saldo si tiene cuenta corriente -->
+                    {% else %}
+                        <span class="text-muted">Sin cuenta corriente</span> <!-- Mensaje si no tiene cuenta corriente -->
+                    {% endif %}
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" class="text-center">No hay clientes registrados.</td>
+                <td colspan="6" class="text-center">No hay clientes registrados.</td>
             </tr>
             {% endfor %}
         </tbody>

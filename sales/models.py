@@ -44,10 +44,10 @@ class Pago(models.Model):
     def __str__(self):
         return f'Pago de ${self.monto} - Cliente: {self.cliente.nombre} el {self.fecha.strftime("%d/%m/%Y")}'
 
-# Modelo para llevar la cuenta corriente del cliente (saldo deudor)
-class CuentaCorriente(models.Model):
-    cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, related_name='cuenta_corriente')
-    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+# # Modelo para llevar la cuenta corriente del cliente (saldo deudor)
+# class CuentaCorriente(models.Model):
+#     cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, related_name='cuenta_corriente')
+#     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    def __str__(self):
-        return f'Cuenta Corriente - Cliente: {self.cliente.nombre} - Saldo: ${self.saldo}'
+#     def __str__(self):
+#         return f'Cuenta Corriente - Cliente: {self.cliente.nombre} - Saldo: ${self.saldo}'

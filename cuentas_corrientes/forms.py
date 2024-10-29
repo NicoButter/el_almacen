@@ -4,4 +4,4 @@ from .models import CuentaCorriente
 class CuentaCorrienteForm(forms.ModelForm):
     class Meta:
         model = CuentaCorriente
-        fields = ['cliente', 'saldo'] 
+        exclude = ['cliente', 'saldo'] 

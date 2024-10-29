@@ -33,9 +33,19 @@ nav.navbar .navbar-brand {
 }
 
 footer {
-    max-height: 100px;
+    max-height: 100px; /* Ajusta según sea necesario */
     padding: 10px 0; 
     background-color: #0B0704; 
     color: white; 
-    text-align: center; 
+    text-align: left; /* Cambiar a left para que no esté centrado */
+}
+
+.footer .container {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.footer span {
+    margin: 0 10px; /* Espacio entre elementos */
 }
