@@ -12,7 +12,6 @@
                 placeholder="Buscar por nombre, teléfono, email, dirección" 
                 value="{{ request.GET.query }}" style="padding-right: 40px; width: 300px;">
             
-            <!-- Ícono de lupa -->
             <button type="submit" class="btn p-0 position-absolute" style="right: -45px; top: 50%; transform: translateY(-50%); background: transparent; border: none;">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -30,62 +29,52 @@
                 <th>Dirección</th>
                 <th>Teléfono</th>
                 <th>Email</th>
-                <th>Cuenta Corriente</th> <!-- Nueva columna para la cuenta corriente -->
+                <th>Cuenta Corriente</th>
             </tr>
-        </thead>
-        <tbody>
-            {% for cliente in clientes %}
-            <tr>
-                {% if is_admin %}
-                <td>
-                    <a href="{% url 'editar_cliente' cliente.pk %}" class="text-warning mx-2" title="Editar">
-                        <i class="fa-regular fa-pen-to-square"></i> <!-- Icono de editar -->
-                    </a>
-                    <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="text-danger" style="border: none; background: none; padding: 0;" title="Eliminar">
-                            <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
-                        </button>
-                    </form>
-                    <!-- Enlace para asignar cuenta corriente -->
-                    <a href="{% url 'asignar_cuenta_corriente' cliente.pk %}" class="text-primary mx-2" title="Asignar Cuenta Corriente">
-                        <i class="fa-solid fa-wallet"></i> <!-- Icono de cuenta corriente -->
-                    </a>
-                </td>
-                {% endif %}
-                <td>{{ cliente.nombre }}</td>
-                <td>
-                    {% for direccion in cliente.direcciones.all %}
-                        {{ direccion.direccion }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for telefono in cliente.telefonos.all %}
-                        {{ telefono.numero }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for email in cliente.emails.all %}
-                        {{ email.email }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% if cliente.cuenta_corriente %}
-                        ${{ cliente.cuenta_corriente.saldo }}  <!-- Muestra el saldo si tiene cuenta corriente -->
-                    {% else %}
-                        <span class="text-muted">Sin cuenta corriente</span> <!-- Mensaje si no tiene cuenta corriente -->
+            <thead>
+                <tr>
+                    {% if is_admin %}
+                        <th>Acciones</th>
                     {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No hay clientes registrados.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
+                    <th>Nombre</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Cuenta Corriente</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    {% if is_admin %}
+                        <td>
+                            <a href="{% url 'editar_cliente' cliente.pk %}" class="text-warning mx-2" title="Editar">
+                                <i class="fa-regular fa-pen-to-square"></i>
+                            </a>
+                            <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="text-danger mx-2" title="Eliminar">
+                                    <i class="fa-regular fa-trash-can"></i>
+                                </button>
+                            </form>
+                        </td>
+                    {% endif %}
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{% for direccion in cliente.direcciones.all %}{{ direccion.direccion }}{% endfor %}</td>
+                    <td>{% for telefono in cliente.telefonos.all %}{{ telefono.numero }}{% endfor %}</td>
+                    <td>{% for email in cliente.emails.all %}{{ email.email }}{% endfor %}</td>
+                    <td>
+                        {% for cuenta in cliente.cuenta_corriente.all %}
+                            Saldo: {{ cuenta.saldo }} <br>
+                            Fecha Apertura: {{ cuenta.fecha_apertura }}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            
     </table>
 
-    <!-- Paginación y botones de navegación -->
     <div class="d-flex justify-content-between align-items-center">
         <div>
             Mostrando {{ clientes.paginator.count }} resultados en total
@@ -98,7 +87,6 @@
         </div>
     </div>
 
-    <!-- Links de paginación -->
     <div class="d-flex justify-content-end mt-3">
         {% if clientes.has_previous %}
             <a href="?page={{ clientes.previous_page_number }}&query={{ request.GET.query }}" class="btn btn-light">Anterior</a>

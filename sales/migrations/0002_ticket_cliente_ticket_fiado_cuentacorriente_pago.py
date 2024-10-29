@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                     "cliente",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="cuenta_corriente",
+                        related_name="cuentas_corrientes",
                         to="accounts.cliente",
                     ),
                 ),

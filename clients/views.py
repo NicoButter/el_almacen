@@ -63,15 +63,17 @@ def agregar_cliente(request):
 @login_required
 def listar_clientes(request):
     query = request.GET.get('query')
-    clientes = Cliente.objects.all()
     
+    # Usamos `prefetch_related` con el nombre correcto `cuentas_corrientes`
+    clientes = Cliente.objects.prefetch_related('direcciones', 'telefonos', 'emails', 'cuentas_corrientes').all()
+
     if query:
         clientes = clientes.filter(
             Q(nombre__icontains=query) |
             Q(direcciones__direccion__icontains=query) |
             Q(telefonos__numero__icontains=query) |
             Q(emails__email__icontains=query)
-        ).distinct()  # `distinct` evita duplicados si hay múltiples coincidencias en relaciones
+        ).distinct()
 
     paginator = Paginator(clientes, 10)
     page_number = request.GET.get('page')
@@ -83,6 +85,7 @@ def listar_clientes(request):
         'clientes': clientes_page,
         'is_admin': is_admin
     })
+
 
 # --------------------------------------------------------------------------------------------------------------
 
