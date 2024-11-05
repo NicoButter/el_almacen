@@ -21,16 +21,6 @@
     <!-- Tabla de clientes -->
     <table class="table table-bordered table-striped">
         <thead>
-            <tr>
-                {% if is_admin %}
-                    <th>Acciones</th>
-                {% endif %}
-                <th>Nombre</th>
-                <th>Dirección</th>
-                <th>Teléfono</th>
-                <th>Email</th>
-                <th>Cuenta Corriente</th>
-            </tr>
             <thead>
                 <tr>
                     {% if is_admin %}
@@ -64,11 +54,18 @@
                     <td>{% for telefono in cliente.telefonos.all %}{{ telefono.numero }}{% endfor %}</td>
                     <td>{% for email in cliente.emails.all %}{{ email.email }}{% endfor %}</td>
                     <td>
+                        {% if cliente.cuentas_corrientes.first %}
+                            Saldo: {{ cliente.cuentas_corrientes.first.saldo }}
+                        {% else %}
+                            Sin cuenta
+                        {% endif %}
+                    </td>
+                    {% comment %} <td>
                         {% for cuenta in cliente.cuenta_corriente.all %}
                             Saldo: {{ cuenta.saldo }} <br>
                             Fecha Apertura: {{ cuenta.fecha_apertura }}
                         {% endfor %}
-                    </td>
+                    </td> {% endcomment %}
                 </tr>
                 {% endfor %}
             </tbody>
