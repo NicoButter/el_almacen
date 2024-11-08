@@ -1,9 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 from django.http import JsonResponse
 from .models import Ticket,  LineItem
 from .forms import NewSaleForm  
 from django.contrib.auth.decorators import login_required
 from products.models import Product
+from accounts.models import Cliente
+from .models import Venta, ProductoVenta
+
 
 
 def ticket_list(request):
@@ -25,6 +32,7 @@ def reprint_ticket(request, ticket_id):
 @login_required
 def new_sale(request):
     productos = Product.objects.all()
+    clientes = Cliente.objects.all()
     scanned_items = []  # Inicializar una lista para almacenar productos escaneados
 
     if request.method == 'POST':
@@ -50,11 +58,12 @@ def new_sale(request):
                     subtotal=item['subtotal']
                 )
 
-            return redirect('sales:detalle_venta', pk=ticket.id)  # Redirigir al detalle de la venta
+            return redirect('sales:detalle_venta', pk=ticket.id, )  # Redirigir al detalle de la venta
     else:
         form = NewSaleForm()
 
-    return render(request, 'sales/new_sale.html', {
+    return render(request, 'sales/new_sale.html' , {
+        'clientes': clientes,
         'form': form,
         'productos': productos,  # Pasar productos a la plantilla
         'scanned_items': scanned_items,  # Pasar productos escaneados a la plantilla
@@ -80,3 +89,34 @@ def get_product(request, product_id):
 # Nueva vista para ProductDetailView
 def product_detail(request, product_id):
     return get_product(request, product_id)
+
+@csrf_exempt
+def realizar_venta(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        cliente_id = data.get('cliente')
+        productos = data.get('productos')
+
+        try:
+            cliente = Cliente.objects.get(id=cliente_id)
+            venta = Venta.objects.create(cliente=cliente, total=0)  # Asigna total 0 temporalmente
+
+            total = 0
+            for producto_data in productos:
+                producto_id = producto_data.get('id')
+                cantidad = producto_data.get('cantidad')
+                # Asumir que existe una función para obtener el precio del producto
+                precio = obtener_precio_producto(producto_id)
+                total_producto = precio * cantidad
+                total += total_producto
+                ProductoVenta.objects.create(venta=venta, producto_id=producto_id, cantidad=cantidad, total=total_producto)
+
+            venta.total = total
+            venta.save()
+
+            return JsonResponse({'success': True})
+        except Cliente.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Cliente no encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

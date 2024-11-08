@@ -4,37 +4,49 @@
 {% block header %}Nueva Venta{% endblock %}
 {% block content %}
 
-<link rel="stylesheet" href="{% static 'sales/css/new_sale_styles.css' %}" />
+<div class="container-fluid p-0">
+  <div class="row g-0">
+    <!-- Columna izquierda: Lista de productos escaneados -->
+    <div class="col-md-6">
+      <h2>Productos Agregados</h2>
+      <ul id="product-list" class="list-group">
+        <!-- Aquí se irán mostrando los productos agregados -->
+      </ul>
+    </div>
 
-<div class="row">
-  <!-- Lista de productos escaneados -->
-  <div class="col-md-6">
-    <h2>Productos Agregados</h2>
-    <ul id="product-list" class="list-group">
-      <!-- Aquí se irán mostrando los productos agregados -->
-    </ul>
+    <!-- Columna derecha: Escáner y selección de cliente -->
+    <div class="col-md-6">
+      <!-- Selección de cliente -->
+      <div class="mb-3">
+        <h4>Seleccionar Cliente</h4>
+        <select id="cliente-select" class="form-select">
+          <option value="">-- Seleccionar Cliente --</option>
+          {% for cliente in clientes %}
+          <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Escáner QR -->
+      <h2>Escáner QR</h2>
+      <video id="video" width="100%" height="250" autoplay></video>
+      <canvas id="canvas" style="display: none"></canvas>
+      <p id="scan-status" class="text-muted">Esperando código QR...</p>
+    </div>
   </div>
 
-  <!-- Escáner QR a la derecha -->
-  <div class="col-md-6">
-    <h2>Escáner QR</h2>
-    <video id="video" width="250" height="250" autoplay></video>
-    <canvas id="canvas" style="display: none"></canvas>
-    <p id="scan-status" class="text-muted">Esperando código QR...</p>
+  <!-- Fila independiente para el total de la compra -->
+  <div class="row mt-3">
+    <div class="col-12 text-start">
+      <h4>Total de la compra: <span id="total-compra">$0</span></h4>
+    </div>
   </div>
-</div>
 
-<!-- Fila independiente para el total de la compra, fuera de la lista de productos -->
-<div class="row mt-3">
-  <div class="col-md-12 text-start">
-    <h4>Total de la compra: <span id="total-compra">$0</span></h4>
-  </div>
-</div>
-
-<!-- Botón para volver al dashboard del cajero -->
-<div class="row mt-3">
-  <div class="col-md-12 text-end">
-    <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+  <!-- Botón para volver al dashboard del cajero -->
+  <div class="row mt-3">
+    <div class="col-12 text-end">
+      <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+    </div>
   </div>
 </div>
 
@@ -65,7 +77,7 @@
       return;
     }
 
-    fetch(`http://127.0.0.1:8001/sales/api/productos/${productIdStr}/`)
+    fetch(`/sales/api/productos/${productIdStr}/`)
       .then(response => {
         if (!response.ok) {
           throw new Error("Error al obtener el producto");
@@ -73,7 +85,6 @@
         return response.json();
       })
       .then(producto => {
-        console.log("Producto recibido:", producto);
         if (!producto || !producto.nombre || !producto.precio_venta) {
           console.error("Producto no válido:", producto);
           return;
@@ -139,16 +150,13 @@
       const code = jsQR(imageData.data, canvas.width, canvas.height);
 
       if (code && code.data) {
-        console.log("Código escaneado:", code.data); // Muestra el código QR escaneado
-
         scanStatus.textContent = `Producto escaneado: ${code.data}`;
         agregarProductoALista(code.data);
         confirmSound.play();
 
-        // Deshabilitar escaneo por 3 segundos
         scanningEnabled = false;
         setTimeout(() => {
-          scanningEnabled = true; // Rehabilitar escaneo después de 3 segundos
+          scanningEnabled = true;
         }, 3000);
       } else {
         scanStatus.textContent = "Esperando código QR...";
@@ -158,24 +166,6 @@
     requestAnimationFrame(scanQRCode);
   }
 
-  function actualizarLista(item) {
-    const cantidad = item.cantidad;
-    const total = cantidad * item.precio_venta;
-
-    const cantidadElement = item.elemento.querySelector('.cantidad');
-    const costoElement = item.elemento.querySelector('.costo');
-
-    if (cantidadElement && costoElement) {
-      if (item.fraccionado) {
-        cantidadElement.textContent = `${(cantidad * 1000).toFixed(0)} gramos`; // Mostrar gramos
-      } else {
-        cantidadElement.textContent = `(x${cantidad})`;
-      }
-      costoElement.textContent = total.toFixed(2);
-    }
-  }
-
-
   function actualizarCantidad(productIdStr, nuevaCantidad, esFraccionado) {
     const producto = productosEscaneados.get(productIdStr);
     if (!producto) return;
@@ -184,28 +174,16 @@
     let costoTotal;
 
     if (esFraccionado) {
-      // Si se vende fraccionado, convierte gramos a kilos y calcula el precio total
-      const cantidadEnKilos = nuevaCantidad / 1000; // Convertir gramos a kilos
-      costoTotal = precio * cantidadEnKilos; // Precio por kilo multiplicado por kilos
+      const cantidadEnKilos = nuevaCantidad / 1000;
+      costoTotal = precio * cantidadEnKilos;
     } else {
-      // Si se vende por unidad
-      costoTotal = precio * nuevaCantidad; // Precio por unidad multiplicado por la cantidad
+      costoTotal = precio * nuevaCantidad;
     }
 
-    // Actualiza el elemento del costo en la lista
     producto.elemento.querySelector('.costo').textContent = costoTotal.toFixed(2);
-    producto.cantidad = nuevaCantidad; // Actualiza la cantidad almacenada
-    producto.total = costoTotal; // Actualiza el total almacenado
-    actualizarTotalCompra(); // Actualiza el total de compra general
-  }
-
-  function aumentarCantidad(productId) {
-    const item = productosEscaneados.get(productId);
-    if (item) {
-      item.cantidad += 1;
-      actualizarLista(item);
-      actualizarTotalCompra();
-    }
+    producto.cantidad = nuevaCantidad;
+    producto.total = costoTotal;
+    actualizarTotalCompra();
   }
 
   function eliminarProducto(id, cantidad) {
@@ -229,28 +207,45 @@
     }
   }
 
-  function actualizarLista(item) {
-    const cantidadElement = item.elemento.querySelector('.cantidad');
-    const costoElement = item.elemento.querySelector('.costo');
-
-    if (cantidadElement && costoElement) {
-      if (item.fraccionado) {
-        cantidadElement.textContent = `${(item.cantidad * 1000).toFixed(0)} gramos`; // Mostrar gramos
-      } else {
-        cantidadElement.textContent = `(x${item.cantidad})`;
-      }
-      costoElement.textContent = `$${item.total.toFixed(2)}`; // Mostrar el total calculado de ese producto
-    }
-  }
-
-
   function actualizarTotalCompra() {
     let total = 0;
     productosEscaneados.forEach(item => {
-      total += item.total; // Aquí se suma el total de cada producto
+      total += item.total;
     });
-    totalCompraElement.textContent = `Total de la compra: $${total.toFixed(2)}`; // Actualizar el elemento del total
+    totalCompraElement.textContent = `Total de la compra: $${total.toFixed(2)}`;
   }
+
+  function realizarVenta() {
+    const clienteId = document.getElementById("cliente-select").value;
+    const productos = Array.from(productosEscaneados.values()).map(item => ({
+        id: item.id,
+        cantidad: item.cantidad,
+        total: item.total
+    }));
+
+    if (!clienteId) {
+        alert("Seleccione un cliente para continuar.");
+        return;
+    }
+
+    fetch('/sales/api/realizar_venta/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ cliente: clienteId, productos })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Venta realizada exitosamente");
+        } else {
+            alert("Error al realizar la venta");
+        }
+    })
+    .catch(error => console.error("Error en la venta:", error));
+}
 </script>
 
 {% endblock %}

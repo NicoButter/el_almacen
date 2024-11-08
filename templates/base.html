@@ -57,15 +57,14 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer py-3">
-        <div class="container d-flex justify-content-center align-items-center">
-            <span>Usuario: {{ user.username }}</span>
-            <span class="mx-2">|</span> <!-- Separador opcional -->
-            <span id="datetime"></span>
-            <span class="mx-2">|</span> <!-- Separador opcional -->
-            <span>&copy; 2024 Tu Empresa</span> <!-- Agregar copyright -->
-        </div>
-    </footer>
+    <!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <span>Usuario: {{ user.username }}</span>
+        <span>&copy; 2024 El Almacenero</span>
+        <span id="datetime"></span>
+    </div>
+</footer>
 
     <script>
         function updateDateTime() {
