@@ -55,18 +55,28 @@ class Pago(models.Model):
 
 
 class Venta(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='ventas')
-    fecha = models.DateTimeField(auto_now_add=True)
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    fecha_venta = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    productos = models.ManyToManyField(Product, through='DetalleVenta')
 
     def __str__(self):
         return f"Venta {self.id} - {self.cliente.nombre}"
 
-class ProductoVenta(models.Model):
-    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='productos')
+class DetalleVenta(models.Model):
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE)
     producto = models.ForeignKey(Product, on_delete=models.CASCADE)
-    cantidad = models.IntegerField()
+    cantidad = models.PositiveIntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.producto.nombre} - Venta {self.venta.id}"
+        return f"{self.producto.nombre} x {self.cantidad}"
+    
+
+def obtener_precio_producto(producto_id):
+    try:
+        producto = Product.objects.get(id=producto_id)
+        return producto.precio_venta  # Adjust the field name if necessary
+    except Product.DoesNotExist:
+        return None  # Or handle this case as needed

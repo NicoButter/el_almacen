@@ -5,42 +5,60 @@
 {% block content %}
 
 <div class="container-fluid p-0">
-  <div class="row g-0">
-    <!-- Columna izquierda: Lista de productos escaneados -->
-    <div class="col-md-6">
-      <h2>Productos Agregados</h2>
-      <ul id="product-list" class="list-group">
-        <!-- Aquí se irán mostrando los productos agregados -->
-      </ul>
-    </div>
-
-    <!-- Columna derecha: Escáner y selección de cliente -->
-    <div class="col-md-6">
-      <!-- Selección de cliente -->
-      <div class="mb-3">
-        <h4>Seleccionar Cliente</h4>
-        <select id="cliente-select" class="form-select">
-          <option value="">-- Seleccionar Cliente --</option>
-          {% for cliente in clientes %}
-          <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+  <form method="post">
+    {% csrf_token %}
+    <div class="row g-0">
+      <!-- Columna izquierda: Lista de productos escaneados -->
+      <div class="col-md-6">
+        <h2>Productos Agregados</h2>
+        <ul id="product-list" class="list-group">
+          <!-- Lista de productos agregados al carrito -->
+          {% for item in scanned_items %}
+            <li class="list-group-item">{{ item.name }} - {{ item.quantity }} x {{ item.price }} = {{ item.subtotal }}</li>
           {% endfor %}
-        </select>
+        </ul>
       </div>
 
-      <!-- Escáner QR -->
-      <h2>Escáner QR</h2>
-      <video id="video" width="100%" height="250" autoplay></video>
-      <canvas id="canvas" style="display: none"></canvas>
-      <p id="scan-status" class="text-muted">Esperando código QR...</p>
-    </div>
-  </div>
+      <!-- Columna derecha: Escáner QR y selección de cliente -->
+      <div class="col-md-6">
+        <!-- Escáner QR -->
+        <h2>Escáner QR</h2>
+        <video id="video" width="100%" height="250" autoplay></video>
+        <canvas id="canvas" style="display: none"></canvas>
+        <p id="scan-status" class="text-muted">Esperando código QR...</p>
 
-  <!-- Fila independiente para el total de la compra -->
-  <div class="row mt-3">
-    <div class="col-12 text-start">
-      <h4>Total de la compra: <span id="total-compra">$0</span></h4>
+        <!-- Entrada manual del código QR como respaldo -->
+        <label for="qr_code_value">Escanea un Producto:</label>
+        <input type="text" name="qr_code_value" id="qr_code_value" placeholder="Código QR" class="form-control mb-2">
+        <button type="submit" name="add_product" class="btn btn-secondary">Añadir Producto</button>
+
+        <!-- Selección de cliente -->
+        <div class="mb-3">
+          <h4>Seleccionar Cliente</h4>
+          <select id="cliente-select" name="cliente_id" class="form-select">
+            <option value="">-- Seleccionar Cliente --</option>
+            {% for cliente in clientes %}
+              <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- Total de la compra -->
+    <div class="row mt-3">
+      <div class="col-12 text-start">
+        <h4>Total de la compra: <span id="total-compra">$0</span></h4>
+      </div>
+    </div>
+
+    <!-- Botón para cerrar la venta -->
+    <div class="row mt-3">
+      <div class="col-12 text-end">
+        <button type="submit" name="close_sale" class="btn btn-success">Cerrar Venta</button>
+      </div>
+    </div>
+  </form>
 
   <!-- Botón para volver al dashboard del cajero -->
   <div class="row mt-3">
@@ -128,8 +146,9 @@
                 <div class="product-total">
                     $<span class="costo">${totalInicial.toFixed(2)}</span>
                 </div>
-                <button class="btn btn-danger btn-sm eliminar" 
-                        onclick="eliminarProducto('${productIdStr}', 1)">Eliminar</button>
+                  <i class="fas fa-trash-alt eliminar" 
+                   onclick="eliminarProducto('${productIdStr}', 1)" style="cursor: pointer; color: red; font-size: 20px;">
+                  </i>
             `;
 
         productList.appendChild(li);
@@ -212,7 +231,7 @@
     productosEscaneados.forEach(item => {
       total += item.total;
     });
-    totalCompraElement.textContent = `Total de la compra: $${total.toFixed(2)}`;
+    totalCompraElement.textContent = `$${total.toFixed(2)}`;
   }
 
   function realizarVenta() {

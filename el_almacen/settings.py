@@ -145,3 +145,6 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
+# Session configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_NAME = 'sessionid'
