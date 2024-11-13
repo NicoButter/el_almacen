@@ -5,7 +5,7 @@
 {% block content %}
 
 <div class="container-fluid p-0">
-  <form method="post">
+  <form method="post" id="sale-form">
     {% csrf_token %}
     <div class="row g-0">
       <!-- Columna izquierda: Lista de productos escaneados -->
@@ -82,9 +82,14 @@
 
   let scanningEnabled = true; // Variable para controlar el escaneo
 
-  navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+  navigator.mediaDevices.getUserMedia({ video: true })
+  .then((stream) => {
     video.srcObject = stream;
     requestAnimationFrame(scanQRCode);
+  })
+  .catch((err) => {
+    console.error('Error al acceder a la cámara:', err);
+    scanStatus.textContent = "No se puede acceder a la cámara";
   });
 
   function agregarProductoALista(productId) {
@@ -114,7 +119,14 @@
 
         const precio = parseFloat(producto.precio_venta.replace(',', '.'));
         const cantidad = 1;
-        const totalInicial = precio * cantidad;
+        let totalInicial = precio * cantidad;
+
+        // Si el producto se vende fraccionado, calculamos en base a la cantidad en gramos
+        if (producto.se_vende_fraccionado) {
+          totalInicial = precio * (cantidad / 1000); // Convertimos gramos a kilogramos
+        } else {
+          totalInicial = precio * cantidad;
+        }
 
         // Determina el texto del precio según la unidad de venta
         const precioTexto = producto.se_vende_fraccionado ? "Precio x Kg" : "Precio x unidad";
@@ -228,43 +240,80 @@
 
   function actualizarTotalCompra() {
     let total = 0;
-    productosEscaneados.forEach(item => {
-      total += item.total;
+    productosEscaneados.forEach(producto => {
+      total += producto.total;
     });
     totalCompraElement.textContent = `$${total.toFixed(2)}`;
   }
 
-  function realizarVenta() {
-    const clienteId = document.getElementById("cliente-select").value;
-    const productos = Array.from(productosEscaneados.values()).map(item => ({
-        id: item.id,
-        cantidad: item.cantidad,
-        total: item.total
-    }));
+  // Evento para procesar el formulario y enviar la venta
+  document.getElementById("sale-form").addEventListener("submit", (e) => {
+    e.preventDefault();
 
+    const clienteId = document.getElementById("cliente-select").value;
     if (!clienteId) {
-        alert("Seleccione un cliente para continuar.");
-        return;
+      alert("Debes seleccionar un cliente para continuar.");
+      return;
     }
 
-    fetch('/sales/api/realizar_venta/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify({ cliente: clienteId, productos })
+    const productosData = Array.from(productosEscaneados.values()).map(producto => ({
+      id: parseInt(producto.elemento.dataset.productId),
+      cantidad: producto.cantidad,
+      total: producto.total,
+      precio_unitario: producto.precio_venta // Aquí agregamos el precio unitario
+    }));
+    
+    // Calcular el total de la compra sumando los totales de los productos
+    const totalCompra = productosData.reduce((total, producto) => total + producto.total, 0);
+    
+    const data = {
+      cliente_id: parseInt(clienteId),
+      productos: productosData,
+      total: parseFloat(totalCompra) || 0
+    };
+
+    console.log("Objeto JSON que se enviará al backend:", data);
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch("/sales/api/realizar-venta/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify(data)
     })
-    .then(response => response.json())
-    .then(data => {
+      .then(response => response.json())
+      .then(data => {
         if (data.success) {
-            alert("Venta realizada exitosamente");
+          alert("Venta registrada con éxito");
+          window.location.href = `/sales/tickets/${data.ticket_id}/`;
         } else {
-            alert("Error al realizar la venta");
+          alert("Error al registrar la venta");
         }
-    })
-    .catch(error => console.error("Error en la venta:", error));
-}
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        alert("Hubo un problema al procesar la venta.");
+      });
+  });
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
 </script>
 
 {% endblock %}

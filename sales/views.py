@@ -1,96 +1,105 @@
+import json
+
+from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.conf import settings
+
+
+
 from .models import Ticket, Venta, DetalleVenta, LineItem
 from products.models import Product
 from accounts.models import Cliente
+
+from decimal import Decimal
+
+def parse_decimal(value):
+    # Elimina cualquier separador de miles (por ejemplo, coma)
+    value = value.replace('.', '')  # Quitar los puntos de los miles
+    value = value.replace(',', '.')  # Convertir coma en punto decimal
+    return Decimal(value)
 
 
 def ticket_list(request):
     tickets = Ticket.objects.all().order_by('-date') 
     return render(request, 'sales/ticket_list.html', {'tickets': tickets})
 
-# def ticket_detail(request, ticket_id):
-#     ticket = get_object_or_404(Ticket, id=ticket_id)
-#     line_items = ticket.line_items.all()
-#     return render(request, 'sales/ticket_detail.html', {'ticket': ticket, 'line_items': line_items})
 
 def reprint_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
     line_items = ticket.line_items.all()
     return render(request, 'sales/reprint_ticket.html', {'ticket': ticket, 'line_items': line_items})
 
+
 @login_required
 def new_sale(request):
+    # Carga de productos y clientes para el formulario de la venta
     productos = Product.objects.all()
     clientes = Cliente.objects.all()
-    scanned_items = request.session.get('scanned_items', [])
 
     if request.method == 'POST':
-        if 'add_product' in request.POST:
-            qr_code_value = request.POST.get('qr_code_value')
-            if qr_code_value:
-                product = get_object_or_404(Product, id=qr_code_value)
-                item = {
-                    'product_id': product.id,
-                    'name': product.nombre,
-                    'price': float(product.precio_venta),
-                    'quantity': 1
-                }
-                
-                # Actualizar cantidad o agregar nuevo producto
-                for scanned_item in scanned_items:
-                    if scanned_item['product_id'] == product.id:
-                        scanned_item['quantity'] += 1
-                        scanned_item['subtotal'] = scanned_item['quantity'] * scanned_item['price']
-                        break
+        # Obtener datos JSON de la solicitud
+        try:
+            data = json.loads(request.body)
+            cliente_id = data.get('cliente_id')
+            productos_data = data.get('productos', [])
+
+            # Cálculo del total de la venta
+            total_compra = Decimal('0.00')
+            for producto_data in productos_data:
+                producto_id = producto_data.get('id')
+                cantidad = producto_data.get('cantidad')
+                precio_unitario = parse_decimal(str(producto_data.get('precio_unitario')))  # Usar parse_decimal
+                producto = Product.objects.get(id=producto_id)
+
+                if producto.se_vende_fraccionado:
+                    # Si el producto se vende por fracción, el precio se calcula por gramos (o kilos)
+                    precio_unitario_por_gramo = precio_unitario / 1000
+                    total_producto = precio_unitario_por_gramo * cantidad
                 else:
-                    item['subtotal'] = item['price']
-                    scanned_items.append(item)
+                    total_producto = precio_unitario * cantidad
 
-                # Persistir cambios en la sesión
-                request.session['scanned_items'] = scanned_items
-                request.session.modified = True
+                total_compra += total_producto
 
-        elif 'close_sale' in request.POST:
-            cliente_id = request.POST.get('cliente_id')
-            cliente = get_object_or_404(Cliente, id=cliente_id)
+            # Crear la venta
+            venta = Venta(cliente_id=cliente_id, total=total_compra, fecha_venta=timezone.now())
+            venta.save()
 
-            total_venta = sum(item['subtotal'] for item in scanned_items)
+            # Agregar los detalles de la venta
+            for producto_data in productos_data:
+                producto_id = producto_data.get('id')
+                cantidad = producto_data.get('cantidad')
+                producto = Product.objects.get(id=producto_id)
+                precio_unitario = parse_decimal(str(producto_data.get('precio_unitario')))  # Usar parse_decimal
 
-            ticket = Ticket.objects.create(
-                cliente=cliente,
-                total=total_venta,
-                cashier=request.user,
-                fiado=False
-            )
+                if producto.se_vende_fraccionado:
+                    # Si el producto se vende por fracción, ajustamos la cantidad
+                    total_producto = precio_unitario * (cantidad / 1000)
+                else:
+                    total_producto = precio_unitario * cantidad
 
-            # Crear LineItems
-            for item in scanned_items:
-                try:
-                    product = Product.objects.get(id=item['product_id'])
-                    line_item = LineItem.objects.create(
-                        ticket=ticket,
-                        product=product,  # Asigna el objeto Product directamente
-                        quantity=item['quantity'],
-                        subtotal=item['subtotal']
-                    )
-                    print(f"LineItem created: {line_item}")
-                except Product.DoesNotExist:
-                    print(f"Product with ID {item['product_id']} does not exist")
+                detalle_venta = DetalleVenta(
+                    venta=venta,
+                    producto_id=producto_id,
+                    cantidad=cantidad,
+                    precio_unitario=precio_unitario,
+                    total=total_producto
+                )
+                detalle_venta.save()
 
-            request.session['scanned_items'] = []
-            request.session.modified = True
+            return JsonResponse({'success': True, 'ticket_id': venta.id})
 
-            return redirect('sales:ticket_detail', ticket_id=ticket.id)
+        except Exception as e:
+            print(f"Error en la venta: {e}")
+            return JsonResponse({'success': False, 'error': str(e)})
 
-    return render(request, 'sales/new_sale.html', {
-        'clientes': clientes,
-        'productos': productos,
-        'scanned_items': scanned_items,
-    })
+    # Renderizar el formulario de venta si no es una petición POST
+    return render(request, 'sales/new_sale.html', {'productos': productos, 'clientes': clientes})
+
 
 
 def buscar_venta(request):
@@ -125,3 +134,105 @@ def ticket_detail(request, ticket_id):
         'ticket': ticket,
         'line_items': line_items
     })
+
+@csrf_exempt
+@login_required
+def realizar_venta(request):
+    if request.method == 'POST':
+        try:
+            # Imprimir el cuerpo de la solicitud para depuración
+            print("JSON recibido:", request.body.decode('utf-8'))
+            
+            data = json.loads(request.body)
+            cliente_id = data.get('cliente_id')
+            productos_data = data.get('productos', [])
+            total_compra = data.get('total', 0)
+
+            if not cliente_id or not productos_data or total_compra is None:
+                return JsonResponse({"success": False, "message": "Faltan datos de cliente, productos o total."}, status=400)
+
+            cliente = get_object_or_404(Cliente, id=cliente_id)
+            venta = Venta.objects.create(cliente=cliente, fecha_venta=timezone.now(), total=total_compra)
+
+            # Obtener el usuario actual (cajero)
+            cajero = request.user
+
+            # Crear el ticket con el cajero asignado
+            ticket = Ticket.objects.create(
+                venta=venta,
+                date=timezone.now(),
+                total=total_compra,
+                cashier_id=cajero.id  # Asignar el cajero
+            )
+
+            for item in productos_data:
+                product_id = item.get('id')
+                cantidad = int(item.get('cantidad'))  # Asegurarse de que sea un número entero
+                total_producto = Decimal(item.get('total'))  # Convertir total a Decimal
+                precio_unitario = Decimal(item.get('precio_unitario'))  # Convertir a Decimal
+
+                product = get_object_or_404(Product, id=product_id)
+
+                # Crear el detalle de la venta
+                detalle_venta = DetalleVenta.objects.create(
+                    venta=venta,
+                    producto=product,
+                    cantidad=cantidad,
+                    total=total_producto,
+                    precio_unitario=precio_unitario
+                )
+
+                # Crear el LineItem
+                LineItem.objects.create(  
+                    ticket=ticket,
+                    product=product,      
+                    quantity=cantidad,    
+                    subtotal=total_producto  # Asegurarse de que 'subtotal' sea Decimal
+                )
+
+            # Devolver un JSON con el éxito y el ID del ticket
+            return JsonResponse({
+                "success": True,
+                "message": "Venta procesada correctamente",
+                "ticket_id": ticket.id
+            })
+
+
+            # return redirect('sales:ticket_detail', ticket_id=ticket.id)  # Redirigir usando el ID del ticket
+
+        except Exception as e:
+            print(f"Error al procesar la venta: {e}")
+            return JsonResponse({"success": False, "message": "Hubo un error al procesar la venta. Inténtalo nuevamente."}, status=500)
+
+
+def enviar_ticket_email(request, ticket_id):
+    # Aquí obtienes el ticket y los datos del cliente, según tu modelo
+    ticket = Ticket.objects.get(id=ticket_id)
+    cliente_email = ticket.cliente.email  # Asegúrate de tener el email del cliente
+
+    # Compones el asunto y el mensaje
+    asunto = f'Ticket de Compra - {ticket.id}'
+    mensaje = f"""
+    Detalles del Ticket:
+    ID: {ticket.id}
+    Cajero: {ticket.cashier.username}
+    Fecha: {ticket.date}
+    Total: {ticket.total}
+    
+    Productos:
+    """
+    
+    for item in ticket.line_items.all():
+        mensaje += f"\n{item.product.nombre} - {item.quantity} /u - ${item.subtotal}"
+    
+    # Envías el correo
+    send_mail(
+        asunto,
+        mensaje,
+        settings.EMAIL_HOST_USER,  # El correo desde el cual se enviará
+        [cliente_email],  # El correo del destinatario
+        fail_silently=False,
+    )
+
+    # Después rediriges o devuelves algo
+    return render(request, 'ticket_details.html', {'ticket': ticket})

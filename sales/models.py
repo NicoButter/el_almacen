@@ -4,18 +4,27 @@ from products.models import Product
 from accounts.models import Cliente
 from products.models import Product
 
+class Venta(models.Model):
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    fecha_venta = models.DateTimeField(auto_now_add=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    productos = models.ManyToManyField(Product, through='DetalleVenta')
+
+    def __str__(self):
+        return f"Venta {self.id} - {self.cliente.nombre}"
+
 class Ticket(models.Model):
+    venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='tickets', null=True, blank=True)
     cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')  # Relaciona al ticket con un cliente
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
     date = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    fiado = models.BooleanField(default=False)  # Añade el campo para identificar si la venta fue fiada o no
+    fiado = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Ticket {self.id} - {self.date}'
 
     def save(self, *args, **kwargs):
-        # Si la venta fue fiada, actualiza el saldo de la cuenta corriente del cliente
         if self.fiado and self.cliente:
             cuenta_corriente, created = CuentaCorriente.objects.get_or_create(cliente=self.cliente)
             cuenta_corriente.saldo += self.total
@@ -29,11 +38,11 @@ class LineItem(models.Model):
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'{self.quantity} x {self.product.name}'
+        return f'{self.quantity} x {self.product.nombre}'
 
     def save(self, *args, **kwargs):
         # Calcula el subtotal como cantidad * precio del producto
-        self.subtotal = self.quantity * self.product.price
+        self.subtotal = self.quantity * self.product.precio_venta
         super().save(*args, **kwargs)
 
 # Modelo para registrar los pagos (cuando un cliente paga su saldo fiado)
@@ -45,23 +54,13 @@ class Pago(models.Model):
     def __str__(self):
         return f'Pago de ${self.monto} - Cliente: {self.cliente.nombre} el {self.fecha.strftime("%d/%m/%Y")}'
 
-# # Modelo para llevar la cuenta corriente del cliente (saldo deudor)
-# class CuentaCorriente(models.Model):
-#     cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, related_name='cuenta_corriente')
-#     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
-#     def __str__(self):
-#         return f'Cuenta Corriente - Cliente: {self.cliente.nombre} - Saldo: ${self.saldo}'
-
-
-class Venta(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    fecha_venta = models.DateTimeField(auto_now_add=True)
-    total = models.DecimalField(max_digits=10, decimal_places=2)
-    productos = models.ManyToManyField(Product, through='DetalleVenta')
+# Modelo para llevar la cuenta corriente del cliente (saldo deudor)
+class CuentaCorriente(models.Model):
+    cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, related_name='cuenta_corriente')
+    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
-        return f"Venta {self.id} - {self.cliente.nombre}"
+        return f'Cuenta Corriente - Cliente: {self.cliente.nombre} - Saldo: ${self.saldo}'
 
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE)
@@ -77,6 +76,6 @@ class DetalleVenta(models.Model):
 def obtener_precio_producto(producto_id):
     try:
         producto = Product.objects.get(id=producto_id)
-        return producto.precio_venta  # Adjust the field name if necessary
+        return producto.precio_venta  
     except Product.DoesNotExist:
-        return None  # Or handle this case as needed
+        return None  

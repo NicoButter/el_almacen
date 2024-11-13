@@ -1,30 +1,72 @@
-<h2>Detalles del Ticket</h2>
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Detalle del Ticket{% endblock %}
+{% block header %}Detalle del Ticket{% endblock %}
 
-<p>ID: {{ ticket.id }}</p>
-<p>Cajero: {{ ticket.cashier.username }}</p>
-<p>Fecha: {{ ticket.date }}</p>
-<p>Total: ${{ ticket.total }}</p>
+{% block content %}
+<div class="ticket-container">
+    <div class="ticket-header">
+        <h1>El Almacén</h1> 
+        <h2>Almacén Cristina</h2>
+        <p>B° Virgen del Valle M46 L 16</p>
+    </div>
+    
+    <div class="ticket-body">
+        <h2>Detalles del Ticket</h2>
+        <div class="ticket-details">
+            <p><strong>ID:</strong> {{ ticket.id }}</p>
+            <p><strong>Cajero:</strong> {{ ticket.cashier.username }}</p>
+            <p><strong>Fecha:</strong> {{ ticket.date }}</p>
+        </div>
+        
+        <h3>Productos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in line_items %}
+                <tr>
+                    <td>{{ item.product.nombre }}</td>
+                    <td>
+                        {% if item.product.se_vende_fraccionado %}
+                            {{ item.quantity }} grs.
+                        {% else %}
+                            {{ item.quantity }} /u
+                        {% endif %}
+                    </td>
+                    <td>${{ item.subtotal|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
-<h3>Productos</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for item in line_items %}
-        <tr>
-            <td>{{ item.product.nombre }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>${{ item.subtotal }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        {% if line_items.count == 0 %}
+        <p>No hay productos en este ticket.</p>
+        {% endif %}
+    </div>
 
-{% if line_items.count == 0 %}
-<p>No hay productos en este ticket.</p>
-{% endif %}
+    <div class="ticket-footer">
+        <p><strong>Total: </strong>${{ ticket.total|floatformat:2 }}</p>
+    </div>
+
+    <!-- Botones al lado derecho -->
+    <div class="ticket-buttons">
+        <!-- Enviar por WhatsApp -->
+        <a href="https://wa.me/{{ ticket.cliente.telefono }}?text=Detalles%20del%20Ticket:%20ID:%20{{ ticket.id }}%20Total:%20${{ ticket.total }}%20Productos:%20{% for item in ticket.line_items.all %}{{ item.product.nombre }}%20{{ item.quantity }}%20/u%20${{ item.subtotal }}{% endfor %}" class="btn btn-warning" target="_blank">
+            Enviar por WhatsApp
+        </a>
+    
+        <!-- Enviar por Email -->
+        <a href="{% url 'enviar_ticket_email' ticket.id %}" class="btn btn-success">Enviar por Email</a>
+    
+        <!-- Terminar -->
+        <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Terminar</a>
+    </div>
+
+</div>
+{% endblock %}
