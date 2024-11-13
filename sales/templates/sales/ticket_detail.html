@@ -8,7 +8,7 @@
     <div class="ticket-header">
         <h1>El Almacén</h1> 
         <h2>Almacén Cristina</h2>
-        <p>B° Virgen del Valle M46 L 16</p>
+        <p>B° Virgen del Valle M46 L16</p>
     </div>
     
     <div class="ticket-body">
@@ -31,7 +31,15 @@
             <tbody>
                 {% for item in line_items %}
                 <tr>
-                    <td>{{ item.product.nombre }}</td>
+                    <td>{{ item.product.nombre }}<br>
+                        <span style="font-size: 0.8em; color: #666;">
+                            {% if item.product.se_vende_fraccionado %}
+                                Precio por kilo: ${{ item.product.precio_venta|floatformat:2 }}
+                            {% else %}
+                                Precio por unidad: ${{ item.product.precio_venta|floatformat:2 }}
+                            {% endif %}
+                        </span>
+                    </td>
                     <td>
                         {% if item.product.se_vende_fraccionado %}
                             {{ item.quantity }} grs.
@@ -57,12 +65,12 @@
     <!-- Botones al lado derecho -->
     <div class="ticket-buttons">
         <!-- Enviar por WhatsApp -->
-        <a href="https://wa.me/{{ ticket.cliente.telefono }}?text=Detalles%20del%20Ticket:%20ID:%20{{ ticket.id }}%20Total:%20${{ ticket.total }}%20Productos:%20{% for item in ticket.line_items.all %}{{ item.product.nombre }}%20{{ item.quantity }}%20/u%20${{ item.subtotal }}{% endfor %}" class="btn btn-warning" target="_blank">
+        <a href="{% url 'sales:generar_pdf_whatsapp' ticket.id %}" class="btn btn-warning" target="_blank">
             Enviar por WhatsApp
         </a>
     
         <!-- Enviar por Email -->
-        <a href="{% url 'enviar_ticket_email' ticket.id %}" class="btn btn-success">Enviar por Email</a>
+        <a href="{% url 'sales:enviar_ticket_email' ticket.id %}" class="btn btn-success">Enviar por Email</a>
     
         <!-- Terminar -->
         <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Terminar</a>

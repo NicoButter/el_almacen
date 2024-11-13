@@ -1,12 +1,16 @@
+import io
 import json
+import weasyprint
 
+from .models import Ticket
+
+from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
+from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.conf import settings
 
 
@@ -206,33 +210,62 @@ def realizar_venta(request):
 
 
 def enviar_ticket_email(request, ticket_id):
-    # Aquí obtienes el ticket y los datos del cliente, según tu modelo
-    ticket = Ticket.objects.get(id=ticket_id)
-    cliente_email = ticket.cliente.email  # Asegúrate de tener el email del cliente
+    # Obtener el ticket de la base de datos
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    line_items = ticket.line_items.all()
 
-    # Compones el asunto y el mensaje
-    asunto = f'Ticket de Compra - {ticket.id}'
-    mensaje = f"""
-    Detalles del Ticket:
-    ID: {ticket.id}
-    Cajero: {ticket.cashier.username}
-    Fecha: {ticket.date}
-    Total: {ticket.total}
-    
-    Productos:
-    """
-    
-    for item in ticket.line_items.all():
-        mensaje += f"\n{item.product.nombre} - {item.quantity} /u - ${item.subtotal}"
-    
-    # Envías el correo
-    send_mail(
-        asunto,
-        mensaje,
-        settings.EMAIL_HOST_USER,  # El correo desde el cual se enviará
-        [cliente_email],  # El correo del destinatario
-        fail_silently=False,
+    # Renderizar el template a HTML
+    html = render_to_string('ticket_details.html', {'ticket': ticket, 'line_items': line_items})
+
+    # Convertir el HTML a PDF
+    pdf = weasyprint.HTML(string=html).write_pdf()
+
+    # Crear un archivo en memoria con el PDF
+    pdf_file = io.BytesIO(pdf)
+
+    # Crear el correo electrónico
+    email = EmailMessage(
+        'Detalles de tu Ticket de Compra',  # Asunto
+        'Adjunto encontrarás el PDF con los detalles de tu compra.',  # Cuerpo del correo
+        'from@example.com',  # Dirección de envío
+        [ticket.cliente.email]  # Dirección de destino (cliente)
     )
+    email.attach(f'ticket_{ticket.id}.pdf', pdf_file.getvalue(), 'application/pdf')
 
-    # Después rediriges o devuelves algo
-    return render(request, 'ticket_details.html', {'ticket': ticket})
+    # Enviar el correo
+    email.send()
+
+    # Redirigir a la página de confirmación o dashboard
+    return HttpResponse('El ticket ha sido enviado por email.', content_type='text/plain')
+
+def generar_pdf(request, ticket_id):
+    # Obtener el ticket de la base de datos
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    line_items = ticket.line_items.all()
+
+    # Renderizar el template a HTML
+    html = render_to_string('ticket_details.html', {'ticket': ticket, 'line_items': line_items})
+
+    # Convertir el HTML a PDF
+    pdf = weasyprint.HTML(string=html).write_pdf()
+
+    # Crear una respuesta HTTP con el PDF como adjunto
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
+    return response
+
+def generar_pdf_whatsapp(request, ticket_id):
+    # Obtener el ticket
+    ticket = get_object_or_404(Ticket, id=ticket_id)
+    line_items = ticket.line_items.all()
+
+    # Renderizar el template a HTML
+    html = render_to_string('ticket_details.html', {'ticket': ticket, 'line_items': line_items})
+
+    # Convertir el HTML a PDF
+    pdf = weasyprint.HTML(string=html).write_pdf()
+
+    # Crear una respuesta con el archivo PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
+    return response

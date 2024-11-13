@@ -10,5 +10,8 @@ urlpatterns = [
     path('nueva-venta/', views.new_sale, name='new_sale'),
     path('buscar/', views.buscar_venta, name='buscar_venta'),
     path('api/productos/<int:product_id>/', views.product_detail, name='product_detail'),
-    path('api/realizar-venta/', views.realizar_venta, name='realizar_venta')
+    path('api/realizar-venta/', views.realizar_venta, name='realizar_venta'),
+    path('ticket/pdf/<int:ticket_id>/', views.generar_pdf, name='generar_pdf'),
+    path('ticket/email/<int:ticket_id>/', views.enviar_ticket_email, name='enviar_ticket_email'),
+    path('ticket/whatsapp/<int:ticket_id>/', views.generar_pdf_whatsapp, name='generar_pdf_whatsapp'),
 ]
