@@ -13,13 +13,12 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.conf import settings
 
-
-
 from .models import Ticket, Venta, DetalleVenta, LineItem
 from products.models import Product
 from accounts.models import Cliente
-
 from decimal import Decimal
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def parse_decimal(value):
     # Elimina cualquier separador de miles (por ejemplo, coma)
@@ -27,17 +26,20 @@ def parse_decimal(value):
     value = value.replace(',', '.')  # Convertir coma en punto decimal
     return Decimal(value)
 
+# ---------------------------------------------------------------------------------------------------------------
 
 def ticket_list(request):
     tickets = Ticket.objects.all().order_by('-date') 
     return render(request, 'sales/ticket_list.html', {'tickets': tickets})
 
+# ---------------------------------------------------------------------------------------------------------------
 
 def reprint_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
     line_items = ticket.line_items.all()
     return render(request, 'sales/reprint_ticket.html', {'ticket': ticket, 'line_items': line_items})
 
+# ---------------------------------------------------------------------------------------------------------------
 
 @login_required
 def new_sale(request):
@@ -104,11 +106,13 @@ def new_sale(request):
     # Renderizar el formulario de venta si no es una petición POST
     return render(request, 'sales/new_sale.html', {'productos': productos, 'clientes': clientes})
 
-
+# ---------------------------------------------------------------------------------------------------------------
 
 def buscar_venta(request):
     # lógica para buscar venta
     return render(request, 'sales/buscar_venta.html')
+
+# ---------------------------------------------------------------------------------------------------------------
 
 def get_product(request, product_id):
     try:
@@ -121,11 +125,14 @@ def get_product(request, product_id):
         return JsonResponse(data)
     except Product.DoesNotExist:
         return JsonResponse({"error": "Producto no encontrado"}, status=404)
+    
+# ---------------------------------------------------------------------------------------------------------------
 
 # Nueva vista para ProductDetailView
 def product_detail(request, product_id):
     return get_product(request, product_id)
 
+# ---------------------------------------------------------------------------------------------------------------
 
 @login_required
 def ticket_detail(request, ticket_id):
@@ -138,6 +145,8 @@ def ticket_detail(request, ticket_id):
         'ticket': ticket,
         'line_items': line_items
     })
+
+# ---------------------------------------------------------------------------------------------------------------
 
 @csrf_exempt
 @login_required
@@ -171,11 +180,35 @@ def realizar_venta(request):
 
             for item in productos_data:
                 product_id = item.get('id')
-                cantidad = int(item.get('cantidad'))  # Asegurarse de que sea un número entero
+                cantidad = Decimal(item.get('cantidad'))  # Convertir cantidad a Decimal
                 total_producto = Decimal(item.get('total'))  # Convertir total a Decimal
                 precio_unitario = Decimal(item.get('precio_unitario'))  # Convertir a Decimal
 
                 product = get_object_or_404(Product, id=product_id)
+
+                # Verificar si el producto se vende fraccionado
+                if product.se_vende_fraccionado:
+                    # Convertir cantidad de gramos a kilogramos
+                    cantidad_kg = cantidad / Decimal('1000')
+                    if product.cantidad_stock < cantidad_kg:
+                        return JsonResponse({
+                            "success": False,
+                            "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg"
+                        }, status=400)
+                    # Reducir el stock en kilogramos
+                    product.cantidad_stock -= cantidad_kg
+                else:
+                    # Producto vendido en unidades
+                    if product.cantidad_stock < cantidad:
+                        return JsonResponse({
+                            "success": False,
+                            "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades"
+                        }, status=400)
+                    # Reducir el stock en unidades
+                    product.cantidad_stock -= cantidad
+
+                # Guardar la actualización del producto
+                product.save()
 
                 # Crear el detalle de la venta
                 detalle_venta = DetalleVenta.objects.create(
@@ -201,13 +234,11 @@ def realizar_venta(request):
                 "ticket_id": ticket.id
             })
 
-
-            # return redirect('sales:ticket_detail', ticket_id=ticket.id)  # Redirigir usando el ID del ticket
-
         except Exception as e:
             print(f"Error al procesar la venta: {e}")
             return JsonResponse({"success": False, "message": "Hubo un error al procesar la venta. Inténtalo nuevamente."}, status=500)
 
+# ---------------------------------------------------------------------------------------------------------------
 
 def enviar_ticket_email(request, ticket_id):
     # Obtener el ticket de la base de datos
@@ -238,6 +269,8 @@ def enviar_ticket_email(request, ticket_id):
     # Redirigir a la página de confirmación o dashboard
     return HttpResponse('El ticket ha sido enviado por email.', content_type='text/plain')
 
+# ---------------------------------------------------------------------------------------------------------------
+
 def generar_pdf(request, ticket_id):
     # Obtener el ticket de la base de datos
     ticket = get_object_or_404(Ticket, id=ticket_id)
@@ -254,6 +287,8 @@ def generar_pdf(request, ticket_id):
     response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
     return response
 
+# ---------------------------------------------------------------------------------------------------------------
+
 def generar_pdf_whatsapp(request, ticket_id):
     # Obtener el ticket
     ticket = get_object_or_404(Ticket, id=ticket_id)
@@ -269,3 +304,5 @@ def generar_pdf_whatsapp(request, ticket_id):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
     return response
+
+# ---------------------------------------------------------------------------------------------------------------
