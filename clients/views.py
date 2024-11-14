@@ -64,8 +64,8 @@ def agregar_cliente(request):
 def listar_clientes(request):
     query = request.GET.get('query')
     
-    # Usamos `prefetch_related` con el nombre correcto `cuentas_corrientes`
-    clientes = Cliente.objects.prefetch_related('direcciones', 'telefonos', 'emails', 'cuentas_corrientes').all()
+    # Usamos `prefetch_related` para optimizar la consulta, aunque ahora solo hay una cuenta corriente por cliente
+    clientes = Cliente.objects.prefetch_related('direcciones', 'telefonos', 'emails', 'cuenta_corriente_cc').all()
 
     if query:
         clientes = clientes.filter(

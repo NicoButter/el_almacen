@@ -54,18 +54,11 @@
                     <td>{% for telefono in cliente.telefonos.all %}{{ telefono.numero }}{% endfor %}</td>
                     <td>{% for email in cliente.emails.all %}{{ email.email }}{% endfor %}</td>
                     <td>
-                        {% if cliente.cuentas_corrientes.first %}
-                            Saldo: {{ cliente.cuentas_corrientes.first.saldo }}
-                        {% else %}
-                            Sin cuenta
-                        {% endif %}
-                    </td>
-                    {% comment %} <td>
-                        {% for cuenta in cliente.cuenta_corriente.all %}
-                            Saldo: {{ cuenta.saldo }} <br>
-                            Fecha Apertura: {{ cuenta.fecha_apertura }}
+                        {% for cliente in clientes %}
+                            <p>{{ cliente.nombre }}</p>
+                            <p>{{ cliente.cuenta_corriente_cc.saldo }}</p> <!-- Accede a los datos de CuentaCorriente -->
                         {% endfor %}
-                    </td> {% endcomment %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

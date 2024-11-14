@@ -1,6 +1,7 @@
 import io
 import json
 import weasyprint
+import logging
 
 from .models import Ticket
 
@@ -13,10 +14,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.conf import settings
 
-from .models import Ticket, Venta, DetalleVenta, LineItem
+from .models import Ticket, Venta, DetalleVenta, LineItem, CuentaCorriente
 from products.models import Product
 from accounts.models import Cliente
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -43,67 +47,82 @@ def reprint_ticket(request, ticket_id):
 
 @login_required
 def new_sale(request):
-    # Carga de productos y clientes para el formulario de la venta
-    productos = Product.objects.all()
-    clientes = Cliente.objects.all()
-
     if request.method == 'POST':
-        # Obtener datos JSON de la solicitud
         try:
+            # Intentar cargar los datos de la solicitud
             data = json.loads(request.body)
             cliente_id = data.get('cliente_id')
             productos_data = data.get('productos', [])
+            venta_fiada = data.get('venta_fiada')
 
-            # Cálculo del total de la venta
+            # Log de inicio de procesamiento
+            logger.info("Iniciando procesamiento de la nueva venta.")
+            
+            # Inicialización del total
             total_compra = Decimal('0.00')
+
+            # Procesar cada producto
             for producto_data in productos_data:
-                producto_id = producto_data.get('id')
-                cantidad = producto_data.get('cantidad')
-                precio_unitario = parse_decimal(str(producto_data.get('precio_unitario')))  # Usar parse_decimal
-                producto = Product.objects.get(id=producto_id)
+                try:
+                    producto_id = producto_data.get('id')
+                    cantidad = Decimal(producto_data.get('cantidad'))
+                    precio_unitario = Decimal(producto_data.get('precio_unitario'))
+                    
+                    # Validación y cálculo para productos fraccionados
+                    producto = Product.objects.get(id=producto_id)
+                    if producto.se_vende_fraccionado:
+                        total_producto = precio_unitario * (cantidad / 1000)
+                    else:
+                        total_producto = precio_unitario * cantidad
+                    
+                    total_compra += total_producto
+                except Exception as e:
+                    logger.error(f"Error procesando el producto {producto_data.get('id')}: {str(e)}")
+                    raise
 
-                if producto.se_vende_fraccionado:
-                    # Si el producto se vende por fracción, el precio se calcula por gramos (o kilos)
-                    precio_unitario_por_gramo = precio_unitario / 1000
-                    total_producto = precio_unitario_por_gramo * cantidad
-                else:
-                    total_producto = precio_unitario * cantidad
-
-                total_compra += total_producto
-
-            # Crear la venta
+            # Crear y guardar la venta
             venta = Venta(cliente_id=cliente_id, total=total_compra, fecha_venta=timezone.now())
             venta.save()
 
-            # Agregar los detalles de la venta
+            # Agregar detalles de la venta
             for producto_data in productos_data:
-                producto_id = producto_data.get('id')
-                cantidad = producto_data.get('cantidad')
-                producto = Product.objects.get(id=producto_id)
-                precio_unitario = parse_decimal(str(producto_data.get('precio_unitario')))  # Usar parse_decimal
+                try:
+                    producto_id = producto_data.get('id')
+                    cantidad = Decimal(producto_data.get('cantidad'))
+                    precio_unitario = Decimal(producto_data.get('precio_unitario'))
+                    total_producto = precio_unitario * cantidad if not producto.se_vende_fraccionado else precio_unitario * (cantidad / 1000)
+                    
+                    DetalleVenta.objects.create(
+                        venta=venta,
+                        producto_id=producto_id,
+                        cantidad=cantidad,
+                        precio_unitario=precio_unitario,
+                        total=total_producto
+                    )
+                except Exception as e:
+                    logger.error(f"Error creando detalle de venta para producto {producto_data.get('id')}: {str(e)}")
+                    raise
 
-                if producto.se_vende_fraccionado:
-                    # Si el producto se vende por fracción, ajustamos la cantidad
-                    total_producto = precio_unitario * (cantidad / 1000)
-                else:
-                    total_producto = precio_unitario * cantidad
-
-                detalle_venta = DetalleVenta(
-                    venta=venta,
-                    producto_id=producto_id,
-                    cantidad=cantidad,
-                    precio_unitario=precio_unitario,
-                    total=total_producto
-                )
-                detalle_venta.save()
+            # Verificar si es venta fiada y actualizar cuenta corriente
+            if venta_fiada:
+                venta.realizar_venta_fiada()
+            
+            logger.info(f"Venta procesada con éxito. ID de venta: {venta.id}")
 
             return JsonResponse({'success': True, 'ticket_id': venta.id})
 
+        except (ValueError, TypeError, InvalidOperation) as e:
+            logger.error(f"Error en la solicitud de venta: {str(e)}")
+            return JsonResponse({'success': False, 'error': f'Error en la solicitud: {str(e)}'}, status=400)
+        except Product.DoesNotExist:
+            logger.error("Producto no encontrado durante la venta.")
+            return JsonResponse({'success': False, 'error': 'Producto no encontrado'}, status=404)
         except Exception as e:
-            print(f"Error en la venta: {e}")
-            return JsonResponse({'success': False, 'error': str(e)})
+            logger.error(f"Error inesperado: {str(e)}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
-    # Renderizar el formulario de venta si no es una petición POST
+    productos = Product.objects.all()
+    clientes = Cliente.objects.all()
     return render(request, 'sales/new_sale.html', {'productos': productos, 'clientes': clientes})
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -153,90 +172,88 @@ def ticket_detail(request, ticket_id):
 def realizar_venta(request):
     if request.method == 'POST':
         try:
-            # Imprimir el cuerpo de la solicitud para depuración
-            print("JSON recibido:", request.body.decode('utf-8'))
-            
             data = json.loads(request.body)
+            logger.debug(f"Datos recibidos: {data}")
+            
             cliente_id = data.get('cliente_id')
             productos_data = data.get('productos', [])
             total_compra = data.get('total', 0)
 
             if not cliente_id or not productos_data or total_compra is None:
+                logger.warning("Faltan datos de cliente, productos o total.")
                 return JsonResponse({"success": False, "message": "Faltan datos de cliente, productos o total."}, status=400)
 
             cliente = get_object_or_404(Cliente, id=cliente_id)
-            venta = Venta.objects.create(cliente=cliente, fecha_venta=timezone.now(), total=total_compra)
+            
+            # Verificar si el cliente tiene cuenta corriente
+            try:
+                cuenta_corriente = CuentaCorriente.objects.get(cliente=cliente)
+            except CuentaCorriente.DoesNotExist:
+                logger.error(f"Cliente con ID {cliente.id} no tiene cuenta corriente.")
+                return JsonResponse({
+                    "success": False,
+                    "message": "El cliente no tiene una cuenta corriente asociada."
+                }, status=400)
+            
+            # Crear la venta
+            logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.id})")
+            venta = Venta.objects.create(cliente=cliente, fecha_venta=timezone.now(), total=total_compra, cuenta_corriente=cuenta_corriente)
 
-            # Obtener el usuario actual (cajero)
-            cajero = request.user
+            # Llamar al método para agregar el monto de la venta a la cuenta corriente
+            logger.debug(f"Realizando venta fiada para la venta {venta.id}")
+            venta.realizar_venta_fiada()
 
-            # Crear el ticket con el cajero asignado
-            ticket = Ticket.objects.create(
-                venta=venta,
-                date=timezone.now(),
-                total=total_compra,
-                cashier_id=cajero.id  # Asignar el cajero
-            )
-
+            # Procesar productos de la venta (detalles de la venta)
             for item in productos_data:
                 product_id = item.get('id')
-                cantidad = Decimal(item.get('cantidad'))  # Convertir cantidad a Decimal
-                total_producto = Decimal(item.get('total'))  # Convertir total a Decimal
-                precio_unitario = Decimal(item.get('precio_unitario'))  # Convertir a Decimal
+                cantidad = Decimal(item.get('cantidad'))
+                total_producto = Decimal(item.get('total'))
+                precio_unitario = Decimal(item.get('precio_unitario'))
 
                 product = get_object_or_404(Product, id=product_id)
+                logger.debug(f"Procesando producto: {product.nombre}, cantidad: {cantidad}, precio unitario: {precio_unitario}")
 
-                # Verificar si el producto se vende fraccionado
                 if product.se_vende_fraccionado:
-                    # Convertir cantidad de gramos a kilogramos
                     cantidad_kg = cantidad / Decimal('1000')
                     if product.cantidad_stock < cantidad_kg:
+                        logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg")
                         return JsonResponse({
                             "success": False,
                             "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg"
                         }, status=400)
-                    # Reducir el stock en kilogramos
                     product.cantidad_stock -= cantidad_kg
                 else:
-                    # Producto vendido en unidades
                     if product.cantidad_stock < cantidad:
+                        logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades")
                         return JsonResponse({
                             "success": False,
                             "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades"
                         }, status=400)
-                    # Reducir el stock en unidades
                     product.cantidad_stock -= cantidad
 
-                # Guardar la actualización del producto
                 product.save()
 
-                # Crear el detalle de la venta
-                detalle_venta = DetalleVenta.objects.create(
+                # Crear los detalles de la venta
+                DetalleVenta.objects.create(
                     venta=venta,
                     producto=product,
                     cantidad=cantidad,
                     total=total_producto,
                     precio_unitario=precio_unitario
                 )
+                logger.debug(f"Detalle de venta creado para el producto '{product.nombre}'")
 
-                # Crear el LineItem
-                LineItem.objects.create(  
-                    ticket=ticket,
-                    product=product,      
-                    quantity=cantidad,    
-                    subtotal=total_producto  # Asegurarse de que 'subtotal' sea Decimal
-                )
-
-            # Devolver un JSON con el éxito y el ID del ticket
+            logger.info(f"Venta procesada correctamente, ID de ticket: {venta.id}")
             return JsonResponse({
                 "success": True,
                 "message": "Venta procesada correctamente",
-                "ticket_id": ticket.id
+                "ticket_id": venta.id
             })
 
         except Exception as e:
-            print(f"Error al procesar la venta: {e}")
+            logger.error(f"Error al procesar la venta: {e}")
             return JsonResponse({"success": False, "message": "Hubo un error al procesar la venta. Inténtalo nuevamente."}, status=500)
+
 
 # ---------------------------------------------------------------------------------------------------------------
 

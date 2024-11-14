@@ -60,6 +60,14 @@
     </div>
   </form>
 
+  <div class="mb-3">
+    <h4>¿Venta Fiada?</h4>
+    <select id="venta-fiada" name="venta_fiada" class="form-select">
+      <option value="no">No</option>
+      <option value="si">Sí</option>
+    </select>
+  </div>
+
   <!-- Botón para volver al dashboard del cajero -->
   <div class="row mt-3">
     <div class="col-12 text-end">
@@ -67,6 +75,7 @@
     </div>
   </div>
 </div>
+
 
 <!-- Incluye la biblioteca jsQR -->
 <script src="{% static 'js/jsQR.js' %}"></script>
@@ -260,16 +269,18 @@
       id: parseInt(producto.elemento.dataset.productId),
       cantidad: producto.cantidad,
       total: producto.total,
-      precio_unitario: producto.precio_venta // Aquí agregamos el precio unitario
+      precio_unitario: producto.precio_venta 
     }));
     
     // Calcular el total de la compra sumando los totales de los productos
     const totalCompra = productosData.reduce((total, producto) => total + producto.total, 0);
-    
+    const ventaFiada = document.getElementById("venta-fiada").value || ''; 
+
     const data = {
       cliente_id: parseInt(clienteId),
       productos: productosData,
-      total: parseFloat(totalCompra) || 0
+      total: parseFloat(totalCompra) || 0,
+      venta_fiada: ventaFiada
     };
 
     console.log("Objeto JSON que se enviará al backend:", data);
