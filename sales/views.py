@@ -3,18 +3,19 @@ import json
 import weasyprint
 import logging
 
-from .models import Ticket
-
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
-from django.conf import settings
+from django.db import transaction
 
-from .models import Ticket, Venta, DetalleVenta, LineItem, CuentaCorriente
+
+from .models import Ticket, Venta, DetalleVenta, LineItem, Pago
 from products.models import Product
 from accounts.models import Cliente
 from decimal import Decimal, InvalidOperation
@@ -128,8 +129,58 @@ def new_sale(request):
 # ---------------------------------------------------------------------------------------------------------------
 
 def buscar_venta(request):
-    # lógica para buscar venta
-    return render(request, 'sales/buscar_venta.html')
+    query = Venta.objects.all()
+
+    # Obtener parámetros de búsqueda
+    search = request.GET.get('search', '').strip()
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    ticket = request.GET.get('ticket', '').strip()
+    monto_min = request.GET.get('monto_min')
+    monto_max = request.GET.get('monto_max')
+    estado = request.GET.get('estado', '').strip()
+
+    # Filtrar por cliente o ID de venta
+    if search:
+        query = query.filter(
+            Q(id__icontains=search) |
+            Q(cliente__nombre__icontains=search)
+        )
+
+    # Filtrar por rango de fechas
+    if fecha_inicio:
+        query = query.filter(fecha_venta__gte=fecha_inicio)
+    if fecha_fin:
+        query = query.filter(fecha_venta__lte=fecha_fin)
+
+    # Filtrar por número de ticket
+    if ticket:
+        query = query.filter(tickets__id__icontains=ticket)  # Se usa 'tickets__id' para acceder al ID de un ticket relacionado
+
+    # Filtrar por rango de montos
+    if monto_min:
+        query = query.filter(total__gte=monto_min)
+    if monto_max:
+        query = query.filter(total__lte=monto_max)
+
+    # Filtrar por estado
+    if estado:
+        if estado == 'pagada':
+            query = query.filter(es_fiada=False)
+        elif estado == 'fiada':
+            query = query.filter(es_fiada=True)
+
+    # Paginación
+    page_number = request.GET.get('page', 1)  # Página actual
+    per_page = int(request.GET.get('per_page', 10))  # Número de resultados por página (default: 10)
+    paginator = Paginator(query, per_page)
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'sales/buscar_venta.html', {
+        'ventas': page_obj.object_list,
+        'page_obj': page_obj,
+        'per_page': per_page
+    })
 
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -183,76 +234,106 @@ def realizar_venta(request):
                 logger.warning("Faltan datos de cliente, productos o total.")
                 return JsonResponse({"success": False, "message": "Faltan datos de cliente, productos o total."}, status=400)
 
+            # Asegurarse de que total_compra es un número
+            try:
+                total_compra = float(total_compra)
+            except ValueError:
+                logger.error("El campo 'total' debe ser un número.")
+                return JsonResponse({
+                    "success": False,
+                    "message": "El campo 'total' debe ser un número válido."
+                }, status=400)
+
             cliente = get_object_or_404(Cliente, id=cliente_id)
             
             # Verificar si el cliente tiene cuenta corriente
-            try:
-                cuenta_corriente = CuentaCorriente.objects.get(cliente=cliente)
-            except CuentaCorriente.DoesNotExist:
+            cuenta_corriente = getattr(cliente, 'cuenta_corriente_cc', None)
+            if not cuenta_corriente:
                 logger.error(f"Cliente con ID {cliente.id} no tiene cuenta corriente.")
                 return JsonResponse({
                     "success": False,
                     "message": "El cliente no tiene una cuenta corriente asociada."
                 }, status=400)
             
-            # Crear la venta
-            logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.id})")
-            venta = Venta.objects.create(cliente=cliente, fecha_venta=timezone.now(), total=total_compra, cuenta_corriente=cuenta_corriente)
+            # Iniciar transacción para asegurar consistencia
+            with transaction.atomic():
+                # Crear la venta
+                logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.id})")
+                venta = Venta.objects.create(cliente=cliente, fecha_venta=timezone.now(), total=total_compra, cuenta_corriente=cuenta_corriente)
 
-            # Llamar al método para agregar el monto de la venta a la cuenta corriente
-            logger.debug(f"Realizando venta fiada para la venta {venta.id}")
-            venta.realizar_venta_fiada()
+                # Calcular si es fiado
+                fiado = cuenta_corriente and total_compra > 0
 
-            # Procesar productos de la venta (detalles de la venta)
-            for item in productos_data:
-                product_id = item.get('id')
-                cantidad = Decimal(item.get('cantidad'))
-                total_producto = Decimal(item.get('total'))
-                precio_unitario = Decimal(item.get('precio_unitario'))
-
-                product = get_object_or_404(Product, id=product_id)
-                logger.debug(f"Procesando producto: {product.nombre}, cantidad: {cantidad}, precio unitario: {precio_unitario}")
-
-                if product.se_vende_fraccionado:
-                    cantidad_kg = cantidad / Decimal('1000')
-                    if product.cantidad_stock < cantidad_kg:
-                        logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg")
-                        return JsonResponse({
-                            "success": False,
-                            "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg"
-                        }, status=400)
-                    product.cantidad_stock -= cantidad_kg
-                else:
-                    if product.cantidad_stock < cantidad:
-                        logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades")
-                        return JsonResponse({
-                            "success": False,
-                            "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades"
-                        }, status=400)
-                    product.cantidad_stock -= cantidad
-
-                product.save()
-
-                # Crear los detalles de la venta
-                DetalleVenta.objects.create(
+                # Crear el ticket asociado a la venta
+                ticket = Ticket.objects.create(
                     venta=venta,
-                    producto=product,
-                    cantidad=cantidad,
-                    total=total_producto,
-                    precio_unitario=precio_unitario
+                    total=total_compra,
+                    cashier_id=request.user.id,
+                    fiado=fiado
                 )
-                logger.debug(f"Detalle de venta creado para el producto '{product.nombre}'")
 
-            logger.info(f"Venta procesada correctamente, ID de ticket: {venta.id}")
-            return JsonResponse({
-                "success": True,
-                "message": "Venta procesada correctamente",
-                "ticket_id": venta.id
-            })
+                logger.debug(f"Ticket creado para la venta ID: {venta.id}, Ticket ID: {ticket.id}")
+
+                # Procesar productos de la venta (detalles de la venta)
+                for item in productos_data:
+                    product_id = item.get('id')
+                    quantity = item.get('cantidad')  # Asegúrate de que la cantidad es un número entero
+                    product = get_object_or_404(Product, id=product_id)
+                    
+                    logger.debug(f"Procesando producto: {product.nombre}, cantidad: {quantity}")
+
+                    if product.se_vende_fraccionado:
+                        cantidad_kg = quantity / Decimal('1000')
+                        if product.cantidad_stock < cantidad_kg:
+                            logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg")
+                            return JsonResponse({
+                                "success": False,
+                                "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg"
+                            }, status=400)
+                        product.cantidad_stock -= cantidad_kg
+                    else:
+                        if product.cantidad_stock < quantity:
+                            logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades")
+                            return JsonResponse({
+                                "success": False,
+                                "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades"
+                            }, status=400)
+                        product.cantidad_stock -= quantity
+
+                    product.save()
+
+                    # Crear el LineItem (detalle de la venta)
+                    LineItem.objects.create(
+                        ticket=ticket,
+                        product=product,
+                        quantity=quantity,
+                    )
+                    logger.debug(f"Detalle de venta creado para el producto '{product.nombre}'")
+
+                # Crear el pago asociado al ticket (si es necesario)
+                pago = Pago.objects.create(ticket=ticket, cliente=cliente, monto=total_compra)
+
+                logger.debug(f"Pago registrado para el ticket ID: {ticket.id}, Monto: {pago.monto}")
+
+                # Confirmar la venta
+                logger.info(f"Venta procesada correctamente, Ticket ID: {ticket.id}")
+                return JsonResponse({
+                    "success": True,
+                    "message": "Venta procesada correctamente",
+                    "ticket_id": ticket.id
+                })
 
         except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
             logger.error(f"Error al procesar la venta: {e}")
-            return JsonResponse({"success": False, "message": "Hubo un error al procesar la venta. Inténtalo nuevamente."}, status=500)
+            logger.debug(f"Detalles del error:\n{error_details}")
+            return JsonResponse({
+                "success": False,
+                "message": "Hubo un error al procesar la venta. Inténtalo nuevamente.",
+                "error": str(e),
+                "traceback": error_details
+            }, status=500)
 
 
 # ---------------------------------------------------------------------------------------------------------------

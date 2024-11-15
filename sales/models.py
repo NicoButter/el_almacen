@@ -72,9 +72,9 @@ class LineItem(models.Model):
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
-# Modelo para registrar los pagos (cuando un cliente paga su saldo fiado)
 class Pago(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pagos')  # Relacionado con el cliente
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pagos')
+    ticket = models.ForeignKey(Ticket, null=True, on_delete=models.CASCADE, related_name='pagos')  # Agregar el campo ticket
     fecha = models.DateTimeField(auto_now_add=True)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
 

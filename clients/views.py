@@ -12,6 +12,7 @@ import logging
 from django.contrib.auth.decorators import login_required
 
 
+
 #----------------------------------------------------------------------------------------------------------------------------
 
 @login_required
@@ -92,12 +93,6 @@ def listar_clientes(request):
 
 # --------------------------------------------------------------------------------------------------------------
 
-# views.py
-
-import logging
-from cuentas_corrientes.forms import CuentaCorrienteForm
-
-# Crea un logger
 logger = logging.getLogger(__name__)
 
 @login_required
