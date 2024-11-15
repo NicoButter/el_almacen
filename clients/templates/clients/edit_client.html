@@ -6,4 +6,10 @@
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Actualizar Cliente</button>
 </form>
+
+ <!-- Enlace para editar la cuenta corriente -->
+{% if cliente.cuenta_corriente_cc %}
+    <a href="{% url 'editar_cuenta_corriente' cliente.cuenta_corriente_cc.pk %}">Editar Cuenta Corriente</a>
+{% endif %}
+
 {% endblock %}

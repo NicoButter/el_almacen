@@ -7,8 +7,12 @@ from django.db.models import Q
 from accounts.forms import ClienteForm, TelefonoForm, DireccionForm, EmailForm
 from django.core.paginator import Paginator
 from django.utils.crypto import get_random_string
+from cuentas_corrientes.forms import CuentaCorrienteForm
+import logging
+from django.contrib.auth.decorators import login_required
 
 
+#----------------------------------------------------------------------------------------------------------------------------
 
 @login_required
 def agregar_cliente(request):
@@ -86,20 +90,65 @@ def listar_clientes(request):
         'is_admin': is_admin
     })
 
-
 # --------------------------------------------------------------------------------------------------------------
+
+# views.py
+
+import logging
+from cuentas_corrientes.forms import CuentaCorrienteForm
+
+# Crea un logger
+logger = logging.getLogger(__name__)
 
 @login_required
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
+
+    # Verificar si el cliente tiene una cuenta corriente asociada
+    cuenta_corriente = cliente.cuenta_corriente_cc if hasattr(cliente, 'cuenta_corriente_cc') else None
+    
+    logger.debug(f"Cliente encontrado: {cliente}")
+    logger.debug(f"Cuenta corriente asociada: {cuenta_corriente}")
+
     if request.method == 'POST':
         form = ClienteForm(request.POST, instance=cliente)
-        if form.is_valid():
-            form.save()
+
+        # Si el cliente tiene una cuenta corriente, pasamos la instancia de cuenta corriente al formulario
+        if cuenta_corriente:
+            cuenta_corriente_form = CuentaCorrienteForm(request.POST, instance=cuenta_corriente)
+        else:
+            cuenta_corriente_form = CuentaCorrienteForm(request.POST)
+
+        logger.debug("Formulario de cliente procesado")
+        logger.debug(f"Formulario de cuenta corriente: {cuenta_corriente_form}")
+
+        if form.is_valid() and cuenta_corriente_form.is_valid():
+            form.save()  # Guardamos el cliente
+            logger.debug("Formulario de cliente guardado exitosamente")
+
+            # Si la cuenta corriente existe o es válida, guarda los cambios
+            if cuenta_corriente_form.has_changed():
+                cuenta_corriente_form.save()
+                logger.debug("Formulario de cuenta corriente guardado exitosamente")
+
             return redirect('listar_clientes')
+        else:
+            logger.error(f"Formulario no válido: {form.errors}")
+            logger.error(f"Formulario de cuenta corriente no válido: {cuenta_corriente_form.errors}")
     else:
         form = ClienteForm(instance=cliente)
-    return render(request, 'clients/edit_client.html', {'form': form, 'cliente': cliente})
+
+        if cuenta_corriente:
+            cuenta_corriente_form = CuentaCorrienteForm(instance=cuenta_corriente)
+        else:
+            cuenta_corriente_form = CuentaCorrienteForm()
+
+    return render(request, 'clients/edit_client.html', {
+        'form': form,
+        'cuenta_corriente_form': cuenta_corriente_form,  
+        'cliente': cliente,
+    })
+
 
 # --------------------------------------------------------------------------------------------------------------
 

@@ -3,8 +3,9 @@ from .models import CuentaCorriente
 from .forms import CuentaCorrienteForm
 from django.contrib import messages
 from accounts.models import Cliente
+from django.contrib.auth.decorators import login_required
 
-
+# -------------------------------------------------------------------------------------------------------------------
 
 def crear_cuenta_corriente(request):
     if request.method == 'POST':
@@ -15,6 +16,23 @@ def crear_cuenta_corriente(request):
     else:
         form = CuentaCorrienteForm()
     return render(request, 'cuentas_corrientes/crear_cuenta.html', {'form': form})
+
+# -------------------------------------------------------------------------------------------------------------------
+
+@login_required
+def editar_cuenta_corriente(request, pk):
+    cuenta_corriente = get_object_or_404(CuentaCorriente, pk=pk)
+
+    if request.method == 'POST':
+        form = CuentaCorrienteForm(request.POST, instance=cuenta_corriente)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cuenta corriente actualizada correctamente.')
+            return redirect('listar_clientes')  # O la página que prefieras
+    else:
+        form = CuentaCorrienteForm(instance=cuenta_corriente)
+
+    return render(request, 'cuentas_corrientes/edit_cuenta.html', {'form': form, 'cuenta_corriente': cuenta_corriente})
 
 # -------------------------------------------------------------------------------------------------------------------
 

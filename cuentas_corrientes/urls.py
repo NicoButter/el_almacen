@@ -6,5 +6,6 @@ urlpatterns = [
     path('crear/', views.crear_cuenta_corriente, name='crear_cuenta_corriente'),
     path('agregar_saldo/<int:cuenta_id>/', views.agregar_saldo, name='agregar_saldo'),
     path('pagar/<int:cuenta_id>/', views.pagar_cuenta, name='pagar_cuenta'),
-    path('asignar-cuenta-corriente/<int:cliente_id>/', asignar_cuenta_corriente, name='asignar_cuenta_corriente')
+    path('asignar-cuenta-corriente/<int:cliente_id>/', asignar_cuenta_corriente, name='asignar_cuenta_corriente'),
+    path('editar/<int:pk>/', views.editar_cuenta_corriente, name='editar_cuenta_corriente'),
 ]

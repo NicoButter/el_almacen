@@ -156,3 +156,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'tu_email@gmail.com'  # Tu dirección de correo
 EMAIL_HOST_PASSWORD = 'tu_contraseña'
+
