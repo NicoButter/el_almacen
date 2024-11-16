@@ -60,10 +60,10 @@
 
     <div class="ticket-footer">
         <p><strong>Total:</strong> ${{ ticket.total|floatformat:2 }}</p>
-        {% if ticket.fiado %}
-        <p><strong>Estado:</strong> Compra fiada</p>
+        {% if venta.es_fiada %}
+            <p><strong>Estado:</strong> Compra fiada</p>
         {% else %}
-        <p><strong>Estado:</strong> Pago realizado</p>
+            <p><strong>Estado:</strong> Pago realizado</p>
         {% endif %}
     </div>
 

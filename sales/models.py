@@ -28,10 +28,14 @@ class Venta(models.Model):
         return f"Venta {self.id} - {self.cliente.nombre}"
 
     def realizar_venta_fiada(self):
-        """Método para realizar la venta y agregar el total a la cuenta corriente del cliente."""
-        if self.cuenta_corriente:
+        """Método para realizar la venta, agregar el total a la cuenta corriente del cliente y marcar la venta como fiada."""
+        if self.cuenta_corriente:  # Verificar si el cliente tiene una cuenta corriente
             # Sumamos el total de la venta al saldo de la cuenta corriente
             self.cuenta_corriente.agregar_saldo(self.total)
+            
+            # Cambiar el estado de la venta a fiada
+            self.es_fiada = True
+            self.save()  # Guardamos los cambios en el objeto Venta 
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,17 +46,9 @@ class Ticket(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
     date = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    fiado = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Ticket {self.id} - {self.date}'
-
-    def save(self, *args, **kwargs):
-        if self.fiado and self.cliente:
-            cuenta_corriente, created = CuentaCorriente.objects.get_or_create(cliente=self.cliente)
-            cuenta_corriente.saldo += self.total
-            cuenta_corriente.save()
-        super().save(*args, **kwargs)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -80,16 +76,6 @@ class Pago(models.Model):
 
     def __str__(self):
         return f'Pago de ${self.monto} - Cliente: {self.cliente.nombre} el {self.fecha.strftime("%d/%m/%Y")}'
-
-# ------------------------------------------------------------------------------------------------------------------------------------------
-
-# Modelo para llevar la cuenta corriente del cliente (saldo deudor)
-class CuentaCorriente(models.Model):
-    cliente = models.OneToOneField(Cliente, on_delete=models.CASCADE, related_name='cuenta_corriente_sales')
-    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
-    def __str__(self):
-        return f'Cuenta Corriente - Cliente: {self.cliente.nombre} - Saldo: ${self.saldo}'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
