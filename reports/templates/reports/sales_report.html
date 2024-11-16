@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title %}Reporte de Ventas{% endblock %}
+{% block content %}
+
+<h1>Reporte de Ventas</h1>
+
+<!-- Filtros -->
+<form method="GET">
+    <div class="mb-3">
+        <label for="fecha_inicio" class="form-label">Fecha Inicio:</label>
+        <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" value="{{ request.GET.fecha_inicio }}">
+    </div>
+    <div class="mb-3">
+        <label for="fecha_fin" class="form-label">Fecha Fin:</label>
+        <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Filtrar</button>
+</form>
+
+<!-- Botón para generar reporte -->
+<a href="{% url 'reporte_ventas_pdf' %}?fecha_inicio={{ request.GET.fecha_inicio }}&fecha_fin={{ request.GET.fecha_fin }}" class="btn btn-success mt-3">
+  Generar Reporte
+</a>
+
+<!-- Resumen de Ventas -->
+<table class="table table-striped mt-4">
+  <thead>
+      <tr>
+          <th>Período</th>
+          <th>Total Vendido</th>
+          <th>Total Fiado</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Hoy</td>
+          <td>${{ total_ventas_dia|floatformat:2 }}</td>
+          <td>${{ total_fiado_dia|floatformat:2 }}</td>
+      </tr>
+      <tr>
+          <td>Semana</td>
+          <td>${{ total_ventas_semana|floatformat:2 }}</td>
+          <td>${{ total_fiado_semana|floatformat:2 }}</td>
+      </tr>
+      <tr>
+          <td>Mes</td>
+          <td>${{ total_ventas_mes|floatformat:2 }}</td>
+          <td>${{ total_fiado_mes|floatformat:2 }}</td>
+      </tr>
+      <tr>
+          <td>Año</td>
+          <td>${{ total_ventas_anio|floatformat:2 }}</td>
+          <td>${{ total_fiado_anio|floatformat:2 }}</td>
+      </tr>
+      <tr>
+          <td>Periodo Personalizado</td>
+          <td>${{ total_ventas_periodo|floatformat:2 }}</td>
+          <td>${{ total_fiado_periodo|floatformat:2 }}</td>
+      </tr>
+  </tbody>
+</table>
+
+<!-- Gráfico -->
+<div id="grafico-ventas" style="height: 400px;"></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('grafico-ventas').getContext('2d');
+    const data = {
+        labels: {{ grafico_datos|json_script:"graficoEtiquetas" }},
+        datasets: [{
+            label: 'Ventas ($)',
+            data: {{ grafico_datos|json_script:"graficoValores" }},
+            backgroundColor: ['rgba(75, 192, 192, 0.2)'],
+            borderColor: ['rgba(75, 192, 192, 1)'],
+            borderWidth: 1
+        }]
+    };
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.labels.map(d => d.etiqueta),
+            datasets: [{
+                label: 'Ventas',
+                data: data.labels.map(d => d.total),
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
