@@ -1,0 +1,133 @@
+/* Formulario */
+.filter-form {
+    max-width: 600px;
+    margin: 2rem auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    display: block;
+    color: #333;
+  }
+  
+  .select-input,
+  .input-field {
+    width: 100%;
+    padding: 10px;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  .select-input:focus,
+  .input-field:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  .btn-submit {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+  }
+  
+  .btn-submit:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Tabla */
+  .inventory-table {
+    width: 100%;
+    margin-top: 2rem;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .inventory-table th,
+  .inventory-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .inventory-table th {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .inventory-table tr:hover {
+    background-color: #f4f7fa;
+  }
+  
+  /* Botones */
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+  }
+  
+  .btn-pdf,
+  .btn-back {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-left: 10px;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .btn-pdf:hover {
+    background-color: #218838;
+  }
+  
+  .btn-back {
+    background-color: #ffc107;
+  }
+  
+  .btn-back:hover {
+    background-color: #e0a800;
+  }
+  
+  /* Responsividad */
+  @media (max-width: 768px) {
+    .filter-form {
+      padding: 15px;
+    }
+  
+    .btn-submit {
+      font-size: 14px;
+    }
+  
+    .inventory-table th,
+    .inventory-table td {
+      padding: 8px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .inventory-table th,
+    .inventory-table td {
+      font-size: 14px;
+    }
+  
+    .btn-pdf,
+    .btn-back {
+      font-size: 14px;
+    }
+  }

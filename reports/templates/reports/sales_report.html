@@ -1,29 +1,39 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
+{% block header_title %}
+    Reporte de Ventas
+{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'reports/css/sales_report_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block title %}Reporte de Ventas{% endblock %}
+
 {% block content %}
 
-<h1>Reporte de Ventas</h1>
-
 <!-- Filtros -->
-<form method="GET">
-    <div class="mb-3">
-        <label for="fecha_inicio" class="form-label">Fecha Inicio:</label>
-        <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control" value="{{ request.GET.fecha_inicio }}">
+<form method="GET" class="filters-form">
+    <div class="form-group">
+        <label for="fecha_inicio">Fecha Inicio:</label>
+        <input type="date" name="fecha_inicio" id="fecha_inicio" class="input-field" value="{{ request.GET.fecha_inicio }}">
     </div>
-    <div class="mb-3">
-        <label for="fecha_fin" class="form-label">Fecha Fin:</label>
-        <input type="date" name="fecha_fin" id="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin }}">
+    <div class="form-group">
+        <label for="fecha_fin">Fecha Fin:</label>
+        <input type="date" name="fecha_fin" id="fecha_fin" class="input-field" value="{{ request.GET.fecha_fin }}">
     </div>
-    <button type="submit" class="btn btn-primary">Filtrar</button>
+    <button type="submit" class="btn-submit">Filtrar</button>
 </form>
 
 <!-- Botón para generar reporte -->
-<a href="{% url 'reporte_ventas_pdf' %}?fecha_inicio={{ request.GET.fecha_inicio }}&fecha_fin={{ request.GET.fecha_fin }}" class="btn btn-success mt-3">
+<a href="{% url 'reporte_ventas_pdf' %}?fecha_inicio={{ request.GET.fecha_inicio }}&fecha_fin={{ request.GET.fecha_fin }}" class="btn-generate-report">
   Generar Reporte
 </a>
 
 <!-- Resumen de Ventas -->
-<table class="table table-striped mt-4">
+<table class="sales-summary-table">
   <thead>
       <tr>
           <th>Período</th>
@@ -60,42 +70,78 @@
   </tbody>
 </table>
 
-<!-- Gráfico -->
-<div id="grafico-ventas" style="height: 400px;"></div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('grafico-ventas').getContext('2d');
-    const data = {
-        labels: {{ grafico_datos|json_script:"graficoEtiquetas" }},
-        datasets: [{
-            label: 'Ventas ($)',
-            data: {{ grafico_datos|json_script:"graficoValores" }},
-            backgroundColor: ['rgba(75, 192, 192, 0.2)'],
-            borderColor: ['rgba(75, 192, 192, 1)'],
-            borderWidth: 1
-        }]
-    };
+<!-- Filtro de selección de período para el gráfico -->
+<div class="form-group">
+    <label for="periodo">Seleccionar Período para el Gráfico:</label>
+    <select id="periodo" name="periodo" class="input-field">
+        <option value="Día" {% if request.GET.periodo == "Día" %}selected{% endif %}>Día</option>
+        <option value="Semana" {% if request.GET.periodo == "Semana" %}selected{% endif %}>Semana</option>
+        <option value="Mes" {% if request.GET.periodo == "Mes" %}selected{% endif %}>Mes</option>
+        <option value="Año" {% if request.GET.periodo == "Año" %}selected{% endif %}>Año</option>
+    </select>
+</div>
+<button type="submit" class="btn-submit">Filtrar</button>
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.labels.map(d => d.etiqueta),
+<div class="button-container">
+    <a href="{% url 'reports_dashboard' %}" class="btn-back">Volver</a>
+</div>
+
+<!-- Gráfico -->
+<div id="grafico-ventas" class="chart-container" style="width: 100%; height: 400px;"></div>
+
+<script id="graficoEtiquetas" type="application/json">
+    {% if grafico_datos %}
+        {{ grafico_datos|json_script:"graficoEtiquetas" }}
+    {% else %}
+        []  <!-- Devuelve un arreglo vacío si no hay datos -->
+    {% endif %}
+</script>
+
+<script>
+    // Parsear los datos del JSON pasado desde Django
+    var graficoDatos = JSON.parse(document.getElementById('graficoEtiquetas').textContent);
+    console.log(graficoDatos);  // Verificar los datos
+
+    // Obtener el periodo seleccionado del formulario
+    var periodoSeleccionado = "{{ request.GET.periodo|default:'Mes' }}";  // Valor por defecto es 'Mes'
+
+    // Filtrar los datos del gráfico para solo mostrar el periodo seleccionado
+    var datosFiltrados = graficoDatos.filter(function(d) {
+        return d.etiqueta === periodoSeleccionado;
+    });
+
+    // Comprobar si hay datos antes de crear el gráfico
+    if (datosFiltrados.length > 0) {
+        const labels = datosFiltrados.map(d => d.etiqueta);
+        const dataValues = datosFiltrados.map(d => d.total);
+
+        const ctx = document.getElementById('grafico-ventas').getContext('2d');
+        const data = {
+            labels: labels,
             datasets: [{
-                label: 'Ventas',
-                data: data.labels.map(d => d.total),
+                label: 'Ventas ($)',
+                data: dataValues,
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
             }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: data,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
+    } else {
+        console.log("No hay datos para mostrar en el gráfico.");
+    }
 </script>
+
 
 {% endblock %}

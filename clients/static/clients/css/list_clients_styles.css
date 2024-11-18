@@ -1,4 +1,3 @@
-/* Estilo para el contenedor principal */
 .container {
     width: 100%;
     margin: 0 auto;
@@ -7,29 +6,34 @@
     background-color: #fff;
 }
 
-/* Barra de búsqueda */
-.search-form {
+.search-bar-container {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    background-color: #ecf0f1;
     padding: 10px;
+    background-color: #ecf0f1;
     border-radius: 8px;
+    gap: 20px;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
 }
 
 .search-form input {
     flex-grow: 1;
+    max-width: 300px;
     padding: 8px 12px;
     font-size: 1rem;
     border-radius: 6px;
     border: 1px solid #ccc;
-    background-color: #fff;
-    color: #333;
 }
 
-.search-button {
-    margin-left: 10px;
+.search-form .search-button {
     padding: 8px 12px;
     font-size: 1rem;
     background-color: #3498db;
@@ -37,13 +41,45 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.search-button:hover {
+.search-form .search-button:hover {
     background-color: #2980b9;
 }
 
-/* Estilo de la tabla */
+.actions-bar {
+    display: flex;
+    gap: 10px;
+}
+
+.actions-bar .button {
+    padding: 8px 16px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.actions-bar .button.primary {
+    background-color: #3498db;
+}
+
+.actions-bar .button.primary:hover {
+    background-color: #2980b9;
+}
+
+.actions-bar .button.secondary {
+    background-color: #7f8c8d;
+}
+
+.actions-bar .button.secondary:hover {
+    background-color: #95a5a6;
+}
+
 .client-table {
     width: 100%;
     border-collapse: collapse;
@@ -71,47 +107,19 @@
     background-color: #ffffff;
 }
 
-.client-table td.descripcion {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.actions {
+    display: flex; /* Usar flexbox para alinearlos en fila */
+    align-items: center; /* Alineación vertical si es necesario */
+    gap: 10px; /* Espaciado entre los íconos */
 }
 
-/* Estilos para los botones */
-.button {
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    text-align: center;
-    border-radius: 6px;
-    transition: background-color 0.3s, transform 0.2s;
-    text-decoration: none;
-}
-
-.button.primary {
-    background-color: #3498db;
-}
-
-.button.primary:hover {
-    background-color: #2980b9;
-}
-
-.button.secondary {
-    background-color: #7f8c8d;
-}
-
-.button.secondary:hover {
-    background-color: #95a5a6;
-}
-
-/* Estilo de los iconos de acción */
 .actions .edit-icon,
 .actions .delete-icon {
-    margin: 0 5px;
-    color: #f39c12;
-    font-size: 1.2rem;
-    transition: color 0.2s;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
 }
 
 .actions .edit-icon:hover {
@@ -122,7 +130,6 @@
     color: #e74c3c;
 }
 
-/* Estilos de la paginación */
 .pagination {
     display: flex;
     justify-content: center;
@@ -133,6 +140,7 @@
     margin: 0 10px;
     color: #3498db;
     text-decoration: none;
+    transition: color 0.3s;
 }
 
 .pagination-link:hover {
@@ -141,4 +149,16 @@
 
 .pagination-info {
     margin: 0 10px;
+}
+
+@media (max-width: 768px) {
+    .search-bar-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .actions-bar {
+        justify-content: flex-start;
+        margin-top: 10px;
+    }
 }

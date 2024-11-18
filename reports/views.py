@@ -307,6 +307,9 @@ def reporte_ventas(request):
         {'etiqueta': 'Año', 'total': float(total_ventas_anio)},
     ]
 
+    print(grafico_datos)
+
+
     return render(request, 'reports/sales_report.html', {
         'total_ventas_dia': total_ventas_dia,
         'total_fiado_dia': total_fiado_dia,
@@ -373,3 +376,4 @@ def buscar_cliente(request):
     return render(request, 'nombre_del_template.html', {'clientes': clientes, 'busqueda': busqueda})
 
 #-----------------------------------------------------------------------------------------------------------------------------------
+

@@ -1,14 +1,24 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
+{% block header_title %}
+    Reporte Inventario
+{% endblock %}
+
 {% block title %}Reporte de Inventario{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'reports/css/inventory_report_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 
-<h1>Reporte de Inventario</h1>
-
 <!-- Formulario de Filtros -->
-<form method="GET" action="{% url 'inventory_report' %}">
-  <div class="mb-3">
-    <label for="categoria" class="form-label">Categoría:</label>
-    <select name="categoria" id="categoria" class="form-select">
+<form method="GET" action="{% url 'inventory_report' %}" class="filter-form">
+  <div class="form-group">
+    <label for="categoria">Categoría:</label>
+    <select name="categoria" id="categoria" class="select-input">
       <option value="">Todas las categorías</option>
       {% for categoria in categorias %}
         <option value="{{ categoria.id }}" {% if categoria.id == request.GET.categoria %}selected{% endif %}>
@@ -18,16 +28,16 @@
     </select>
   </div>
 
-  <div class="mb-3">
-    <label for="min_stock" class="form-label">Mínimo en stock:</label>
-    <input type="number" name="min_stock" id="min_stock" class="form-control" value="{{ request.GET.min_stock }}">
+  <div class="form-group">
+    <label for="min_stock">Mínimo en stock:</label>
+    <input type="number" name="min_stock" id="min_stock" class="input-field" value="{{ request.GET.min_stock }}">
   </div>
 
-  <button type="submit" class="btn btn-primary">Filtrar</button>
+  <button type="submit" class="btn-submit">Filtrar</button>
 </form>
 
 <!-- Tabla de Inventario -->
-<table class="table table-striped mt-4">
+<table class="inventory-table">
   <thead>
     <tr>
       <th>Producto</th>
@@ -65,8 +75,9 @@
 </table>
 
 <!-- Botón para generar PDF -->
-<div class="text-end mt-4">
-  <a href="{% url 'inventory_report_pdf' %}" class="btn btn-primary">Generar PDF</a>
+<div class="button-container">
+  <a href="{% url 'inventory_report_pdf' %}" class="btn-pdf">Generar PDF</a>
+  <a href="{% url 'reports_dashboard' %}" class="btn-back">Volver</a>
 </div>
 
 {% endblock %}

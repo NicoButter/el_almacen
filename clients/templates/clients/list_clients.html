@@ -2,8 +2,8 @@
 
 {% load static %}
 
-{% block extra_css %}
-    <link href="{% static 'clients/css/list_clients_styles.css'  %}" rel="stylesheet">
+{% block extra_styles %}
+    <link href="{% static '/clients/css/list_clients_styles.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block header_title %}
@@ -13,8 +13,8 @@
 {% block content %}
 
 <div class="container">
-    <!-- Barra de búsqueda -->
-    <div class="search-form">
+    <!-- Barra de búsqueda y botones -->
+    <div class="search-bar-container">
         <form method="GET" action="{% url 'listar_clientes' %}" class="search-form">
             <input 
                 type="text" 
@@ -26,6 +26,12 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
+        <div class="actions-bar">
+            <a href="{% url 'admin_dashboard' %}" class="button secondary">Volver al Dashboard</a>
+            {% if is_admin %}
+                <a href="{% url 'agregar_cliente' %}" class="button primary">Agregar Cliente</a>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Tabla de clientes -->
@@ -68,19 +74,6 @@
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-
-    <!-- Opciones adicionales -->
-    <div class="actions-bar">
-        <div class="results-info">
-            Mostrando {{ clientes.paginator.count }} resultados en total
-        </div>
-        <div class="buttons">
-            <a href="{% url 'admin_dashboard' %}" class="button secondary">Volver al Dashboard</a>
-            {% if is_admin %}
-                <a href="{% url 'agregar_cliente' %}" class="button primary">Agregar Cliente</a>
-            {% endif %}
-        </div>
     </div>
 
     <!-- Navegación -->
