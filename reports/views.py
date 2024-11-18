@@ -2,7 +2,8 @@ from io import BytesIO
 
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.db.models import Sum
+from django.db.models import Sum, Q
+from django.shortcuts import render, get_object_or_404
 
 from reportlab.lib.pagesizes import A4, landscape, letter
 from reportlab.platypus import Table, TableStyle, Paragraph, SimpleDocTemplate
@@ -12,6 +13,8 @@ from reportlab.pdfgen import canvas
 
 from products.models import Product, Categoria
 from sales.models import Venta
+from cuentas_corrientes.models import CuentaCorriente
+from accounts.models import Cliente
 
 from datetime import date, datetime, timedelta
 
@@ -319,3 +322,54 @@ def reporte_ventas(request):
         'grafico_datos': grafico_datos,
     })
 
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+def reporte_cuentas_corrientes(request):
+    # Obtener los filtros si los hay
+    busqueda = request.GET.get('busqueda', '')
+    if busqueda:
+        cuentas_corrientes = CuentaCorriente.objects.filter(
+            Q(cliente__nombre__icontains=busqueda) |
+            Q(cliente__emails__email__icontains=busqueda) |
+            Q(cliente__telefonos__numero__icontains=busqueda)
+        ).distinct()
+    else:
+        cuentas_corrientes = CuentaCorriente.objects.all()
+
+    # Resumen
+    total_cuentas = cuentas_corrientes.count()
+    saldo_total = cuentas_corrientes.aggregate(Sum('saldo'))['saldo__sum'] or 0
+
+    # Pasar al contexto
+    context = {
+        'cuentas_corrientes': cuentas_corrientes,
+        'busqueda': busqueda,
+        'total_cuentas': total_cuentas,
+        'saldo_total': saldo_total,
+    }
+
+    return render(request, 'reports/reporte_cuentas_corrientes.html', context)
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+def cuenta_detalle(request, id):
+    cuenta = get_object_or_404(CuentaCorriente, id=id)
+    return render(request, 'reports/cuenta_detalle.html', {'cuenta': cuenta})
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+def buscar_cliente(request):
+    busqueda = request.GET.get('busqueda', '')
+    clientes = Cliente.objects.all()
+
+    if busqueda:
+        # Buscamos por el nombre del cliente, email o teléfono
+        clientes = clientes.filter(
+            Q(nombre__icontains=busqueda) |  # Busca en el nombre
+            Q(user__email__icontains=busqueda) |  # Busca en el email del usuario relacionado
+            Q(telefonos__numero__icontains=busqueda)  # Busca en el teléfono relacionado
+        ).distinct()  # Distinct para evitar duplicados si un cliente tiene más de un teléfono
+
+    return render(request, 'nombre_del_template.html', {'clientes': clientes, 'busqueda': busqueda})
+
+#-----------------------------------------------------------------------------------------------------------------------------------

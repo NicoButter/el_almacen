@@ -5,11 +5,11 @@
 html,
 body {
     height: 100%;
+    width: 100%;
+    min-height: 100dvh;
     margin: 0;
     padding: 0;
-    width: 100%;
     display: grid;
-    min-height: 100dvh;
     grid-template-rows: auto 1fr auto;
     font-family: "Raleway", sans-serif;
     font-optical-sizing: auto;
@@ -17,44 +17,95 @@ body {
     font-style: normal;
 }
 
-header {
-    background-color: #0B0704;
-    color: white !important;
-}
-
-nav.navbar .navbar-brand {
-    color: white;
-}
-
-.nav-link {
-    color: white;
-}
-
-.navbar-toggler-icon {
-    color: white;
-}
-
-.content {
-    padding: 0px;
-    flex: 1;
-}
-
-footer {
-    padding: 10px 0;
-    background-color: #0B0704;
-    color: white;
-    width: 100%;
-    margin-top: auto;
-}
-
-.footer-content {
+.header {
+    color: #e0e0e0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 0 15px;
+    padding: 10px 20px;
+    background-color: #000;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.header-left,
+.header-center,
+.header-right {
+    flex: 1;
+    text-align: center;
+}
+
+.header-left {
+    text-align: left;
+}
+
+.header-right {
+    text-align: right;
+}
+
+.logo {
+    width: 180px;
+    height: auto;
+}
+
+.brand-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.header-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: #007bff;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.logout-button:hover {
+    color: #0056b3;
+}
+
+.footer {
+    color: #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #000;
+    border-top: 2px solid #e0e0e0;
 }
 
 .footer-content span {
-    margin: 0 15px;
+    margin: 0 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .header-left,
+    .header-center,
+    .header-right {
+        flex: none;
+        margin-bottom: 10px;
+    }
+
+    .footer {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-content span {
+        margin-bottom: 5px;
+    }
 }

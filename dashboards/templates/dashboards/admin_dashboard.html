@@ -1,4 +1,58 @@
+
 {% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Dashboard Administrador{% endblock %}
+
+{% block header %}Dashboard Administrador{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <h2>Panel de Gestión</h2>
+    <p class="text-center">Selecciona una opción para gestionar el almacén</p>
+    
+    <div class="dashboard-container">
+        <div class="card">
+            <h5 class="card-title">Agregar Producto</h5>
+            <p class="card-text">Añade un nuevo producto.</p>
+            <a href="{% url 'add_products' %}" class="btn-custom">Agregar Producto</a>
+        </div>
+
+        <div class="card">
+            <h5 class="card-title">Listar Productos</h5>
+            <p class="card-text">Revisa, tus productos.</p>
+            <a href="{% url 'list_products' %}" class="btn-custom">Listar Productos</a>
+        </div>
+
+        <div class="card">
+            <h5 class="card-title">Agregar Cliente</h5>
+            <p class="card-text">Añade un nuevo cliente al sistema.</p>
+            <a href="{% url 'agregar_cliente' %}" class="btn-custom">Agregar Cliente</a>
+        </div>
+
+        <div class="card">
+            <h5 class="card-title">Listar Clientes</h5>
+            <p class="card-text">Revisa, edita o elimina tus clientes.</p>
+            <a href="{% url 'listar_clientes' %}" class="btn-custom">Listar Clientes</a>
+        </div>
+
+        <div class="card">
+            <h5 class="card-title">Reportes</h5>
+            <p class="card-text">Genera reportes detallados del inventario y más.</p>
+            <a href="{% url 'reports_dashboard' %}" class="btn-custom">Ir a Reportes</a>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
 
 {% block title %}Dashboard Administrador{% endblock %}
 
@@ -9,7 +63,7 @@
     <h2>Panel de Gestión</h2>
     <p class="text-center">Selecciona una opción para gestionar el almacén</p>
     
-    <div class="container mt-4">
+    <div class="container-fluid mt-4">
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
@@ -67,4 +121,5 @@
         <!-- Puedes agregar más secciones según sea necesario -->
 
     </div>
-{% endblock %}
+{% endblock %} {% endcomment %}
+

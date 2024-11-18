@@ -1,42 +1,139 @@
-.form-check-input {
-    width: 20px;
-    height: 20px;
+/* Contenedor principal */
+.form-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.form-check-label {
-    font-size: 16px;
-    margin-left: 8px;
-}
-
-.btn {
-    min-width: 150px;
+/* Título del formulario */
+.form-title {
     text-align: center;
+    color: #343a40;
+    margin-bottom: 20px;
 }
 
-.form-control-file {
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
-    padding: 0.375rem 0.75rem;
-    width: 100%;
+/* Contenedor del formulario */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-.custom-checkbox {
-    border: 2px solid #007BFF;
-    background-color: rgba(0, 123, 255, 0.1);
-    padding: 10px;
-    border-radius: 5px;
+/* Contenedor para detalles del producto con 2 columnas */
+.form-details-container {
+    display: flex;
+    gap: 30px;
+    align-items: stretch;
+    /* Asegura que las columnas tengan la misma altura */
 }
 
-.form-control.descripcion {
-    max-width: 100%;
-    max-height: 180px;
+/* Columna izquierda */
+.form-column-left,
+.form-column-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-.w-50 {
-    width: 100%;
-}
-
-.flex-grow-1 {
+/* Estilos del fieldset */
+.form-fieldset {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    /* Espaciado entre los fieldsets */
     flex-grow: 1;
+    /* Asegura que los fieldsets llenen el espacio disponible */
 }
 
+/* Leyenda del fieldset */
+.form-legend {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Estilos de los inputs y textarea */
+.form-input,
+.form-file-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Estilos de las etiquetas */
+.form-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Estilos de los grupos de formularios */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Estilos de los mensajes de error */
+.form-error {
+    color: red;
+    font-size: 0.9em;
+}
+
+/* Estilos del texto de ayuda */
+.form-help-text {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+/* Estilos de los botones */
+.form-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+    margin: 0 10px;
+}
+
+.form-btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.form-btn-success:hover {
+    background-color: #218838;
+}
+
+.form-btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.form-btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.form-btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.form-btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .form-details-container {
+        flex-direction: column;
+    }
+
+    .form-column-left,
+    .form-column-right {
+        min-width: 100%;
+    }
+}

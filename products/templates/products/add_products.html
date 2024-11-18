@@ -1,66 +1,83 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
 {% load custom_tags %}
 
+{% block extra_styles %}
+    <link href="{% static 'products/css/add_product_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<div class="mt-4 mb-5"> <!-- Clase mb-5 para dar margen inferior -->
-    <h1 class="text-center">Agregar Producto</h1>
-    <form method="post" enctype="multipart/form-data" class="mt-4" id="product-form">
+<div class="form-container">
+    <h1 class="form-title">Agregar Producto</h1>
+    <form method="post" enctype="multipart/form-data" class="form" id="product-form">
         {% csrf_token %}
         
-        <div class="d-flex">
-            <!-- Detalles del producto (Columna izquierda) -->
-            <div class="w-50 d-flex flex-column">
-                <fieldset class="border p-3 flex-grow-1">
-                    <legend class="font-weight-bold">Detalles del Producto</legend>
-                    
-                    {% for field in form %}
-                        {% if field.name not in "se_vende_fraccionado imagen" %}
-                            <div class="form-group">
-                                <label for="{{ field.id_for_label }}" class="font-weight-bold">{{ field.label }}</label>
-                                {% if field.name == "descripcion" %}
-                                    {{ field|add_class:"form-control descripcion" }}
-                                {% elif field.name == "categoria" %}
-                                    {{ field|add_class:"form-control" }}
-                                {% else %}
-                                    {{ field|add_class:"form-control" }}
-                                {% endif %}
-                                {% if field.errors %}
-                                    <div class="text-danger">{{ field.errors|striptags }}</div>
-                                {% endif %}
-                                {% if field.help_text %}
-                                    <small class="form-text text-muted">{{ field.help_text }}</small>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endfor %}
+        <div class="form-details-container">
+            <!-- Columna izquierda: Nombre, Descripción, Costo, Porcentaje -->
+            <div class="form-column-left">
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">Detalles del Producto</legend>
                     
                     <div class="form-group">
-                        <label for="precio_venta" class="font-weight-bold">Precio de Venta al Público</label>
-                        <input type="text" id="precio_venta" class="form-control" readonly>
+                        <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre</label>
+                        {{ form.nombre|add_class:"form-input" }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción</label>
+                        {{ form.descripcion|add_class:"form-input descripcion" }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.costo.id_for_label }}" class="form-label">Costo</label>
+                        {{ form.costo|add_class:"form-input" }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="{{ form.porcentaje_ganancia.id_for_label }}" class="form-label">Porcentaje de Ganancia</label>
+                        {{ form.porcentaje_ganancia|add_class:"form-input" }}
                     </div>
                 </fieldset>
             </div>
 
-            <!-- Opciones adicionales e Imagen del producto (Columna derecha) -->
-            <div class="w-50 d-flex flex-column">
-                <fieldset class="border p-3 flex-grow-1">
-                    <legend class="font-weight-bold">Opciones adicionales</legend>
+            <!-- Columna derecha: Resto de los campos (Stock, Categoría, Opciones adicionales, Imagen) -->
+            <div class="form-column-right">
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">Opciones adicionales</legend>
                     <div class="form-group">
-                        <label for="{{ form.se_vende_fraccionado.id_for_label }}" class="font-weight-bold">¿El producto se vende fraccionado?</label>
+                        <label for="{{ form.se_vende_fraccionado.id_for_label }}" class="form-label">¿El producto se vende fraccionado?</label>
                         {{ form.se_vende_fraccionado|add_class:"custom-checkbox" }}
                     </div>
                 </fieldset>
 
-                <fieldset class="border p-3 mt-4 flex-grow-1">
-                    <legend class="font-weight-bold">Imagen del Producto</legend>
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">Cantidad de Stock</legend>
                     <div class="form-group">
-                        <label for="{{ form.imagen.id_for_label }}" class="font-weight-bold">Subir Imagen</label>
-                        {{ form.imagen|add_class:"form-control-file" }}
+                        <label for="{{ form.cantidad_stock.id_for_label }}" class="form-label">Cantidad de Stock</label>
+                        {{ form.cantidad_stock|add_class:"form-input" }}
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">Categoría</legend>
+                    <div class="form-group">
+                        <label for="{{ form.categoria.id_for_label }}" class="form-label">Categoría</label>
+                        {{ form.categoria|add_class:"form-input" }}
+                    </div>
+                </fieldset>
+
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">Imagen del Producto</legend>
+                    <div class="form-group">
+                        <label for="{{ form.imagen.id_for_label }}" class="form-label">Subir Imagen</label>
+                        {{ form.imagen|add_class:"form-file-input" }}
                         {% if form.imagen.errors %}
-                            <div class="text-danger">{{ form.imagen.errors|striptags }}</div>
+                            <div class="form-error">{{ form.imagen.errors|striptags }}</div>
                         {% endif %}
                         {% if form.imagen.help_text %}
-                            <small class="form-text text-muted">{{ form.imagen.help_text }}</small>
+                            <small class="form-help-text">{{ form.imagen.help_text }}</small>
                         {% endif %}
                     </div>
                 </fieldset>
@@ -68,10 +85,10 @@
         </div>
 
         <!-- Botones -->
-        <div class="d-flex justify-content-center mt-4">
-            <button type="submit" class="btn btn-success mx-2 btn-lg">Agregar Producto</button>
-            <a href="{% url 'listar_productos' %}" class="btn btn-secondary mx-2 btn-lg">Volver al listado</a>
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mx-2 btn-lg">Volver al Dashboard</a>
+        <div class="form-buttons">
+            <button type="submit" class="form-btn form-btn-success">Agregar Producto</button>
+            <a href="{% url 'listar_productos' %}" class="form-btn form-btn-secondary">Volver al listado</a>
+            <a href="{% url 'admin_dashboard' %}" class="form-btn form-btn-primary">Volver al Dashboard</a>
         </div>
     </form>
 </div>
@@ -105,4 +122,5 @@
         }
     };
 </script>
+
 {% endblock %}

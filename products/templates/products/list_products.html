@@ -1,24 +1,22 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_styles %}
+    <link href="{% static 'products/css/list_products_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block title %}Listado de Productos{% endblock %}
+
 {% block content %}
 
-<style>
-.table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9; /* Color gris claro para filas impares */
-}
-
-.table tbody tr:nth-child(even) {
-    background-color: #ffffff; /* Color blanco para filas pares */
-}
-</style>
-
-<div class="container mt-4">
+<div class="container">
     <h1>Listado de Productos</h1>
 
     <!-- Filtro de Categoría -->
-    <form method="GET" action="{% url 'listar_productos' %}" class="mb-4">
+    <form method="GET" action="{% url 'listar_productos' %}" class="filter-form">
         <label for="categoria">Filtrar por Categoría:</label>
-        <select name="categoria" id="categoria" class="form-control" onchange="this.form.submit()">
+        <select name="categoria" id="categoria" onchange="this.form.submit()">
             <option value="">Todas</option>
             {% for categoria in categorias %}
                 <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == request.GET.categoria %}selected{% endif %}>
@@ -57,7 +55,16 @@
                                 <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
                             </button>
                         </form>
+                        <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                            <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
+                        </a>
                     </td>
+                {% else %}
+                <td>
+                    <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                        <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
+                    </a>
+                </td>
                 {% endif %}
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.descripcion }}</td>
@@ -66,12 +73,42 @@
                 <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
                 <td>{{ producto.categoria.nombre }}</td> <!-- Mostrar nombre de la categoría -->
                 <td>
-                    <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" width="100">
+                    <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}">
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+   <!-- Modal para mostrar detalles -->
+    {% for producto in productos %}
+    <div class="modal fade" id="detalleModal{{ producto.pk }}" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleModalLabel">Detalles del Producto: {{ producto.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Imagen del Producto -->
+                        <div class="col-md-4">
+                            <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid">
+
+                        </div>
+                        <div class="col-md-8">
+                            <!-- Descripción del Producto -->
+                            <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
+                            <p><strong>Precio:</strong> ${{ producto.precio_venta }}</p>
+                            <p><strong>Stock disponible:</strong> {{ producto.cantidad_stock }}</p>
+                            <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 
     <!-- Botón para volver al dashboard -->
     <div class="mt-4 text-center">

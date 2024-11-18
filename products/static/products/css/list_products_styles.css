@@ -1,7 +1,177 @@
+.container,
+.content {
+    width: 100%;
+    margin: 10;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #fff;
+    box-shadow: none;
+}
+
+
+h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Estilos de la tabla */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th,
+.table td {
+    padding: 12px;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #2980b9;
+    color: #fff;
+    font-weight: 600;
+}
+
 .table tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
+    background-color: #ecf0f1;
 }
 
 .table tbody tr:nth-child(even) {
     background-color: #ffffff;
+}
+
+.table td.descripcion {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Estilo de botones */
+.btn {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    transition: background-color 0.3s, transform 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background-color: #3498db;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+/* Filtro de Categoría */
+.filter-form {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: #ecf0f1;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.filter-form label {
+    font-size: 1rem;
+    margin-right: 10px;
+    color: #2c3e50;
+}
+
+.filter-form select {
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Iconos de acción */
+.action-icons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.action-icons a,
+.action-icons button {
+    margin-right: 10px;
+    color: #f39c12;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+}
+
+.action-icons a:hover,
+.action-icons button:hover {
+    color: #e67e22;
+}
+
+/* Imagen de QR */
+.table img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+/* Ajustar el tamaño de las celdas */
+.table td:nth-child(2) {
+    width: 25%;
+}
+
+.table td:nth-child(3) {
+    width: 15%;
+}
+
+.table td:nth-child(4) {
+    width: 15%;
+}
+
+.table td:nth-child(5) {
+    width: 10%;
+}
+
+.table td:nth-child(6) {
+    width: 15%;
+}
+
+.table td:nth-child(7) {
+    width: 10%;
+}
+
+.modal-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.modal-body {
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.modal-body .row {
+    display: flex;
+    align-items: center;
+}
+
+.modal-body img {
+    max-width: 100%;
+    height: auto;
 }
