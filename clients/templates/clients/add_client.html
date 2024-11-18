@@ -1,11 +1,19 @@
 {% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+    <link href="{% static '/clients/css/add_client_styles.css' %}" rel="stylesheet"/>
+{% endblock %}
+
 {% load form_tags %}
 
-{% block title %}Agregar Cliente{% endblock %}
+{% block header_title %}
+    Agregar Cliente
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Agregar Cliente</h2>
 
     <!-- Bloque para mostrar mensajes -->
     {% if messages %}
@@ -38,4 +46,5 @@
         <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al Panel de Administración</a>
     </form>
 </div>
+
 {% endblock %}

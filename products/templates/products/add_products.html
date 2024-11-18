@@ -4,13 +4,16 @@
 
 {% load custom_tags %}
 
+{% block header_title %}
+    Agregar Productos
+{% endblock %}
+
 {% block extra_styles %}
     <link href="{% static 'products/css/add_product_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h1 class="form-title">Agregar Producto</h1>
     <form method="post" enctype="multipart/form-data" class="form" id="product-form">
         {% csrf_token %}
         

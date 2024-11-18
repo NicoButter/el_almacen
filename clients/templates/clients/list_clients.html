@@ -1,26 +1,36 @@
 {% extends 'base.html' %}
-{% block title %}Lista de Clientes{% endblock %}
+
+{% load static %}
+
+{% block extra_css %}
+    <link href="{% static 'clients/css/list_clients_styles.css'  %}" rel="stylesheet">
+{% endblock %}
+
+{% block header_title %}
+    Listado de Clientes
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="my-4 text-center">Lista de Clientes</h2>
 
+<div class="container">
     <!-- Barra de búsqueda -->
-    <div class="d-flex justify-content-start mb-3">
-        <form method="GET" action="{% url 'listar_clientes' %}" class="form-inline position-relative">
-            <input type="text" name="query" class="form-control" 
+    <div class="search-form">
+        <form method="GET" action="{% url 'listar_clientes' %}" class="search-form">
+            <input 
+                type="text" 
+                name="query" 
                 placeholder="Buscar por nombre, teléfono, email, dirección" 
-                value="{{ request.GET.query }}" style="padding-right: 40px; width: 300px;">
-            
-            <button type="submit" class="btn p-0 position-absolute" style="right: -45px; top: 50%; transform: translateY(-50%); background: transparent; border: none;">
+                value="{{ request.GET.query }}" 
+                aria-label="Buscar clientes">
+            <button type="submit" class="search-button" aria-label="Buscar">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </form>
     </div>
 
     <!-- Tabla de clientes -->
-    <table class="table table-bordered table-striped">
-        <thead>
+    <div class="table-container">
+        <table class="client-table">
             <thead>
                 <tr>
                     {% if is_admin %}
@@ -37,13 +47,13 @@
                 {% for cliente in clientes %}
                 <tr>
                     {% if is_admin %}
-                        <td>
-                            <a href="{% url 'editar_cliente' cliente.pk %}" class="text-warning mx-2" title="Editar">
+                        <td class="actions">
+                            <a href="{% url 'editar_cliente' cliente.pk %}" class="edit-icon" title="Editar">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </a>
-                            <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" style="display:inline;">
+                            <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" class="delete-form">
                                 {% csrf_token %}
-                                <button type="submit" class="text-danger mx-2" title="Eliminar">
+                                <button type="submit" class="delete-icon" title="Eliminar">
                                     <i class="fa-regular fa-trash-can"></i>
                                 </button>
                             </form>
@@ -53,38 +63,36 @@
                     <td>{% for direccion in cliente.direcciones.all %}{{ direccion.direccion }}{% endfor %}</td>
                     <td>{% for telefono in cliente.telefonos.all %}{{ telefono.numero }}{% endfor %}</td>
                     <td>{% for email in cliente.emails.all %}{{ email.email }}{% endfor %}</td>
-                    <td>
-                        {% for cliente in clientes %}
-                            <p>{{ cliente.nombre }}</p>
-                            <p>{{ cliente.cuenta_corriente_cc.saldo }}</p> <!-- Accede a los datos de CuentaCorriente -->
-                        {% endfor %}
-                    </td>
+                    <td>{{ cliente.cuenta_corriente_cc.saldo }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
-            
-    </table>
+        </table>
+    </div>
 
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
+    <!-- Opciones adicionales -->
+    <div class="actions-bar">
+        <div class="results-info">
             Mostrando {{ clientes.paginator.count }} resultados en total
         </div>
-        <div>
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Volver al Dashboard</a>
+        <div class="buttons">
+            <a href="{% url 'admin_dashboard' %}" class="button secondary">Volver al Dashboard</a>
             {% if is_admin %}
-                <a href="{% url 'agregar_cliente' %}" class="btn btn-primary">Agregar Cliente</a>
+                <a href="{% url 'agregar_cliente' %}" class="button primary">Agregar Cliente</a>
             {% endif %}
         </div>
     </div>
 
-    <div class="d-flex justify-content-end mt-3">
+    <!-- Navegación -->
+    <div class="pagination">
         {% if clientes.has_previous %}
-            <a href="?page={{ clientes.previous_page_number }}&query={{ request.GET.query }}" class="btn btn-light">Anterior</a>
+            <a href="?page={{ clientes.previous_page_number }}&query={{ request.GET.query }}" class="pagination-link">Anterior</a>
         {% endif %}
-        <span class="mx-2">Página {{ clientes.number }} de {{ clientes.paginator.num_pages }}</span>
+        <span class="pagination-info">Página {{ clientes.number }} de {{ clientes.paginator.num_pages }}</span>
         {% if clientes.has_next %}
-            <a href="?page={{ clientes.next_page_number }}&query={{ request.GET.query }}" class="btn btn-light">Siguiente</a>
+            <a href="?page={{ clientes.next_page_number }}&query={{ request.GET.query }}" class="pagination-link">Siguiente</a>
         {% endif %}
     </div>
 </div>
+
 {% endblock %}

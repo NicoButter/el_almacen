@@ -6,12 +6,13 @@
     <link href="{% static 'products/css/list_products_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block title %}Listado de Productos{% endblock %}
+{% block header_title %}
+    Listado de Productos
+{% endblock %}
 
 {% block content %}
 
 <div class="container">
-    <h1>Listado de Productos</h1>
 
     <!-- Filtro de Categoría -->
     <form method="GET" action="{% url 'listar_productos' %}" class="filter-form">

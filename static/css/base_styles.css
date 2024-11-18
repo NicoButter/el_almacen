@@ -18,7 +18,17 @@ body {
 }
 
 .header {
-    color: #e0e0e0;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #000;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.header {
+    color: #fff;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -47,29 +57,51 @@ body {
     height: auto;
 }
 
+.negocio-logo {
+    width: 120px; /* Tamaño del logo del negocio */
+    height: auto;
+}
+
 .brand-name {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: bold;
-    margin-left: 10px;
+    margin-left: 5px;
+}
+
+.header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
 }
 
 .header-title {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 2rem; /* Aumentar tamaño del título */
+    font-weight: 700; /* Más negrita */
     margin: 0;
+    color: #ffffff; /* Forzar el color blanco */
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); /* Agregar sombra para contraste */
+    letter-spacing: 1px; /* Mejorar espaciado entre letras */
+    text-transform: uppercase; /* Transformar texto a mayúsculas */
 }
 
 .logout-button {
     background: none;
     border: none;
-    color: #007bff;
-    font-size: 1rem;
     cursor: pointer;
-    text-decoration: underline;
+    font-size: 1.5rem; /* Ajusta el tamaño del ícono */
+    color: #007bff; /* Color inicial */
+    padding: 5px;
+    transition: color 0.3s ease;
 }
 
 .logout-button:hover {
-    color: #0056b3;
+    color: #0056b3; /* Color al pasar el cursor */
+}
+
+.logout-button i {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .footer {
@@ -107,5 +139,20 @@ body {
 
     .footer-content span {
         margin-bottom: 5px;
+    }
+    .logos {
+        flex-direction: column; /* Coloca los logos uno encima del otro en pantallas pequeñas */
+        gap: 5px;
+    }
+
+    .logo,
+    .negocio-logo {
+        width: 100px; /* Reduce el tamaño de los logos en dispositivos pequeños */
+    }
+
+    .brand-name {
+        font-size: 1rem;
+        margin-left: 0;
+        text-align: center;
     }
 }

@@ -5,42 +5,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>{% block title %}Dashboard{% endblock %}</title>
+    
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
+    <link href="{% static 'sales/css/ticket_details_styles.css' %}" rel="stylesheet"/>
+    <link href="{% static 'sales/css/buscar_venta_styles.css' %}" rel="stylesheet"/>
+    <link href="{% static 'css/base_styles.css' %}" rel="stylesheet">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/base_styles.css' %}" rel="stylesheet">
-    <link href="{% static '/sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
-    <link href="{% static '/clients/css/add_client_styles.css' %}" rel="stylesheet"/>
-    <link href="{% static '/clients/css/list_clients_styles.css' %}" rel="stylesheet"/>
-    <link href="{% static '/sales/css/ticket_details_styles.css' %}" rel="stylesheet"/>
-    <link href="{% static '/sales/css/buscar_venta_styles.css' %}" rel="stylesheet"/>
-    <link href="{% static 'css/base_styles.css' %}" rel="stylesheet">
+    {% block extra_styles %}{% endblock %}
 
     <script src="https://kit.fontawesome.com/16c678032e.js" crossorigin="anonymous"></script>
-
-    
-    
-    {% block extra_styles %}{% endblock %}
 
 </head>
 <body>
     <header class="header">
         <div class="header-left">
             <img src="{% static 'images/el_almacen_logo.png' %}" alt="Logo" class="logo">
+            <img src="{% static 'images/la_seniora_del_salame_logo.png' %}" alt="Logo Negocio" class="logo negocio-logo">
             <span class="brand-name">La Señora del Salame</span>
         </div>
         <div class="header-center">
-            <h1 class="header-title">{% block header_title %}Título Predeterminado{% endblock %}</h1>
+            <h1 class="header-title">{% block header_title %}El Almacén{% endblock %}</h1>
         </div>
         <div class="header-right">
             <form id="logout-form" method="post" action="{% url 'accounts:logout' %}">
                 {% csrf_token %}
-                <button type="submit" class="logout-button">Cerrar sesión</button>
+                <button type="submit" class="logout-button" title="Cerrar sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </form>
         </div>
     </header>
