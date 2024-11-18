@@ -1,3 +1,4 @@
+/* Ajustes generales */
 .container,
 .content {
     width: 100%;
@@ -154,23 +155,51 @@ h1 {
     width: 10%;
 }
 
+/* Estilo del modal */
 .modal-header {
     background-color: #007bff;
     color: white;
 }
 
 .modal-body {
-    padding: 20px;
+    padding: 30px;
     font-size: 16px;
     line-height: 1.5;
+    height: auto;
+    /* Ajusta la altura del cuerpo del modal automáticamente */
+    max-height: 120vh;
+    /* Limita la altura máxima del modal al 80% de la ventana */
+    overflow-y: auto;
 }
 
 .modal-body .row {
     display: flex;
+    flex-direction: column;
+    /* Asegura que los elementos dentro se apilen correctamente */
+    justify-content: center;
     align-items: center;
+    gap: 20px;
 }
 
+/* Ajustes para la imagen dentro del modal */
 .modal-body img {
-    max-width: 100%;
+    width: 100%;
+    /* Hace que la imagen ocupe el 100% del contenedor */
     height: auto;
+    /* Mantiene la proporción de la imagen */
+    max-width: 500px;
+    /* Limita el ancho máximo de la imagen */
+    object-fit: contain;
+    /* Mantiene la proporción y ajusta la imagen dentro del contenedor */
+    margin-bottom: 20px;
+    /* Espacio debajo de la imagen */
+}
+
+/* Asegurar que el texto y otros elementos se vean bien */
+.modal-body p {
+    margin-bottom: 15px;
+}
+
+.modal-body h5 {
+    margin-bottom: 10px;
 }

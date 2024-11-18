@@ -1,0 +1,168 @@
+/* General container */
+.container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Títulos */
+h1 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+
+/* Estilo del formulario de búsqueda */
+.search-form {
+    margin-bottom: 30px;
+}
+
+.search-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-input {
+    width: 75%;
+}
+
+.search-input label {
+    font-size: 1rem;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.search-button {
+    width: 20%;
+}
+
+.btn-submit {
+    padding: 12px 18px;
+    background-color: #3498db;
+    color: white;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: #2980b9;
+}
+
+/* Estilo de las cuentas corrientes */
+.cuentas-list {
+    list-style: none;
+    padding: 0;
+}
+
+.cuenta-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.cuenta-item h5 {
+    font-size: 1.2rem;
+    color: #2980b9;
+    margin-bottom: 10px;
+}
+
+.cuenta-details {
+    font-size: 1rem;
+    color: #7f8c8d;
+}
+
+/* Información resumen */
+.summary {
+    display: flex;
+    justify-content: space-between;
+}
+
+.summary-item {
+    width: 30%;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.summary-item h3 {
+    font-size: 1.2rem;
+    color: #2980b9;
+    margin-bottom: 10px;
+}
+
+.summary-item p {
+    font-size: 1.5rem;
+    color: #2c3e50;
+}
+
+/* Tabla de cuentas */
+.accounts-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 30px;
+}
+
+.accounts-table th,
+.accounts-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+.accounts-table th {
+    background-color: #2980b9;
+    color: white;
+    font-weight: bold;
+}
+
+.accounts-table tbody tr:nth-child(odd) {
+    background-color: #ecf0f1;
+}
+
+.accounts-table tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+.accounts-table td a {
+    color: #3498db;
+    font-size: 1.2rem;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.accounts-table td a:hover {
+    color: #2980b9;
+}
+
+/* Botones */
+.btn-outline {
+    padding: 12px 18px;
+    border: 2px solid #3498db;
+    color: #3498db;
+    font-size: 1.2rem;
+    background-color: transparent;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline:hover {
+    background-color: #3498db;
+    color: white;
+}
