@@ -1,7 +1,17 @@
 {% extends 'base.html' %}
+
 {% load static %}
-{% block title %}Nueva Venta{% endblock %}
-{% block header %}Nueva Venta{% endblock %}
+
+{% block extra_styles %}
+  <link href="{% static 'sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block title %}Terminal de Venta{% endblock %}
+
+{% block header_title %}
+    Terminal de venta
+{% endblock %}
+
 {% block content %}
 
 <div class="container-fluid p-0">

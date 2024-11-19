@@ -2,18 +2,17 @@
 
 {% load static %}
 
+{% block header_title %}
+    Gestión de Ventas
+{% endblock %}
+
 {% block extra_styles %}
     <link href="{% static 'dashboards/css/cashier_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}Dashboard Cajero{% endblock %}
 
-{% block header %}Dashboard Cajero{% endblock %}
-
 {% block content %}
-    <h2 class="dashboard-title">Gestión de Ventas</h2>
-    <p class="dashboard-subtitle text-center">Selecciona una opción para gestionar las ventas y productos</p>
-    
     <div class="dashboard-container">
         <!-- Nueva Venta -->
         <div class="card">
