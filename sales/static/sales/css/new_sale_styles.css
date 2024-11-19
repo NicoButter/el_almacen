@@ -1,83 +1,66 @@
-.container-fluid {
-  width: 100%;
-  padding: 0;
-  margin: 0;
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
 }
 
 .row {
   display: flex;
-  gap: 0; /* Si es necesario, ajusta el gap */
-  margin: 0; /* Elimina márgenes que puedan estar afectando el ancho */
-  width: 100%;
-}
-
-/* .row.g-0 {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-} */
-
-.col-md-6 {
-  padding: 15px;
-  max-width: 100%;
-  flex: 1;  /* Hace que la columna ocupe el mismo espacio */
-}
-
-.col-12 {
-  padding: 15px;
-}
-
-/* Estilos para las listas */
-#product-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.list-group-item {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section {
+  border: 1px solid #ddd;
   padding: 15px;
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  background-color: #f9f9f9;
-}
-
-.product-info,
-.product-quantity,
-.product-total {
   flex: 1;
-  text-align: center;
+  margin-right: 10px;
 }
 
-/* Estilos generales */
-.product-price, .product-name {
-  font-weight: bold;
+.section:last-child {
+  margin-right: 0;
 }
 
-/* Video */
-#video {
-  border: 2px solid #007bff;
-  border-radius: 8px;
-  margin-bottom: 15px;
+h2, h4 {
+  margin: 0 0 10px;
 }
 
-/* Botón de volver */
-.btn-primary {
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.input-field, .select-field {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.button.primary {
   background-color: #007bff;
-  border-color: #007bff;
+  color: white;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #004085;
+.button.success {
+  background-color: #28a745;
+  color: white;
 }
 
-/* Total de la compra */
-#total-compra {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #28a745;
-  text-align: center;
+.text-right {
+  text-align: right;
 }

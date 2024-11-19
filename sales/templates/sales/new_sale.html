@@ -14,77 +14,73 @@
 
 {% block content %}
 
-<div class="container-fluid p-0">
+<div class="container">
   <form method="post" id="sale-form">
     {% csrf_token %}
-    <div class="row g-0">
+    <div class="row">
       <!-- Columna izquierda: Lista de productos escaneados -->
-      <div class="col-md-6">
+      <div class="section">
         <h2>Productos Agregados</h2>
-        <ul id="product-list" class="list-group">
-          <!-- Lista de productos agregados al carrito -->
+        <ul id="product-list">
           {% for item in scanned_items %}
-            <li class="list-group-item">{{ item.name }} - {{ item.quantity }} x {{ item.price }} = {{ item.subtotal }}</li>
+            <li>{{ item.name }} - {{ item.quantity }} x {{ item.price }} = {{ item.subtotal }}</li>
           {% endfor %}
         </ul>
       </div>
 
       <!-- Columna derecha: Escáner QR y selección de cliente -->
-      <div class="col-md-6">
-        <!-- Escáner QR -->
+      <div class="section">
         <h2>Escáner QR</h2>
         <video id="video" width="100%" height="250" autoplay></video>
         <canvas id="canvas" style="display: none"></canvas>
-        <p id="scan-status" class="text-muted">Esperando código QR...</p>
+        <p id="scan-status">Esperando código QR...</p>
 
-        <!-- Entrada manual del código QR como respaldo -->
         <label for="qr_code_value">Escanea un Producto:</label>
-        <input type="text" name="qr_code_value" id="qr_code_value" placeholder="Código QR" class="form-control mb-2">
-        <button type="submit" name="add_product" class="btn btn-secondary">Añadir Producto</button>
+        <input type="text" name="qr_code_value" id="qr_code_value" placeholder="Código QR" class="input-field">
+        <button type="submit" name="add_product" class="button">Añadir Producto</button>
 
-        <!-- Selección de cliente -->
-        <div class="mb-3">
+        <!-- Selección de cliente y venta fiada -->
+        <div class="field-group">
           <h4>Seleccionar Cliente</h4>
-          <select id="cliente-select" name="cliente_id" class="form-select">
+          <select id="cliente-select" name="cliente_id" class="select-field">
             <option value="">-- Seleccionar Cliente --</option>
             {% for cliente in clientes %}
               <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
             {% endfor %}
+          </select>
+          
+          <h4>¿Venta Fiada?</h4>
+          <select id="venta-fiada" name="venta_fiada" class="select-field">
+            <option value="no">No</option>
+            <option value="si">Sí</option>
           </select>
         </div>
       </div>
     </div>
 
     <!-- Total de la compra -->
-    <div class="row mt-3">
-      <div class="col-12 text-start">
+    <div class="row">
+      <div class="section">
         <h4>Total de la compra: <span id="total-compra">$0</span></h4>
       </div>
     </div>
 
     <!-- Botón para cerrar la venta -->
-    <div class="row mt-3">
-      <div class="col-12 text-end">
-        <button type="submit" name="close_sale" class="btn btn-success">Cerrar Venta</button>
+    <div class="row">
+      <div class="section text-right">
+        <button type="submit" name="close_sale" class="button success">Cerrar Venta</button>
       </div>
     </div>
   </form>
 
-  <div class="mb-3">
-    <h4>¿Venta Fiada?</h4>
-    <select id="venta-fiada" name="venta_fiada" class="form-select">
-      <option value="no">No</option>
-      <option value="si">Sí</option>
-    </select>
-  </div>
-
   <!-- Botón para volver al dashboard del cajero -->
-  <div class="row mt-3">
-    <div class="col-12 text-end">
-      <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+  <div class="row">
+    <div class="section text-right">
+      <a href="{% url 'cashier_dashboard' %}" class="button primary">Volver al Dashboard</a>
     </div>
   </div>
 </div>
+
 
 
 <!-- Incluye la biblioteca jsQR -->
