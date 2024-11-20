@@ -17,6 +17,7 @@ urlpatterns = [
     path('ticket/pdf/<int:ticket_id>/', views.generar_pdf, name='generar_pdf'),
     path('ticket/email/<int:ticket_id>/', views.enviar_ticket_email, name='enviar_ticket_email'),
     path('ticket/whatsapp/<int:ticket_id>/', views.generar_pdf_whatsapp, name='generar_pdf_whatsapp'),
+    path('api/search_products/', views.search_products, name='search_products')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

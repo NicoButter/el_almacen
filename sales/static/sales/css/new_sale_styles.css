@@ -270,3 +270,30 @@ ul {
 #video {
   visibility: hidden;
 }
+
+/*****************************************************************************************************/
+
+#search-results {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.product-result {
+  padding: 5px;
+  margin: 5px 0;
+  cursor: pointer;
+  background-color: #f8f8f8;
+  border-radius: 4px;
+}
+
+.product-result:hover {
+  background-color: #e2e2e2;
+}
+
+.product-result span {
+  margin-right: 10px;
+}

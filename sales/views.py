@@ -429,3 +429,26 @@ def generar_pdf_whatsapp(request, ticket_id):
     return response
 
 # ---------------------------------------------------------------------------------------------------------------
+
+def search_products(request):
+    query = request.GET.get('query', '').strip()  # Eliminar espacios al principio y al final
+
+    if query:  # Si hay un término de búsqueda
+        # Filtrar los productos que contienen el texto de la búsqueda (sin importar mayúsculas/minúsculas)
+        products = Product.objects.filter(nombre__icontains=query)
+    else:
+        products = Product.objects.none()  # Si no hay consulta, no devolver productos
+
+    # Imprimir cantidad de productos encontrados
+    print(f"Productos encontrados: {products.count()}")  # Esto te ayudará a ver si se encuentran productos
+
+    # Formatear los productos para devolverlos como JSON
+    products_data = []
+    for product in products:
+        products_data.append({
+            'id': product.id,
+            'nombre': product.nombre,  # Cambiado de 'name' a 'nombre'
+            'precio_venta': product.precio_venta,
+        })
+    
+    return JsonResponse({'products': products_data})

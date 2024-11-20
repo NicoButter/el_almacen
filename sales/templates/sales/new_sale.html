@@ -62,30 +62,14 @@
       <div id="product-image-container" style="display: none;">
           <img id="product-image" src="" alt="Producto Escaneado">
       </div>
-
-
-
-
-        {% comment %}         
-        <label for="qr_code_value">Escanea un Producto:</label>
-        <input type="text" name="qr_code_value" id="qr_code_value" placeholder="Código QR" class="input-field">
-        <button type="submit" name="add_product" class="button">Añadir Producto</button> {% endcomment %}
-
-
-        <!-- Formulario de búsqueda -->
+        <!-- Formulario de búsqueda de productos -->
         <form id="search-form">
-          <input type="text" id="search-input" name="search" placeholder="Buscar proyecto..." oninput="searchProjects()">
-          <button type="submit" style="display: none;">Buscar</button>  <!-- Este botón no se usa -->
+          <input type="text" id="search-input" name="search" placeholder="Buscar producto..." oninput="searchProducts()">
         </form>
 
-        <!-- Aquí se mostrarán los resultados de la búsqueda -->
+        <!-- Contenedor para mostrar los resultados -->
         <div id="search-results"></div>
 
-
-
-
-
-        
         <!-- Selección de cliente y venta fiada -->
         <div class="field-group">
           <h4>Seleccionar Cliente</h4>
@@ -459,6 +443,36 @@ function hideBackgroundVideo() {
     }
     return cookieValue;
   }
+
+  function searchProducts() {
+    const query = document.getElementById("search-input").value;
+
+    if (query.length > 2) {  // Solo hacer la búsqueda si el texto tiene más de 2 caracteres
+        fetch(`/sales/api/search_products/?query=${encodeURIComponent(query)}`, {
+            method: "GET",
+        })
+        .then(response => response.json())
+        .then(data => {
+            let resultsHtml = '';
+            if (data.products.length > 0) {
+                data.products.forEach(product => {
+                    resultsHtml += `
+                        <div class="product-result" onclick="agregarProductoALista(${product.id})">
+                            <span>${product.name}</span>
+                            <span>$${product.precio_venta}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                resultsHtml = '<p>No se encontraron productos.</p>';
+            }
+            document.getElementById("search-results").innerHTML = resultsHtml;
+        })
+        .catch(error => console.error('Error en la búsqueda:', error));
+    } else {
+        document.getElementById("search-results").innerHTML = '';  // Limpiar resultados si la búsqueda es vacía
+    }
+}
 
 </script>
 
