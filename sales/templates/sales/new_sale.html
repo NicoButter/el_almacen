@@ -62,13 +62,29 @@
       <div id="product-image-container" style="display: none;">
           <img id="product-image" src="" alt="Producto Escaneado">
       </div>
-        
 
 
 
+
+        {% comment %}         
         <label for="qr_code_value">Escanea un Producto:</label>
         <input type="text" name="qr_code_value" id="qr_code_value" placeholder="Código QR" class="input-field">
-        <button type="submit" name="add_product" class="button">Añadir Producto</button>
+        <button type="submit" name="add_product" class="button">Añadir Producto</button> {% endcomment %}
+
+
+        <!-- Formulario de búsqueda -->
+        <form id="search-form">
+          <input type="text" id="search-input" name="search" placeholder="Buscar proyecto..." oninput="searchProjects()">
+          <button type="submit" style="display: none;">Buscar</button>  <!-- Este botón no se usa -->
+        </form>
+
+        <!-- Aquí se mostrarán los resultados de la búsqueda -->
+        <div id="search-results"></div>
+
+
+
+
+
         
         <!-- Selección de cliente y venta fiada -->
         <div class="field-group">
