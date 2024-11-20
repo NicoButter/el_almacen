@@ -103,10 +103,6 @@
   </div>
 </div>
 
-
-
-
-
 <!-- Incluye la biblioteca jsQR -->
 <script src="{% static 'js/jsQR.js' %}"></script>
 
@@ -458,7 +454,7 @@ function hideBackgroundVideo() {
                 data.products.forEach(product => {
                     resultsHtml += `
                         <div class="product-result" onclick="agregarProductoALista(${product.id})">
-                            <span>${product.name}</span>
+                            <span>${product.nombre}</span>
                             <span>$${product.precio_venta}</span>
                         </div>
                     `;
