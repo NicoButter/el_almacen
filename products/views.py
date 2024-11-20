@@ -3,6 +3,8 @@ from django.http import HttpResponseForbidden
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
 
+# -----------------------------------------------------------------------------------------------------------------
+
 def listar_productos(request):
     categoria_id = request.GET.get('categoria')
     if categoria_id:
@@ -22,6 +24,8 @@ def listar_productos(request):
         'is_cashier': is_cashier
     })
 
+# -----------------------------------------------------------------------------------------------------------------
+
 def agregar_producto(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)  # Asegurarse de incluir request.FILES
@@ -35,6 +39,7 @@ def agregar_producto(request):
         form = ProductForm()
     return render(request, 'products/add_products.html', {'form': form})
 
+# -----------------------------------------------------------------------------------------------------------------
 
 def editar_producto(request, pk):
     producto = Product.objects.get(pk=pk)
@@ -46,6 +51,8 @@ def editar_producto(request, pk):
     else:
         form = ProductForm(instance=producto)
     return render(request, 'products/edit_products.html', {'form': form, 'producto': producto})
+
+# -----------------------------------------------------------------------------------------------------------------
 
 def eliminar_producto(request, pk):
     producto = Product.objects.get(pk=pk)
@@ -60,6 +67,8 @@ def eliminar_producto(request, pk):
 
     return render(request, 'products/delete_product.html', {'producto': producto})
 
+# -----------------------------------------------------------------------------------------------------------------
+
 def crear_categoria(request):
     if request.method == 'POST':
         form = CategoriaForm(request.POST)
@@ -70,6 +79,7 @@ def crear_categoria(request):
         form = CategoriaForm()
     return render(request, 'products/add_category.html', {'form': form})
 
+# -----------------------------------------------------------------------------------------------------------------
 
 def listar_categorias(request):
     categorias = Categoria.objects.all()

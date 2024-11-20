@@ -73,11 +73,8 @@ ul {
 
 .list-group-item {
   display: flex;
-  /* Alinea los elementos en fila */
   justify-content: space-between;
-  /* Distribuye los elementos */
   align-items: center;
-  /* Centra verticalmente los elementos */
   padding: 15px;
   border: 1px solid #dee2e6;
   border-radius: 5px;
@@ -88,12 +85,9 @@ ul {
 /* Detalles del producto */
 .product-info {
   flex: 2;
-  /* Toma más espacio para el nombre y precio */
   display: flex;
   flex-direction: column;
-  /* Nombre encima del precio */
   align-items: flex-start;
-  /* Alinea los elementos a la izquierda */
 }
 
 .product-name {
@@ -108,7 +102,6 @@ ul {
 /* Selector de cantidad */
 .product-quantity {
   flex: 1;
-  /* Ajusta el ancho para el selector de cantidad */
   text-align: center;
 }
 
@@ -123,7 +116,6 @@ ul {
 /* Subtotal */
 .product-total {
   flex: 1;
-  /* Ajusta el espacio para el subtotal */
   text-align: center;
   font-weight: bold;
 }
@@ -154,7 +146,7 @@ ul {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;  /* Asegura que ocupe todo el ancho disponible */
+  width: 100%;
 }
 
 #total-compra {
@@ -165,7 +157,7 @@ ul {
   padding: 5px 10px;
   border-radius: 4px;
   background-color: #f9f9f9;
-  margin-right: 15px;  /* Espaciado entre total y el botón */
+  margin-right: 15px;
 }
 
 .text-right {
@@ -184,5 +176,96 @@ ul {
 
 .button.success:hover {
   background-color: #218838;
-  /* Sombra más oscura */
+}
+
+/**************************************************************************************************/
+
+/* Estilos para la cámara */
+.camera-container {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#video-bg.video-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  display: block;
+}
+
+#video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+
+#canvas {
+  display: none;
+}
+
+.laser-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(0, 255, 0, 0.5);
+  pointer-events: none;
+  animation: laser 1.5s infinite;
+}
+
+/* Animación de láser */
+@keyframes laser {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Estilos para el mensaje "Esperando código QR..." */
+#scan-status {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+  margin-top: 10px;
+}
+
+/* Ocultar el contenedor de imagen cuando no se escanea un producto */
+#product-image-container {
+  display: none;
+  text-align: center;
+  margin-top: 20px;
+}
+
+#product-image {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Opciones para el video oculto */
+#video {
+  visibility: hidden;
 }

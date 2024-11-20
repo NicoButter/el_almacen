@@ -1,5 +1,8 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 app_name = 'sales' 
 
@@ -15,3 +18,5 @@ urlpatterns = [
     path('ticket/email/<int:ticket_id>/', views.enviar_ticket_email, name='enviar_ticket_email'),
     path('ticket/whatsapp/<int:ticket_id>/', views.generar_pdf_whatsapp, name='generar_pdf_whatsapp'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

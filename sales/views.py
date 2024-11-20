@@ -128,86 +128,6 @@ def new_sale(request):
     clientes = Cliente.objects.all()
     return render(request, 'sales/new_sale.html', {'productos': productos, 'clientes': clientes})
 
-# @login_required
-# def new_sale(request):
-#     if request.method == 'POST':
-#         try:
-#             # Intentar cargar los datos de la solicitud
-#             data = json.loads(request.body)
-#             cliente_id = data.get('cliente_id')
-#             productos_data = data.get('productos', [])
-#             venta_fiada = data.get('venta_fiada')
-
-#             # Log de inicio de procesamiento
-#             logger.info("Iniciando procesamiento de la nueva venta.")
-            
-#             # Inicialización del total
-#             total_compra = Decimal('0.00')
-
-#             # Procesar cada producto
-#             for producto_data in productos_data:
-#                 try:
-#                     producto_id = producto_data.get('id')
-#                     cantidad = Decimal(producto_data.get('cantidad'))
-#                     precio_unitario = Decimal(producto_data.get('precio_unitario'))
-                    
-#                     # Validación y cálculo para productos fraccionados
-#                     producto = Product.objects.get(id=producto_id)
-#                     if producto.se_vende_fraccionado:
-#                         total_producto = precio_unitario * (cantidad / 1000)
-#                     else:
-#                         total_producto = precio_unitario * cantidad
-                    
-#                     total_compra += total_producto
-#                 except Exception as e:
-#                     logger.error(f"Error procesando el producto {producto_data.get('id')}: {str(e)}")
-#                     raise
-
-#             # Crear y guardar la venta
-#             venta = Venta(cliente_id=cliente_id, total=total_compra, fecha_venta=timezone.now(), es_fiada=venta_fiada)
-#             venta.save()
-
-#             # Agregar detalles de la venta
-#             for producto_data in productos_data:
-#                 try:
-#                     producto_id = producto_data.get('id')
-#                     cantidad = Decimal(producto_data.get('cantidad'))
-#                     precio_unitario = Decimal(producto_data.get('precio_unitario'))
-#                     total_producto = precio_unitario * cantidad if not producto.se_vende_fraccionado else precio_unitario * (cantidad / 1000)
-                    
-#                     DetalleVenta.objects.create(
-#                         venta=venta,
-#                         producto_id=producto_id,
-#                         cantidad=cantidad,
-#                         precio_unitario=precio_unitario,
-#                         total=total_producto
-#                     )
-#                 except Exception as e:
-#                     logger.error(f"Error creando detalle de venta para producto {producto_data.get('id')}: {str(e)}")
-#                     raise
-
-#             # Verificar si es venta fiada y actualizar cuenta corriente
-#             if venta_fiada:
-#                 venta.realizar_venta_fiada()
-            
-#             logger.info(f"Venta procesada con éxito. ID de venta: {venta.id}")
-
-#             return JsonResponse({'success': True, 'ticket_id': venta.id})
-
-#         except (ValueError, TypeError, InvalidOperation) as e:
-#             logger.error(f"Error en la solicitud de venta: {str(e)}")
-#             return JsonResponse({'success': False, 'error': f'Error en la solicitud: {str(e)}'}, status=400)
-#         except Product.DoesNotExist:
-#             logger.error("Producto no encontrado durante la venta.")
-#             return JsonResponse({'success': False, 'error': 'Producto no encontrado'}, status=404)
-#         except Exception as e:
-#             logger.error(f"Error inesperado: {str(e)}")
-#             return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
-#     productos = Product.objects.all()
-#     clientes = Cliente.objects.all()
-#     return render(request, 'sales/new_sale.html', {'productos': productos, 'clientes': clientes})
-
 # ---------------------------------------------------------------------------------------------------------------
 
 def buscar_venta(request):
@@ -272,7 +192,8 @@ def get_product(request, product_id):
         data = {
             "nombre": product.nombre,
             "precio_venta": str(product.precio_venta),
-            "se_vende_fraccionado": product.se_vende_fraccionado
+            "se_vende_fraccionado": product.se_vende_fraccionado,
+            "imagen": product.imagen.url
         }
         return JsonResponse(data)
     except Product.DoesNotExist:

@@ -47,14 +47,29 @@
       <!-- Columna derecha: Escáner QR y selección de cliente -->
       <div class="section">
         <h2>Escáner QR</h2>
-        <video id="video" width="100%" height="250" autoplay></video>
-        <canvas id="canvas" style="display: none"></canvas>
-        <p id="scan-status">Esperando código QR...</p>
+<div class="camera-container">
+  <video id="video-bg" class="video-animation" autoplay loop muted>
+    <source src="/static/sales/video/qr_scanner.mp4" type="video/mp4">
+    Tu navegador no soporta el video.
+  </video>
+  <video id="video" autoplay></video> <!-- Este es el video de la cámara -->
+  <canvas id="canvas" style="display: none"></canvas>
+  <div class="laser-overlay"></div> <!-- Capa con animación de láser -->
+</div>
+<p id="scan-status">Esperando código QR...</p>
+      
+      <!-- Contenedor de la imagen del producto escaneado -->
+      <div id="product-image-container" style="display: none;">
+          <img id="product-image" src="" alt="Producto Escaneado">
+      </div>
+        
+
+
 
         <label for="qr_code_value">Escanea un Producto:</label>
         <input type="text" name="qr_code_value" id="qr_code_value" placeholder="Código QR" class="input-field">
         <button type="submit" name="add_product" class="button">Añadir Producto</button>
-
+        
         <!-- Selección de cliente y venta fiada -->
         <div class="field-group">
           <h4>Seleccionar Cliente</h4>
@@ -72,7 +87,6 @@
           </select>
         </div>
       </div>
-    </div>
 
     <div class="row">
       <div class="section flex-row">
@@ -81,24 +95,7 @@
         <button type="submit" name="close_sale" class="button success">Cerrar Venta</button>
       </div>
     </div>
-    
-    
-    {% comment %} <!-- Total de la compra -->
-    <div class="row">
-      <div class="section">
-        <h4>Total de la compra: <span id="total-compra">$0</span></h4>
-      </div>
-    </div>
-
-    <!-- Botón para cerrar la venta -->
-    <div class="row">
-      <div class="section text-right">
-        <button type="submit" name="close_sale" class="button success">Cerrar Venta</button>
-      </div>
-    </div>
-  </form> {% endcomment %}
-
-  <!-- Botón para volver al dashboard del cajero -->
+  
   <div class="row">
     <div class="section text-right">
       <a href="{% url 'cashier_dashboard' %}" class="button primary">Volver al Dashboard</a>
@@ -114,6 +111,27 @@
 <script src="{% static 'js/jsQR.js' %}"></script>
 
 <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const videoBg = document.getElementById('video-bg');
+    
+    // Asegurarse de que el video de fondo se reproduzca al cargar la página
+    const playVideo = () => {
+      videoBg.play()
+        .then(() => {
+          console.log('Video de fondo reproduciéndose al cargar la página.');
+        })
+        .catch((error) => {
+          console.error('Error al reproducir el video de fondo:', error);
+        });
+    };
+  
+    // Intentar reproducir el video
+    playVideo();
+  
+    // Si el video no se reproduce al cargar la página, intentar nuevamente con un retraso
+    setTimeout(playVideo, 1000);
+  });
+
   const confirmSound = new Audio("/static/sounds/confirm.wav");
   const productosEscaneados = new Map();
   const video = document.getElementById("video");
@@ -121,26 +139,57 @@
   const context = canvas.getContext("2d");
   const scanStatus = document.getElementById("scan-status");
   const totalCompraElement = document.getElementById("total-compra");
-
+  
+  const productImageContainer = document.getElementById("product-image-container");
+  const productImage = document.getElementById("product-image");
+  
   let scanningEnabled = true; // Variable para controlar el escaneo
-
+  
   navigator.mediaDevices.getUserMedia({ video: true })
-  .then((stream) => {
-    video.srcObject = stream;
+    .then((stream) => {
+      video.srcObject = stream;
+      requestAnimationFrame(scanQRCode); // Asegura que el escaneo comienza cuando la cámara está activa
+    })
+    .catch((err) => {
+      console.error('Error al acceder a la cámara:', err);
+      scanStatus.textContent = "No se puede acceder a la cámara";
+    });
+  
+  function scanQRCode() {
+    if (!scanningEnabled) return; // Si el escaneo está deshabilitado, no hacemos nada
+  
+    // Configuración del canvas para capturar la imagen del video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+    // Aquí se debe integrar tu lógica para escanear el QR, esto depende de la librería que estés usando
+    // Por ejemplo, con `jsQR` (si la estás usando) sería algo así:
+    // const qrCode = jsQR(context.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
+    
+    // Si encuentras un código QR
+    if (qrCode) {
+      const productId = qrCode.data; // Asumiendo que el código QR contiene el ID del producto
+      agregarProductoALista(productId);
+      confirmSound.play();
+    } else {
+      scanStatus.textContent = "Esperando código QR...";
+    }
+  
+    // Continuamos escaneando
     requestAnimationFrame(scanQRCode);
-  })
-  .catch((err) => {
-    console.error('Error al acceder a la cámara:', err);
-    scanStatus.textContent = "No se puede acceder a la cámara";
-  });
-
+  }
+  
   function agregarProductoALista(productId) {
     const productIdStr = String(productId);
     const productList = document.getElementById("product-list");
-
+  
     if (productosEscaneados.has(productIdStr)) {
       return;
     }
+
+    // Mostrar la animación de fondo al iniciar el escaneo
+    showBackgroundVideo();
 
     fetch(`/sales/api/productos/${productIdStr}/`)
       .then(response => {
@@ -155,6 +204,19 @@
           return;
         }
 
+        // Actualizar el fondo de la cámara con la imagen del producto
+        if (producto.imagen) {
+          const cameraContainer = document.querySelector('.camera-container');
+          cameraContainer.style.backgroundImage = `url(${producto.imagen})`;
+          cameraContainer.style.backgroundColor = "transparent";
+
+          // Vuelve a mostrar la animación después de 2 segundos
+          setTimeout(() => {
+            cameraContainer.style.backgroundImage = '';
+            showBackgroundVideo();
+          }, 2000);
+        }
+
         const li = document.createElement("li");
         li.className = "list-group-item";
         li.dataset.productId = productIdStr;
@@ -163,56 +225,80 @@
         const cantidad = 1;
         let totalInicial = precio * cantidad;
 
-        // Si el producto se vende fraccionado, calculamos en base a la cantidad en gramos
         if (producto.se_vende_fraccionado) {
-          totalInicial = precio * (cantidad / 1000); // Convertimos gramos a kilogramos
+          totalInicial = precio * (cantidad / 1000);
         } else {
           totalInicial = precio * cantidad;
         }
 
-        // Determina el texto del precio según la unidad de venta
         const precioTexto = producto.se_vende_fraccionado ? "Precio x Kg" : "Precio x unidad";
         const unidadTexto = producto.se_vende_fraccionado ? "grs" : "unidades";
 
         let inputCantidad;
         if (producto.se_vende_fraccionado) {
           inputCantidad = `
-                    <input type="number" min="10" max="5000" step="10" value="${cantidad}" 
-                        onchange="actualizarCantidad('${productIdStr}', this.value, true)">
-                    ${unidadTexto}
-                `;
+            <input type="number" min="10" max="5000" step="10" value="${cantidad}" 
+              onchange="actualizarCantidad('${productIdStr}', this.value, true)">
+            ${unidadTexto}
+          `;
         } else {
           inputCantidad = `
-                    <input type="number" min="1" value="${cantidad}" 
-                        onchange="actualizarCantidad('${productIdStr}', this.value, false)">
-                    unidades
-                `;
+            <input type="number" min="1" value="${cantidad}" 
+              onchange="actualizarCantidad('${productIdStr}', this.value, false)">
+            unidades
+          `;
         }
 
         li.innerHTML = `
-                <div class="product-info">
-                    <span class="product-name">${producto.nombre}</span>
-                    <span class="product-price">${precioTexto}: $${precio.toFixed(2)}</span>
-                </div>
-                <div class="product-quantity">
-                    ${inputCantidad}
-                </div>
-                <div class="product-total">
-                    $<span class="costo">${totalInicial.toFixed(2)}</span>
-                </div>
-                  <i class="fas fa-trash-alt eliminar" 
-                   onclick="eliminarProducto('${productIdStr}', 1)" style="cursor: pointer; color: red; font-size: 20px;">
-                  </i>
-            `;
+          <div class="product-info">
+            <span class="product-name">${producto.nombre}</span>
+            <span class="product-price">${precioTexto}: $${precio.toFixed(2)}</span>
+          </div>
+          <div class="product-quantity">
+            ${inputCantidad}
+          </div>
+          <div class="product-total">
+            $<span class="costo">${totalInicial.toFixed(2)}</span>
+          </div>
+          <i class="fas fa-trash-alt eliminar" 
+            onclick="eliminarProducto('${productIdStr}', 1)" 
+            style="cursor: pointer; color: red; font-size: 20px;">
+          </i>
+        `;
 
         productList.appendChild(li);
-        productosEscaneados.set(productIdStr, { elemento: li, cantidad: cantidad, precio_venta: precio, fraccionado: producto.se_vende_fraccionado, total: totalInicial });
+        productosEscaneados.set(productIdStr, { 
+          elemento: li, 
+          cantidad: cantidad, 
+          precio_venta: precio, 
+          fraccionado: producto.se_vende_fraccionado, 
+          total: totalInicial 
+        });
         actualizarTotalCompra();
+
+        // Ocultar la animación después de agregar el producto
+        hideBackgroundVideo();
       })
       .catch(error => {
         console.error("Error:", error);
+        hideBackgroundVideo(); // Ocultar la animación en caso de error
       });
-  }
+}
+
+// Mostrar la animación
+function showBackgroundVideo() {
+  const videoBg = document.getElementById('video-bg');
+  videoBg.currentTime = 0; // Reinicia el video
+  videoBg.style.display = 'block'; // Asegúrate de mostrarlo
+  videoBg.play().catch((error) => console.error('Error al reproducir el video:', error));
+}
+
+// Ocultar la animación
+function hideBackgroundVideo() {
+  const videoBg = document.getElementById('video-bg');
+  videoBg.style.display = 'none';
+  videoBg.pause(); // Pausa para evitar usar recursos innecesarios
+}
 
   function scanQRCode() {
     if (video.readyState === video.HAVE_ENOUGH_DATA && scanningEnabled) {
