@@ -1,39 +1,46 @@
 {% extends 'base.html' %}
 
-{% block title %}Listar Categorías{% endblock %}
+{% load static %}
+
+{% block header_title %}
+    Gestión de Categorías
+{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'products/css/list_category_styles.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="text-center">Listado de Categorías</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for categoria in categorias %}
-            <tr>
-                <td>{{ categoria.nombre }}</td>
-                <td>
-                    <a href="{% url 'edit_category' categoria.id %}" class="btn btn-warning">Editar</a>
-                    <form action="{% url 'delete_category' categoria.id %}" method="post" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="2" class="text-center">No hay categorías disponibles.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <div class="d-flex justify-content-end">
-        <a href="{% url 'add_category' %}" class="btn btn-success">Agregar Nueva Categoría</a>
-        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mx-2">Volver al Dashboard</a> <!-- Botón para volver al dashboard -->
+    <div class="dashboard-container">
+
+        <div class="categories-container">
+            <table class="categories-table">
+                <thead>
+                    <tr>
+                        <th>Acciones</th> <!-- Cambié la posición de la columna de acciones -->
+                        <th>ID</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for categoria in categorias %}
+                    <tr>
+                        <td class="actions">
+                            <!-- Iconos para editar y eliminar -->
+                            <a href="{% url 'editar_categoria' categoria.id %}" class="icon-edit" title="Editar"><i class="fas fa-edit"></i></a>
+                            <a href="{% url 'eliminar_categoria' categoria.id %}" class="icon-delete" onclick="return confirm('¿Seguro que deseas eliminar esta categoría?')" title="Eliminar"><i class="fas fa-trash-alt"></i></a>
+                        </td>
+                        <td>{{ categoria.id }}</td>
+                        <td>{{ categoria.nombre }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botón para volver al Dashboard (ubicado a la derecha abajo) -->
+        <div class="back-button-container">
+            <a href="{% url 'admin_dashboard' %}" class="form-btn form-btn-primary">Volver al Dashboard</a>
+        </div>
     </div>
-</div>
 {% endblock %}

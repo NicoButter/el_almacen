@@ -1,6 +1,13 @@
 {% extends 'base.html' %}
+
 {% load static %}
+
+{% block extra_styles %}
+    <link href="{% static 'sales/css/ticket_details_styles.css' %}" rel="stylesheet"/>
+{% endblock %}
+
 {% block title %}Detalle del Ticket{% endblock %}
+
 {% block header %}Detalle del Ticket{% endblock %}
 
 {% block content %}
@@ -67,18 +74,22 @@
         {% endif %}
     </div>
 
-    <!-- Botones al lado derecho -->
+    <!-- Botones al lado derecho con iconos -->
     <div class="ticket-buttons">
         <!-- Enviar por WhatsApp -->
         <a href="{% url 'sales:generar_pdf_whatsapp' ticket.id %}" class="btn btn-warning" target="_blank">
-            Enviar por WhatsApp
+            <i class="fab fa-whatsapp"></i> <!-- Icono de WhatsApp -->
         </a>
     
         <!-- Enviar por Email -->
-        <a href="{% url 'sales:enviar_ticket_email' ticket.id %}" class="btn btn-success">Enviar por Email</a>
+        <a href="{% url 'sales:enviar_ticket_email' ticket.id %}" class="btn btn-success">
+            <i class="fas fa-envelope"></i> <!-- Icono de Email -->
+        </a>
     
-        <!-- Terminar -->
-        <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Terminar</a>
+        <!-- Volver al dashboard -->
+        <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> <!-- Icono de Volver -->
+        </a>
     </div>
 
 </div>

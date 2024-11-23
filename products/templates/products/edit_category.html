@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block header_title %}
+    Editar Categoría
+{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'products/css/edit_category_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard-container">
+        <h2 class="page-title">Editar Categoría</h2>
+
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nombre" class="form-label">Nombre de la Categoría</label>
+                <input type="text" class="form-input" id="nombre" name="nombre" value="{{ categoria.nombre }}" required>
+            </div>
+
+            <button type="submit" class="form-btn form-btn-primary">Guardar Cambios</button>
+        </form>
+    </div>
+
+    <!-- Botón para volver al Dashboard -->
+    <div class="back-button-container">
+        <a href="{% url 'admin_dashboard' %}" class="form-btn form-btn-secondary">Volver al Dashboard</a>
+    </div>
+    
+{% endblock %}

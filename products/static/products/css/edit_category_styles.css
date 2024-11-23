@@ -1,0 +1,107 @@
+.dashboard-container {
+    margin: 20px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+.page-title {
+    font-size: 30px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+form {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-label {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.form-btn {
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: auto;
+    /* No ocupa todo el ancho */
+    display: inline-block;
+    /* Hacer que el botón sea más pequeño */
+}
+
+.form-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Estilo para el botón principal de guardar */
+.form-btn-primary {
+    background-color: #28a745;
+}
+
+.form-btn-primary:hover {
+    background-color: #218838;
+}
+
+/* Estilo para el botón de volver al Dashboard */
+.form-btn-secondary {
+    background-color: #007bff;
+    /* Azul */
+    margin-top: 20px;
+}
+
+.form-btn-secondary:hover {
+    background-color: #0056b3;
+    /* Azul más oscuro */
+}
+
+/* Estilo del contenedor del botón para volver al Dashboard */
+.back-button-container {
+    display: flex;
+    justify-content: flex-end;
+    /* Esto alinea el botón a la derecha */
+    margin-top: 20px;
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+    .form-input {
+        padding: 10px;
+    }
+
+    .form-btn {
+        padding: 10px 15px;
+    }
+
+    .back-button-container {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+    }
+}

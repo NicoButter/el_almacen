@@ -1,0 +1,111 @@
+/* Estilos generales para la página */
+.dashboard-container {
+    margin: 20px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+/* Título de la página */
+.page-title {
+    font-size: 30px;
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de las categorías */
+.categories-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* Título de la sección */
+.section-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #444;
+}
+
+/* Estilos de la tabla */
+.categories-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.categories-table th, .categories-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.categories-table th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+.categories-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.categories-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilo de las acciones (iconos) */
+.actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.icon-edit, .icon-delete {
+    color: #007bff;
+    font-size: 20px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.icon-edit:hover {
+    color: #f39c12;
+}
+
+.icon-delete:hover {
+    color: #e74c3c;
+}
+
+/* Estilo del botón para volver al Dashboard */
+.back-button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.form-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.form-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+/* Estilos para responsividad */
+@media (max-width: 768px) {
+    .categories-table th, .categories-table td {
+        padding: 8px 10px;
+    }
+    .form-btn {
+        padding: 10px 15px;
+    }
+}

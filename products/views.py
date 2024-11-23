@@ -1,6 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden
 from django.contrib import messages
+from django.urls import reverse
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
 
@@ -50,19 +51,6 @@ def agregar_producto(request):
     
     return render(request, 'products/add_products.html', {'form': form})
 
-# def agregar_producto(request):
-#     if request.method == 'POST':
-#         form = ProductForm(request.POST, request.FILES)  # Asegurarse de incluir request.FILES
-#         if form.is_valid():
-#             producto = form.save(commit=False)  # No guardes el producto aún
-#             if 'imagen' in request.FILES:
-#                 producto.imagen = request.FILES['imagen']  # Guarda la imagen en el campo de imagen
-#             producto.save()  # Ahora guarda el producto junto con la imagen
-#             return redirect('listar_productos')
-#     else:
-#         form = ProductForm()
-#     return render(request, 'products/add_products.html', {'form': form})
-
 # -----------------------------------------------------------------------------------------------------------------
 
 def editar_producto(request, pk):
@@ -109,6 +97,36 @@ def crear_categoria(request):
 
 # -----------------------------------------------------------------------------------------------------------------
 
+# Vista para listar categorías
 def listar_categorias(request):
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.all()  # Obtener todas las categorías
     return render(request, 'products/list_category.html', {'categorias': categorias})
+
+# -----------------------------------------------------------------------------------------------------------------
+
+# Vista para editar una categoría
+def editar_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+
+    if request.method == 'POST':
+        categoria.nombre = request.POST.get('nombre')  # Asumiendo que solo modificas el nombre
+        categoria.save()
+        messages.success(request, "Categoría actualizada con éxito.")
+        return redirect('listar_categorias')
+
+    return render(request, 'products/edit_category.html', {'categoria': categoria})
+
+#-----------------------------------------------------------------------------------------------------------------
+
+# Vista para eliminar una categoría
+def eliminar_categoria(request, categoria_id):
+    categoria = get_object_or_404(Categoria, id=categoria_id)
+    # Primero, actualizamos los productos a "Sin categoría" antes de eliminarla
+    categoria_sin_categoria = Categoria.objects.get(nombre="Sin categoría")
+    productos = Product.objects.filter(categoria=categoria)
+    productos.update(categoria=categoria_sin_categoria)
+    
+    # Luego, eliminamos la categoría
+    categoria.delete()
+    messages.success(request, "Categoría eliminada con éxito.")
+    return redirect('listar_categorias')  # Redirige al listado de categorías

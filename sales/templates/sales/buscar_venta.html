@@ -1,67 +1,181 @@
 {% extends 'base.html' %}
+
 {% load static %}
-{% block title %}Buscar Venta{% endblock %}
-{% block header %}Buscar Venta{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'sales/css/buscar_venta_styles.css' %}" rel="stylesheet"/>
+    <link href="{% static 'sales/css/ticket_details_styles.css' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block title %}
+    Buscar Venta
+{% endblock %}
+
+{% block header %}
+    Buscar Venta
+{% endblock %}
+
 {% block content %}
 
-<!-- Resultados de la búsqueda -->
+<!-- Barra de búsqueda -->
 <h1>Buscar Venta</h1>
 <form method="GET" action="{% url 'sales:buscar_venta' %}">
     <div class="search-bar">
-        <input type="text" id="search" name="search" placeholder="Buscar por ID de venta, cliente, ticket, fecha..." />
-        <button type="submit">Buscar</button>
+        <input type="text" id="search" name="search" placeholder="Buscar por ID de venta, cliente, ticket, fecha..." class="search-input" />
+        <button type="submit" class="search-btn">Buscar</button>
     </div>
 </form>
 
-{% if ventas %}
-    <div class="results">
-        <h2>Resultados de la búsqueda:</h2>
-        <div class="grid">
-            {% for venta in ventas %}
-                {% if venta.tickets.all %}
-                    <a href="{% url 'sales:ticket_detail' venta.tickets.first.id %}" class="grid-item">
-                        <div class="grid-item-content">
-                            <strong>ID:</strong> {{ venta.id }}<br>
-                            <strong>Cliente:</strong> {{ venta.cliente.nombre }}<br>
-                            <strong>Fecha:</strong> {{ venta.fecha_venta }}<br>
-                            <strong>Total:</strong> ${{ venta.total }}<br>
-                            <strong>Estado:</strong> 
-                            {% if venta.tickets.first.fiado %}
-                                Fiada
-                            {% else %}
-                                Pagada
-                            {% endif %}
-                        </div>
-                    </a>
-                {% else %}
-                    <div class="grid-item">
-                        <strong>ID:</strong> {{ venta.id }}<br>
-                        <strong>Cliente:</strong> {{ venta.cliente.nombre }}<br>
-                        <strong>Fecha:</strong> {{ venta.fecha_venta }}<br>
-                        <strong>Total:</strong> ${{ venta.total }}<br>
-                        <strong>Estado:</strong> 
-                        {% if venta.ticket.fiado %}
-                            Fiada
-                        {% else %}
-                            Pagada
-                        {% endif %}
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+<!-- Solo mostrar resultados si la búsqueda ha sido realizada -->
+{% if request.GET.search %}
+    {% if ventas %}
+        <div class="results">
+            <h2>Resultados de la búsqueda:</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Fecha</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for venta in ventas %}
+                        <tr>
+                            <td>{{ venta.id }}</td>
+                            <td>{{ venta.cliente.nombre }}</td>
+                            <td>{{ venta.fecha_venta }}</td>
+                            <td>${{ venta.total }}</td>
+                            <td>
+                                {% if venta.es_fiada %}
+                                    Fiada
+                                {% else %}
+                                    Pagada
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if venta.tickets.all %}
+                                    <!-- Botón para activar el modal -->
+                                    <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#ticketModal{{ venta.id }}">
+                                        Ver Ticket
+                                    </button>
+                                {% else %}
+                                    <span class="text-muted">Sin Ticket</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
-        <!-- Paginación -->
-        <div class="pagination">
-            <!-- Paginación (igual que antes) -->
+            <!-- Paginación -->
+            <div class="pagination">
+                <!-- Paginación (igual que antes) -->
+            </div>
+        </div>
+    {% else %}
+        <p class="no-results">No se encontraron resultados.</p>
+    {% endif %}
+{% endif %}
+
+<!-- Modales fuera de la tabla para no afectar la organización -->
+{% for venta in ventas %}
+    <!-- Modal para mostrar el ticket completo -->
+    <div class="modal fade" id="ticketModal{{ venta.id }}" tabindex="-1" aria-labelledby="ticketModalLabel{{ venta.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="ticketModalLabel{{ venta.id }}">Ticket de la Venta {{ venta.id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if venta.tickets.first %}
+                        <div class="ticket-container">
+                            <div class="ticket-header">
+                                <h1>Ticket #{{ venta.tickets.first.id }}</h1>
+                                <h2>{{ venta.fecha_venta }}</h2>
+                                <p>Cliente: {{ venta.cliente.nombre }}</p>
+                                <!-- Estado de la venta: Fiada o Pagada -->
+                                <p><strong>Estado de la Venta:</strong> 
+                                    {% if venta.es_fiada %}
+                                        Fiada
+                                    {% else %}
+                                        Pagada
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="ticket-body">
+                                <div class="ticket-details">
+                                    <h3>Detalles de la Venta</h3>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in venta.tickets.first.line_items.all %}
+                                                <tr>
+                                                    <td>{{ item.product.nombre }}</td>
+                                                    <td>{{ item.quantity }}</td>
+                                                    <td>${{ item.subtotal }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="ticket-footer">
+                                <!-- Monto de la venta: Fiado o Pagado -->
+                                <p><strong>Monto:</strong> 
+                                    {% if venta.es_fiada %}
+                                        Fiado: ${{ venta.total }}
+                                    {% else %}
+                                        Pagado: ${{ venta.total }}
+                                    {% endif %}
+                                </p>
+
+                                <!-- Botones al final del ticket -->
+                                <div class="ticket-buttons">
+                                    <!-- WhatsApp -->
+                                    <a href="whatsapp://send?text=Detalles del Ticket #{{ venta.tickets.first.id }}" class="btn btn-whatsapp">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </a>
+
+                                    <!-- Email -->
+                                    <a href="mailto:?subject=Detalles del Ticket #{{ venta.tickets.first.id }}&body=Detalles de la venta: {{ venta.id }}" class="btn btn-email">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+
+                                    <!-- Terminar -->
+                                    <button class="btn btn-terminar" data-bs-dismiss="modal">Terminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p>No hay detalles del ticket disponibles.</p>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
         </div>
     </div>
-{% else %}
-    <p class="no-results">No se encontraron resultados.</p>
-{% endif %}
+{% endfor %}
 
 <!-- Botón para volver al dashboard del cajero (abajo a la derecha) -->
 <div class="text-end mt-4">
-    <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard</a>
+    <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+    </a>
 </div>
 
 {% endblock %}
