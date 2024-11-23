@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseForbidden
+from django.contrib import messages
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
 
@@ -27,17 +28,40 @@ def listar_productos(request):
 # -----------------------------------------------------------------------------------------------------------------
 
 def agregar_producto(request):
+    # Recuperar datos del formulario desde la sesión
+    initial_data = request.session.pop('product_form_data', None)
+    form = ProductForm(initial=initial_data)
+
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)  # Asegurarse de incluir request.FILES
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
-            producto = form.save(commit=False)  # No guardes el producto aún
+            producto = form.save(commit=False)
             if 'imagen' in request.FILES:
-                producto.imagen = request.FILES['imagen']  # Guarda la imagen en el campo de imagen
-            producto.save()  # Ahora guarda el producto junto con la imagen
+                producto.imagen = request.FILES['imagen']
+            producto.save()
             return redirect('listar_productos')
-    else:
-        form = ProductForm()
+        else:
+            # Si el formulario tiene errores, guardar datos en la sesión
+            request.session['product_form_data'] = request.POST.dict()
+
+    # Guardar datos en la sesión al redirigir a la creación de categorías
+    if request.GET.get('from_category') == 'true':
+        form = ProductForm(initial=request.session.get('product_form_data', None))
+    
     return render(request, 'products/add_products.html', {'form': form})
+
+# def agregar_producto(request):
+#     if request.method == 'POST':
+#         form = ProductForm(request.POST, request.FILES)  # Asegurarse de incluir request.FILES
+#         if form.is_valid():
+#             producto = form.save(commit=False)  # No guardes el producto aún
+#             if 'imagen' in request.FILES:
+#                 producto.imagen = request.FILES['imagen']  # Guarda la imagen en el campo de imagen
+#             producto.save()  # Ahora guarda el producto junto con la imagen
+#             return redirect('listar_productos')
+#     else:
+#         form = ProductForm()
+#     return render(request, 'products/add_products.html', {'form': form})
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -74,9 +98,13 @@ def crear_categoria(request):
         form = CategoriaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('products/list_category')  # Redirigir a una vista de listado de categorías o donde desees
+            # Redirige a la vista de agregar producto con el indicador `from_category`
+            return redirect(reverse('add_products') + '?from_category=true')
+        else:
+            messages.error(request, 'Error al crear la categoría. Por favor, inténtalo nuevamente.')
     else:
         form = CategoriaForm()
+    
     return render(request, 'products/add_category.html', {'form': form})
 
 # -----------------------------------------------------------------------------------------------------------------
