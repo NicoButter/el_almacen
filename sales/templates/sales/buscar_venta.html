@@ -11,14 +11,13 @@
     Buscar Venta
 {% endblock %}
 
-{% block header %}
+{% block header_title %}
     Buscar Venta
 {% endblock %}
 
 {% block content %}
 
 <!-- Barra de búsqueda -->
-<h1>Buscar Venta</h1>
 <form method="GET" action="{% url 'sales:buscar_venta' %}">
     <div class="search-bar">
         <input type="text" id="search" name="search" placeholder="Buscar por ID de venta, cliente, ticket, fecha..." class="search-input" />
