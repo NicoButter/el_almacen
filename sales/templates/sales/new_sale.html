@@ -47,16 +47,16 @@
       <!-- Columna derecha: Escáner QR y selección de cliente -->
       <div class="section">
         <h2>Escáner QR</h2>
-<div class="camera-container">
-  <video id="video-bg" class="video-animation" autoplay loop muted>
-    <source src="/static/sales/video/qr_scanner.mp4" type="video/mp4">
-    Tu navegador no soporta el video.
-  </video>
-  <video id="video" autoplay></video> <!-- Este es el video de la cámara -->
-  <canvas id="canvas" style="display: none"></canvas>
-  <div class="laser-overlay"></div> <!-- Capa con animación de láser -->
-</div>
-<p id="scan-status">Esperando código QR...</p>
+        <div class="camera-container">
+          <video id="video-bg" class="video-animation" autoplay loop muted>
+            <source src="/static/sales/video/qr_scanner.mp4" type="video/mp4">
+            Tu navegador no soporta el video.
+          </video>
+          <video id="video" autoplay></video> <!-- Este es el video de la cámara -->
+          <canvas id="canvas" style="display: none"></canvas>
+          <div class="laser-overlay"></div> <!-- Capa con animación de láser -->
+        </div>
+        <p id="scan-status">Esperando código QR...</p>
       
       <!-- Contenedor de la imagen del producto escaneado -->
       <div id="product-image-container" style="display: none;">
@@ -158,12 +158,8 @@
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-  
-    // Aquí se debe integrar tu lógica para escanear el QR, esto depende de la librería que estés usando
-    // Por ejemplo, con `jsQR` (si la estás usando) sería algo así:
-    // const qrCode = jsQR(context.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
     
-    // Si encuentras un código QR
+    // Si encuentra un código QR
     if (qrCode) {
       const productId = qrCode.data; // Asumiendo que el código QR contiene el ID del producto
       agregarProductoALista(productId);
