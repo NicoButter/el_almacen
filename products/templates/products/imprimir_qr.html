@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block header_title %}
+    Imprimir QR de Productos
+{% endblock %}
+
+{% block extra_styles %}
+    <link href="{% static 'products/css/imprimir_qr_styles.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Imprimir QR para Productos</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="producto">Seleccionar Producto:</label>
+            <select name="producto" id="producto" required>
+                {% for producto in productos %}
+                    <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad">Cantidad de QR a Imprimir:</label>
+            <input type="number" name="cantidad" id="cantidad" min="1" max="100" required>
+        </div>
+
+        <button type="submit" class="btn">Generar QR</button>
+    </form>
+</div>
+{% endblock %}

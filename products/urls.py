@@ -8,8 +8,9 @@ from .views import (
     eliminar_producto,
     crear_categoria,
     listar_categorias,
-    editar_categoria,  # ¡Asegúrate de incluirla!
-    eliminar_categoria,  # También agrega eliminar_categoria
+    editar_categoria,  
+    eliminar_categoria,
+    imprimir_qr  
 )
 
 urlpatterns = [
@@ -22,6 +23,8 @@ urlpatterns = [
     path('listar/', listar_productos, name='list_products'),
     path('editar/<int:pk>/', editar_producto, name='edit_products'),
     path('eliminar/<int:pk>/', eliminar_producto, name='delete_product'),
+    path('imprimir_qr/', imprimir_qr, name='imprimir_qr'),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

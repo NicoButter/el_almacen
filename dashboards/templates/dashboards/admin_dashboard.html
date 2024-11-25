@@ -53,6 +53,13 @@
         <p class="card-text">Genera reportes detallados del inventario y más.</p>
         <a href="{% url 'reports_dashboard' %}" class="btn-custom">Ir a Reportes</a>
     </div>
+
+    <div class="card">
+        <h5 class="card-title">Impresion de QR Codes</h5>
+        <p class="card-text">Imprime los QR necesarios para tus productos.</p>
+        <a href="{% url 'imprimir_qr' %}" class="btn-custom">QR Codes</a>
+    </div>
+
 </div>
 
 {% endblock %}

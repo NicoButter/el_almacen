@@ -1,10 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.contrib import messages
 from django.urls import reverse
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
 from django.core.paginator import Paginator
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib.units import inch
+
+from datetime import datetime
+
+
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -124,7 +134,6 @@ def editar_categoria(request, categoria_id):
 
 #-----------------------------------------------------------------------------------------------------------------
 
-# Vista para eliminar una categoría
 def eliminar_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     # Primero, actualizamos los productos a "Sin categoría" antes de eliminarla
@@ -136,3 +145,79 @@ def eliminar_categoria(request, categoria_id):
     categoria.delete()
     messages.success(request, "Categoría eliminada con éxito.")
     return redirect('listar_categorias')  # Redirige al listado de categorías
+
+#-----------------------------------------------------------------------------------------------------------------
+
+def imprimir_qr(request):
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        producto_id = request.POST.get('producto')
+        cantidad = int(request.POST.get('cantidad'))
+
+        # Obtener el producto de la base de datos
+        producto = Product.objects.get(id=producto_id)
+
+        # Suponiendo que tienes un nombre de almacén almacenado en tu configuración o base de datos
+        nombre_almacen = "La Señora del Salame"  # Esto puede venir de una configuración o modelo
+
+        # Crear el PDF en memoria
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
+        x, y = 100, 750  # Posición inicial
+
+        # Agregar encabezado con el nombre del almacén, producto y fecha
+        c.setFont("Helvetica", 16)
+        c.drawString(x, y, f"Almacén: {nombre_almacen}")
+        y -= 20
+        c.drawString(x, y, f"Producto: {producto.nombre}")
+        y -= 20
+        c.drawString(x, y, f"Fecha: {datetime.now().strftime('%d/%m/%Y')}")
+        y -= 40
+
+        # Ajustar la posición de inicio de los QR más abajo (aumentar el valor de y)
+        y -= 80  # Desplaza los QR hacia abajo para que no se superpongan con el encabezado
+
+        # Definir el tamaño de las celdas en la tabla (ajustado a 20mm = 57 puntos)
+        cell_width = 57  # Ancho de cada celda en puntos (aproximadamente 20mm)
+        cell_height = 57  # Alto de cada celda en puntos (aproximadamente 20mm)
+
+        # Calcular cuántas columnas caben en la página
+        page_width = 612  # Ancho de la página (tamaño letter en puntos)
+        margins = 20  # Margen izquierdo y derecho
+        available_width = page_width - 2 * margins  # Ancho disponible para las celdas
+        max_columns = available_width // cell_width  # Número máximo de columnas
+
+        # Número de filas que caben en la página (esto lo dejamos fijo a 8)
+        max_rows = 8  # Número de filas que caben en la página
+
+        # Dibujar los QR dentro de las celdas
+        for i in range(cantidad):
+            row = i // max_columns  # Fila
+            col = i % max_columns  # Columna
+            qr_x = margins + col * cell_width  # Calcular posición X (con margen izquierdo)
+            qr_y = y - (row * cell_height)  # Calcular posición Y (desplazado hacia abajo)
+
+            # Dibujar el marco (rectángulo) alrededor del QR
+            c.setStrokeColorRGB(0, 0, 0)  # Color negro para el borde
+            c.setLineWidth(1)  # Grosor de línea
+            c.rect(qr_x, qr_y, cell_width, cell_height)  # Dibujar el marco
+
+            # Usar el archivo de imagen QR que ya existe para este producto
+            qr_image_path = producto.qr_code.path
+            c.drawImage(qr_image_path, qr_x, qr_y, width=cell_width, height=cell_height)
+
+        # Finalizar el PDF
+        c.showPage()
+        c.save()
+
+        # Enviar el PDF como respuesta para que se descargue
+        buffer.seek(0)
+        response = HttpResponse(buffer, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="productos_qr.pdf"'  # Forzar la descarga
+
+        return response
+
+    else:
+        # Si no es un POST, mostrar el formulario
+        productos = Product.objects.all()
+        return render(request, 'products/imprimir_qr.html', {'productos': productos})
