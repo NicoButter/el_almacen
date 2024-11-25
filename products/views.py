@@ -179,7 +179,7 @@ def imprimir_qr(request):
 
         # Definir el tamaño de las celdas en la tabla (ajustado a 20mm = 57 puntos)
         cell_width = 57  # Ancho de cada celda en puntos (aproximadamente 20mm)
-        cell_height = 57  # Alto de cada celda en puntos (aproximadamente 20mm)
+        cell_height = 65  # Alto de cada celda en puntos (aproximadamente 20mm)
 
         # Calcular cuántas columnas caben en la página
         page_width = 612  # Ancho de la página (tamaño letter en puntos)
@@ -199,12 +199,18 @@ def imprimir_qr(request):
 
             # Dibujar el marco (rectángulo) alrededor del QR
             c.setStrokeColorRGB(0, 0, 0)  # Color negro para el borde
-            c.setLineWidth(1)  # Grosor de línea
+            c.setLineWidth(2)  # Grosor de línea
             c.rect(qr_x, qr_y, cell_width, cell_height)  # Dibujar el marco
 
             # Usar el archivo de imagen QR que ya existe para este producto
             qr_image_path = producto.qr_code.path
-            c.drawImage(qr_image_path, qr_x, qr_y, width=cell_width, height=cell_height)
+            c.drawImage(qr_image_path, qr_x, qr_y + 10, width=cell_width, height=cell_height - 10)
+
+            # Dibujar el nombre del producto debajo del QR dentro del mismo marco
+            c.setFont("Helvetica", 8)  # Fuente más pequeña
+            text_x = qr_x + 2  # Alinear ligeramente hacia la derecha dentro del marco
+            text_y = qr_y + 5  # Espacio debajo del QR
+            c.drawString(text_x, text_y, producto.nombre[:12])  # Mostrar máximo 12 caracteres para evitar desbordes
 
         # Finalizar el PDF
         c.showPage()
@@ -221,3 +227,4 @@ def imprimir_qr(request):
         # Si no es un POST, mostrar el formulario
         productos = Product.objects.all()
         return render(request, 'products/imprimir_qr.html', {'productos': productos})
+
