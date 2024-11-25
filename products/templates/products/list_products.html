@@ -11,7 +11,6 @@
 {% endblock %}
 
 {% block content %}
-
 <div class="container">
 
     <!-- Filtro de Categoría -->
@@ -45,71 +44,93 @@
         </thead>
         <tbody>
             {% for producto in productos %}
-            <tr>
-                {% if is_admin %}
-                    <td>
-                        <a href="{% url 'edit_products' producto.pk %}" class="text-warning me-2">
-                            <i class="fa-regular fa-pen-to-square"></i> <!-- Icono de editar -->
-                        </a>
-                        <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="text-danger" style="border: none; background: none; padding: 0;">
+                <tr>
+                    {% if is_admin %}
+                        <td>
+                            <a href="{% url 'edit_products' producto.pk %}" class="text-warning me-2">
+                                <i class="fa-regular fa-pen-to-square"></i> <!-- Icono de editar -->
+                            </a>
+                            <!-- Botón para abrir el modal de confirmación -->
+                            <button type="button" class="text-danger" style="border: none; background: none; padding: 0;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.pk }}">
                                 <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
                             </button>
-                        </form>
-                        <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
-                            <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
-                        </a>
+                            <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                                <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
+                            </a>
+                        </td>
+                    {% else %}
+                        <td>
+                            <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                                <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
+                            </a>
+                        </td>
+                    {% endif %}
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>${{ producto.precio_venta }}</td>
+                    <td>{{ producto.cantidad_stock }}</td>
+                    <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
+                    <td>{{ producto.categoria.nombre }}</td>
+                    <td>
+                        <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}">
                     </td>
-                {% else %}
-                <td>
-                    <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
-                        <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
-                    </a>
-                </td>
-                {% endif %}
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.descripcion }}</td>
-                <td>${{ producto.precio_venta }}</td>
-                <td>{{ producto.cantidad_stock }}</td>
-                <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
-                <td>{{ producto.categoria.nombre }}</td> <!-- Mostrar nombre de la categoría -->
-                <td>
-                    <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}">
-                </td>
-            </tr>
+                </tr>
             {% endfor %}
         </tbody>
     </table>
 
-   <!-- Modal para mostrar detalles -->
+    <!-- Modal de confirmación de eliminación -->
     {% for producto in productos %}
-    <div class="modal fade" id="detalleModal{{ producto.pk }}" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="detalleModalLabel">Detalles del Producto: {{ producto.nombre }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <div class="modal fade" id="confirmDeleteModal{{ producto.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ producto.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmDeleteModalLabel{{ producto.pk }}">Confirmar Eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro de que desea eliminar el producto <strong>{{ producto.nombre }}</strong>? Esta acción no se puede deshacer.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <!-- Formulario para confirmar la eliminación -->
+                        <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <!-- Imagen del Producto -->
-                        <div class="col-md-4">
-                            <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid">
+            </div>
+        </div>
+    {% endfor %}
 
-                        </div>
-                        <div class="col-md-8">
-                            <!-- Descripción del Producto -->
-                            <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
-                            <p><strong>Precio:</strong> ${{ producto.precio_venta }}</p>
-                            <p><strong>Stock disponible:</strong> {{ producto.cantidad_stock }}</p>
-                            <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
+    <!-- Modal para mostrar detalles -->
+    {% for producto in productos %}
+        <div class="modal fade" id="detalleModal{{ producto.pk }}" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detalleModalLabel">Detalles del Producto: {{ producto.nombre }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <!-- Imagen del Producto -->
+                            <div class="col-md-4">
+                                <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid">
+                            </div>
+                            <div class="col-md-8">
+                                <!-- Descripción del Producto -->
+                                <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
+                                <p><strong>Precio:</strong> ${{ producto.precio_venta }}</p>
+                                <p><strong>Stock disponible:</strong> {{ producto.cantidad_stock }}</p>
+                                <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     {% endfor %}
 
     <div class="pagination">
@@ -134,7 +155,6 @@
             {% endif %}
         </div>
     </div>
-    
 
     <!-- Botón para volver al dashboard -->
     <div class="mt-4 text-center">
@@ -146,6 +166,6 @@
             <a href="{% url 'user_dashboard' %}" class="btn btn-primary">Volver al Dashboard Usuario</a>
         {% endif %}
     </div>
-</div>
 
+</div>
 {% endblock %}

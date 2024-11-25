@@ -126,6 +126,14 @@
     background-color: #0056b3;
 }
 
+.readonly-input {
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    color: #333;
+    font-weight: bold;
+    cursor: not-allowed;
+}
+
 /* Responsividad */
 @media (max-width: 768px) {
     .form-details-container {

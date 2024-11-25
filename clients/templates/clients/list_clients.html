@@ -57,12 +57,10 @@
                             <a href="{% url 'editar_cliente' cliente.pk %}" class="edit-icon" title="Editar">
                                 <i class="fa-regular fa-pen-to-square"></i>
                             </a>
-                            <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" class="delete-form">
-                                {% csrf_token %}
-                                <button type="submit" class="delete-icon" title="Eliminar">
-                                    <i class="fa-regular fa-trash-can"></i>
-                                </button>
-                            </form>
+                            <!-- Botón para abrir el modal de confirmación -->
+                            <button type="button" class="delete-icon" title="Eliminar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ cliente.pk }}">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </button>
                         </td>
                     {% endif %}
                     <td>{{ cliente.nombre }}</td>
@@ -71,6 +69,28 @@
                     <td>{% for email in cliente.emails.all %}{{ email.email }}{% endfor %}</td>
                     <td>{{ cliente.cuenta_corriente_cc.saldo }}</td>
                 </tr>
+
+                <!-- Modal de confirmación de eliminación -->
+                <div class="modal fade" id="confirmDeleteModal{{ cliente.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ cliente.pk }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ cliente.pk }}">Confirmar Eliminación</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Está seguro de que desea eliminar al cliente <strong>{{ cliente.nombre }}</strong>? Esta acción no se puede deshacer.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <form action="{% url 'eliminar_cliente' cliente.pk %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </tbody>
         </table>

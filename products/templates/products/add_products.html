@@ -42,6 +42,12 @@
                         <label for="{{ form.porcentaje_ganancia.id_for_label }}" class="form-label">Porcentaje de Ganancia</label>
                         {{ form.porcentaje_ganancia|add_class:"form-input" }}
                     </div>
+
+                    <div class="form-group">
+                        <label for="precio_venta" class="form-label">Precio de Venta</label>
+                        <input type="text" id="precio_venta" class="form-input readonly-input" readonly>
+                    </div>
+
                 </fieldset>
             </div>
 
@@ -105,15 +111,16 @@
     document.addEventListener('DOMContentLoaded', function() {
         const costoInput = document.getElementById('{{ form.costo.id_for_label }}');
         const porcentajeInput = document.getElementById('{{ form.porcentaje_ganancia.id_for_label }}');
-        const precioVentaInput = document.getElementById('precio_venta');
+        const precioVentaField = document.getElementById('precio_venta');
 
         function calcularPrecioVenta() {
-            const costo = parseFloat(costoInput.value) || 0;
-            const porcentaje = parseFloat(porcentajeInput.value) || 0;
+            const costo = parseFloat(costoInput.value) || 0; // Si está vacío, toma 0
+            const porcentaje = parseFloat(porcentajeInput.value) || 0; // Si está vacío, toma 0
             const precioVenta = costo * (1 + (porcentaje / 100));
-            precioVentaInput.value = precioVenta.toFixed(2);
+            precioVentaField.value = precioVenta.toFixed(2); // Formato a 2 decimales
         }
 
+        // Listeners para cambios en los campos de costo y porcentaje
         costoInput.addEventListener('input', calcularPrecioVenta);
         porcentajeInput.addEventListener('input', calcularPrecioVenta);
     });

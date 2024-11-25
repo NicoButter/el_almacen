@@ -11,23 +11,43 @@
 {% endblock %}
 
 {% block content %}
-    <div class="dashboard-container">
-        <h2 class="page-title">Editar Categoría</h2>
+<div class="dashboard-container">
+    <h2 class="page-title">Editar Categoría</h2>
 
-        <form method="POST">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="nombre" class="form-label">Nombre de la Categoría</label>
-                <input type="text" class="form-input" id="nombre" name="nombre" value="{{ categoria.nombre }}" required>
+    <form id="editCategoryForm" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="nombre" class="form-label">Nombre de la Categoría</label>
+            <input type="text" class="form-input" id="nombre" name="nombre" value="{{ categoria.nombre }}" required>
+        </div>
+
+        <!-- Botón para abrir el modal -->
+        <button type="button" class="form-btn form-btn-primary" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+            Guardar Cambios
+        </button>
+    </form>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-
-            <button type="submit" class="form-btn form-btn-primary">Guardar Cambios</button>
-        </form>
+            <div class="modal-body">
+                ¿Está seguro de que desea eliminar la categoría <strong>{{ categoria.nombre }}</strong>? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form action="{% url 'delete_category' categoria.pk %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
     </div>
+</div>
 
-    <!-- Botón para volver al Dashboard -->
-    <div class="back-button-container">
-        <a href="{% url 'admin_dashboard' %}" class="form-btn form-btn-secondary">Volver al Dashboard</a>
-    </div>
-    
 {% endblock %}
