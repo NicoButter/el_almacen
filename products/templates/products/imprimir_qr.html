@@ -16,7 +16,7 @@
 
     <form method="POST">
         {% csrf_token %}
-
+    
         <div class="form-group">
             <label for="producto">Seleccionar Producto:</label>
             <select name="producto" id="producto" required>
@@ -25,13 +25,20 @@
                 {% endfor %}
             </select>
         </div>
-
+    
         <div class="form-group">
             <label for="cantidad">Cantidad de QR a Imprimir:</label>
             <input type="number" name="cantidad" id="cantidad" min="1" max="100" required>
         </div>
+    
+        <button type="submit" id="btn-generar-qr" class="btn">Generar QR</button>
 
-        <button type="submit" class="btn">Generar QR</button>
+         <!-- Botón para volver al Dashboard -->
+    <div class="back-button-container">
+        <a href="{% url 'admin_dashboard' %}" class="btn-back-dashboard">Volver al Dashboard</a>
+    </div>
     </form>
-</div>
+    
+   
+
 {% endblock %}
