@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.urls import reverse
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
+from django.core.paginator import Paginator
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -16,11 +17,16 @@ def listar_productos(request):
 
     categorias = Categoria.objects.all()  # Obtener todas las categorías
 
+    # Configuración de paginación
+    paginator = Paginator(productos, 10)  # Mostrar 10 productos por página
+    page_number = request.GET.get('page')  # Obtener el número de página actual
+    page_obj = paginator.get_page(page_number)  # Obtener los productos de la página actual
+
     is_admin = request.user.is_admin
     is_cashier = request.user.is_cashier
 
     return render(request, 'products/list_products.html', {
-        'productos': productos,
+        'productos': page_obj,  # Pasar el objeto de página al template
         'categorias': categorias,  # Enviar categorías al template
         'is_admin': is_admin,
         'is_cashier': is_cashier

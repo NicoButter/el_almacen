@@ -67,11 +67,51 @@
     color: #6c757d;
 }
 
-/* Paginación */
 .pagination {
-    margin-top: 20px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
 }
+
+.pagination-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 10px;
+}
+
+.pagination-list li {
+    display: inline;
+}
+
+.pagination-list a, .pagination-list span {
+    display: inline-block;
+    padding: 10px 15px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    color: #333;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination-list a:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.pagination-list .active span {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+    cursor: default;
+}
+
+.pagination-list a:disabled {
+    color: #ccc;
+    pointer-events: none;
+    border-color: #ccc;
+}
+
 
 /* Sin resultados */
 .no-results {

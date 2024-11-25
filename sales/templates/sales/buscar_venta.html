@@ -109,6 +109,9 @@
 
                             <div class="ticket-body">
                                 <div class="ticket-details">
+                                    <h1>El Almacén</h1>
+                                    <h2>La Señora del Salame</h2>
+                                    <p>B° Los Álamos</p> 
                                     <h3>Detalles de la Venta</h3>
                                     <table>
                                         <thead>
@@ -169,6 +172,28 @@
         </div>
     </div>
 {% endfor %}
+
+<div class="pagination">
+    <ul class="pagination-list">
+        {% if page_obj.has_previous %}
+            <li><a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page=1">&laquo; Primero</a></li>
+            <li><a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ page_obj.previous_page_number }}">&lsaquo; Anterior</a></li>
+        {% endif %}
+        
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <li class="active"><span>{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                <li><a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ num }}">{{ num }}</a></li>
+            {% endif %}
+        {% endfor %}
+        
+        {% if page_obj.has_next %}
+            <li><a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente &rsaquo;</a></li>
+            <li><a href="?{% if request.GET.search %}search={{ request.GET.search }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Último &raquo;</a></li>
+        {% endif %}
+    </ul>
+</div>
 
 <!-- Botón para volver al dashboard del cajero (abajo a la derecha) -->
 <div class="text-end mt-4">

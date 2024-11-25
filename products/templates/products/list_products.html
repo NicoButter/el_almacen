@@ -33,6 +33,7 @@
                 {% if is_admin %}
                     <th>Acciones</th>
                 {% endif %}
+                <th>Info</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Precio</th>
@@ -110,6 +111,30 @@
         </div>
     </div>
     {% endfor %}
+
+    <div class="pagination">
+        <span class="page-info">
+            Página {{ productos.number }} de {{ productos.paginator.num_pages }}
+        </span>
+        <div class="page-links">
+            {% if productos.has_previous %}
+                <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.previous_page_number }}">Anterior</a>
+            {% endif %}
+    
+            {% for num in productos.paginator.page_range %}
+                {% if productos.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
+                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+    
+            {% if productos.has_next %}
+                <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.next_page_number }}">Siguiente</a>
+            {% endif %}
+        </div>
+    </div>
+    
 
     <!-- Botón para volver al dashboard -->
     <div class="mt-4 text-center">
