@@ -4,15 +4,20 @@ from .forms import CuentaCorrienteForm
 from django.contrib import messages
 from accounts.models import Cliente
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+
 
 # -------------------------------------------------------------------------------------------------------------------
 
 @login_required
 def gestion_cuentas_corrientes(request):
-    clientes = Cliente.objects.all()
-    clientes_con_estado = []
+    clientes = Cliente.objects.all()  # Obtener todos los clientes
+    paginator = Paginator(clientes, 10)  # Mostrar 10 clientes por página
+    page_number = request.GET.get('page')  # Obtener el número de página de la URL
+    page_obj = paginator.get_page(page_number)  # Obtener los clientes para la página actual
 
-    for cliente in clientes:
+    clientes_con_estado = []
+    for cliente in page_obj:
         cuenta_corriente = CuentaCorriente.objects.filter(cliente=cliente).first()
         clientes_con_estado.append({
             'cliente': cliente,
@@ -20,7 +25,7 @@ def gestion_cuentas_corrientes(request):
             'saldo': cuenta_corriente.saldo if cuenta_corriente else None,
         })
 
-    return render(request, 'cuentas_corrientes/gestion_cuentas_corrientes.html', {'clientes_con_estado': clientes_con_estado})
+    return render(request, 'cuentas_corrientes/gestion_cuentas_corrientes.html', {'clientes_con_estado': clientes_con_estado, 'page_obj': page_obj})
 
 # -------------------------------------------------------------------------------------------------------------------
 

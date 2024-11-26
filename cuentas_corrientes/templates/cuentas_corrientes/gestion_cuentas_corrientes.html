@@ -36,19 +36,85 @@
                 </td>
                 <td>
                     {% if item.tiene_cuenta %}
-                        <form method="POST" action="{% url 'eliminar_cuenta_corriente' item.cliente.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
+                        <!-- Botón para abrir el modal de eliminación -->
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.cliente.pk }}">Eliminar</button>
                     {% else %}
-                        <a href="{% url 'asignar_cuenta_corriente' item.cliente.pk %}" class="btn btn-primary">Asignar</a>
+                        <!-- Botón para abrir el modal de asignación -->
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asignarModal{{ item.cliente.pk }}">Asignar</button>
                     {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Botón para volver al Dashboard -->
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary mb-3">Volver al Dashboard</a>
+
+    <!-- Paginación -->
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Primera</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
 </div>
 
+<!-- Modal de advertencia para eliminar cuenta corriente -->
+{% for item in clientes_con_estado %}
+<div class="modal fade" id="eliminarModal{{ item.cliente.pk }}" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eliminarModalLabel">Eliminar Cuenta Corriente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar la cuenta corriente de {{ item.cliente.nombre }}? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{% url 'eliminar_cuenta_corriente' item.cliente.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmar Eliminación</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de advertencia para asignar cuenta corriente -->
+<div class="modal fade" id="asignarModal{{ item.cliente.pk }}" tabindex="-1" aria-labelledby="asignarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="asignarModalLabel">Asignar Cuenta Corriente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas asignar una cuenta corriente a {{ item.cliente.nombre }}?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{% url 'asignar_cuenta_corriente' item.cliente.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Confirmar Asignación</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}
