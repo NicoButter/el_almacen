@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block header_title %}
+    Gestión de Cuentas Corrientes
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Cuenta Corriente</th>
+                <th>Saldo Actual</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in clientes_con_estado %}
+            <tr>
+                <td>{{ item.cliente.nombre }}</td>
+                <td>
+                    {% if item.tiene_cuenta %}
+                        Sí
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.tiene_cuenta %}
+                        {{ item.saldo }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.tiene_cuenta %}
+                        <form method="POST" action="{% url 'eliminar_cuenta_corriente' item.cliente.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'asignar_cuenta_corriente' item.cliente.pk %}" class="btn btn-primary">Asignar</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}
