@@ -234,10 +234,11 @@ def realizar_venta(request):
             cliente_id = data.get('cliente_id')
             productos_data = data.get('productos', [])
             total_compra = data.get('total', 0)
+            tipo_pago = data.get('tipo_pago')  # Tipo de pago recibido en la solicitud
 
-            if not cliente_id or not productos_data or total_compra is None:
-                logger.warning("Faltan datos de cliente, productos o total.")
-                return JsonResponse({"success": False, "message": "Faltan datos de cliente, productos o total."}, status=400)
+            if not cliente_id or not productos_data or total_compra is None or not tipo_pago:
+                logger.warning("Faltan datos de cliente, productos, total o tipo de pago.")
+                return JsonResponse({"success": False, "message": "Faltan datos de cliente, productos, total o tipo de pago."}, status=400)
 
             # Asegurarse de que total_compra es un número
             try:
@@ -249,32 +250,42 @@ def realizar_venta(request):
                     "message": "El campo 'total' debe ser un número válido."
                 }, status=400)
 
+            # Validación del tipo de pago
+            tipo_pago_choices = ['EFECTIVO', 'TARJETA', 'CUENTA_CORRIENTE', 'QR', 'CREDITO', 'DEBITO']
+            if tipo_pago not in tipo_pago_choices:
+                logger.error(f"Tipo de pago '{tipo_pago}' no es válido.")
+                return JsonResponse({
+                    "success": False,
+                    "message": f"El tipo de pago '{tipo_pago}' no es válido."
+                }, status=400)
+
             cliente = get_object_or_404(Cliente, id=cliente_id)
             
             # Verificar si el cliente tiene cuenta corriente
             cuenta_corriente = getattr(cliente, 'cuenta_corriente_cc', None)
-            if not cuenta_corriente:
-                logger.warning(f"El cliente con ID {cliente.id} no tiene cuenta corriente.")
-                return JsonResponse({
-                    "success": False,
-                    "message": f"El cliente '{cliente.nombre}' no tiene cuenta corriente asociada. No se puede realizar la venta fiada."
-                }, status=400)
+            es_fiada = False
+            if tipo_pago == 'CUENTA_CORRIENTE':
+                # Verificar si la venta es fiada
+                if not cuenta_corriente:
+                    logger.warning(f"El cliente con ID {cliente.id} no tiene cuenta corriente.")
+                    return JsonResponse({
+                        "success": False,
+                        "message": f"El cliente '{cliente.nombre}' no tiene cuenta corriente asociada. No se puede realizar la venta fiada."
+                    }, status=400)
+                es_fiada = True
             
             # Iniciar transacción para asegurar consistencia
             with transaction.atomic():
                 # Crear la venta
                 logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.id})")
 
-                # Calcular si la venta es fiada (si hay cuenta corriente y el total es mayor a 0)
-                es_fiada = cuenta_corriente and total_compra > 0
-
                 venta = Venta.objects.create(
                     cliente=cliente,
                     fecha_venta=timezone.now(),
                     total=total_compra,
-                    cuenta_corriente=cuenta_corriente,
+                    cuenta_corriente=cuenta_corriente if es_fiada else None,
                     es_fiada=es_fiada,  # Se asigna el valor de es_fiada en la venta
-                    tipo_de_pago='CUENTA_CORRIENTE' if es_fiada else 'EFECTIVO'  # O 'TARJETA' si aplica
+                    tipo_de_pago=tipo_pago  # Asignamos el tipo de pago recibido
                 )
 
                 # Crear el ticket asociado a la venta
@@ -360,6 +371,148 @@ def realizar_venta(request):
                 "error": str(e),
                 "traceback": error_details
             }, status=500)
+
+
+
+
+
+# @csrf_exempt
+# @login_required
+# def realizar_venta(request):
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#             logger.debug(f"Datos recibidos: {data}")
+            
+#             cliente_id = data.get('cliente_id')
+#             productos_data = data.get('productos', [])
+#             total_compra = data.get('total', 0)
+
+#             if not cliente_id or not productos_data or total_compra is None:
+#                 logger.warning("Faltan datos de cliente, productos o total.")
+#                 return JsonResponse({"success": False, "message": "Faltan datos de cliente, productos o total."}, status=400)
+
+#             # Asegurarse de que total_compra es un número
+#             try:
+#                 total_compra = float(total_compra)
+#             except ValueError:
+#                 logger.error("El campo 'total' debe ser un número.")
+#                 return JsonResponse({
+#                     "success": False,
+#                     "message": "El campo 'total' debe ser un número válido."
+#                 }, status=400)
+
+#             cliente = get_object_or_404(Cliente, id=cliente_id)
+            
+#             # Verificar si el cliente tiene cuenta corriente
+#             cuenta_corriente = getattr(cliente, 'cuenta_corriente_cc', None)
+#             if not cuenta_corriente:
+#                 logger.warning(f"El cliente con ID {cliente.id} no tiene cuenta corriente.")
+#                 return JsonResponse({
+#                     "success": False,
+#                     "message": f"El cliente '{cliente.nombre}' no tiene cuenta corriente asociada. No se puede realizar la venta fiada."
+#                 }, status=400)
+            
+#             # Iniciar transacción para asegurar consistencia
+#             with transaction.atomic():
+#                 # Crear la venta
+#                 logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.id})")
+
+#                 # Calcular si la venta es fiada (si hay cuenta corriente y el total es mayor a 0)
+#                 es_fiada = cuenta_corriente and total_compra > 0
+
+#                 venta = Venta.objects.create(
+#                     cliente=cliente,
+#                     fecha_venta=timezone.now(),
+#                     total=total_compra,
+#                     cuenta_corriente=cuenta_corriente,
+#                     es_fiada=es_fiada,  # Se asigna el valor de es_fiada en la venta
+#                     tipo_de_pago='CUENTA_CORRIENTE' if es_fiada else 'EFECTIVO'  # O 'TARJETA' si aplica
+#                 )
+
+#                 # Crear el ticket asociado a la venta
+#                 ticket = Ticket.objects.create(
+#                     venta=venta,
+#                     total=total_compra,
+#                     cashier_id=request.user.id
+#                 )
+
+#                 logger.debug(f"Ticket creado para la venta ID: {venta.id}, Ticket ID: {ticket.id}")
+
+#                 # Procesar productos de la venta (detalles de la venta)
+#                 for item in productos_data:
+#                     product_id = item.get('id')
+#                     quantity = item.get('cantidad')  # Asegúrate de que la cantidad es un número entero
+#                     product = get_object_or_404(Product, id=product_id)
+                    
+#                     logger.debug(f"Procesando producto: {product.nombre}, cantidad: {quantity}")
+
+#                     quantity = Decimal(str(quantity))
+
+#                     # Validación y cálculo para productos fraccionados
+#                     if product.se_vende_fraccionado:
+#                         cantidad_kg = quantity / Decimal('1000')
+#                         if product.cantidad_stock < cantidad_kg:
+#                             logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg")
+#                             return JsonResponse({
+#                                 "success": False,
+#                                 "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg"
+#                             }, status=400)
+#                         product.cantidad_stock -= cantidad_kg
+#                     else:
+#                         if product.cantidad_stock < quantity:
+#                             logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades")
+#                             return JsonResponse({
+#                                 "success": False,
+#                                 "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades"
+#                             }, status=400)
+#                         product.cantidad_stock -= quantity
+
+#                     product.save()
+
+#                     # Crear el LineItem (detalle de la venta)
+#                     LineItem.objects.create(
+#                         ticket=ticket,
+#                         product=product,
+#                         quantity=quantity,
+#                     )
+#                     logger.debug(f"Detalle de venta creado para el producto '{product.nombre}'")
+
+#                 # Si la venta es fiada, actualizar el saldo de la cuenta corriente
+#                 if es_fiada:
+#                     # Asegurarse de que total_compra es un Decimal
+#                     total_compra_decimal = Decimal(str(total_compra))
+                    
+#                     # Actualizamos el saldo de la cuenta corriente
+#                     cuenta_corriente.saldo += total_compra_decimal
+#                     cuenta_corriente.save()
+
+#                     logger.debug(f"Saldo actualizado de la cuenta corriente para el cliente '{cliente.nombre}': {cuenta_corriente.saldo}")
+
+#                 # Crear el pago asociado al ticket (si es necesario)
+#                 pago = Pago.objects.create(ticket=ticket, cliente=cliente, monto=total_compra)
+
+#                 logger.debug(f"Pago registrado para el ticket ID: {ticket.id}, Monto: {pago.monto}")
+
+#                 # Confirmar la venta
+#                 logger.info(f"Venta procesada correctamente, Ticket ID: {ticket.id}")
+#                 return JsonResponse({
+#                     "success": True,
+#                     "message": "Venta procesada correctamente",
+#                     "ticket_id": ticket.id
+#                 })
+
+#         except Exception as e:
+#             import traceback
+#             error_details = traceback.format_exc()
+#             logger.error(f"Error al procesar la venta: {e}")
+#             logger.debug(f"Detalles del error:\n{error_details}")
+#             return JsonResponse({
+#                 "success": False,
+#                 "message": "Hubo un error al procesar la venta. Inténtalo nuevamente.",
+#                 "error": str(e),
+#                 "traceback": error_details
+#             }, status=500)
 
 # ---------------------------------------------------------------------------------------------------------------
 

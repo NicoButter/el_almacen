@@ -55,6 +55,13 @@ def agregar_producto(request):
             producto = form.save(commit=False)
             if 'imagen' in request.FILES:
                 producto.imagen = request.FILES['imagen']
+
+             # Usar el valor de se_vende_fraccionado para determinar la unidad de medida
+            if producto.se_vende_fraccionado:
+                producto.unidad_medida = 'kg'  # Si se vende fraccionado, unidad es 'kg'
+            else:
+                producto.unidad_medida = 'unidad'  # Si no se vende fraccionado, unidad es 'unidad'
+
             producto.save()
             return redirect('listar_productos')
         else:

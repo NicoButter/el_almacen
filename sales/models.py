@@ -17,7 +17,9 @@ class Venta(models.Model):
     TIPO_PAGO_CHOICES = [
         ('EFECTIVO', 'Efectivo'),
         ('TARJETA', 'Tarjeta'),
-        ('CUENTA_CORRIENTE', 'Cuenta Corriente')
+        ('CUENTA_CORRIENTE', 'Cuenta Corriente'),
+        ('CREDITO', 'Crédito'),
+        ('DEBITO', 'Débito'),
     ]
     tipo_de_pago = models.CharField(max_length=20, choices=TIPO_PAGO_CHOICES, null=True, blank=True)
 

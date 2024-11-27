@@ -80,11 +80,17 @@
             {% endfor %}
           </select>
           
-          <h4>¿Venta Fiada?</h4>
-          <select id="venta-fiada" name="venta_fiada" class="select-field">
-            <option value="no">No</option>
-            <option value="si">Sí</option>
-          </select>
+          <div class="field-group">
+            <h4>Seleccionar Método de Pago</h4>
+            <select id="payment-method" name="payment_method" class="select-field">
+              <option value="">-- Seleccionar Método de Pago --</option>
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="credito">Crédito</option>
+              <option value="fiado">Fiado</option> <!-- Opción para pago a crédito -->
+              <option value="otros">Otros</option>
+            </select>
+          </div>
         </div>
       </div>
 

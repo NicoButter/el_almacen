@@ -32,14 +32,14 @@
                 {% if is_admin %}
                     <th>Acciones</th>
                 {% endif %}
-                <th>Info</th>
                 <th>Nombre</th>
                 <th>Descripción</th>
                 <th>Precio</th>
                 <th>Cantidad en Stock</th>
                 <th>Fraccionado</th>
-                <th>Categoría</th> <!-- Nueva columna de categoría -->
-                <th>QR</th>    
+                <th>Categoría</th>
+                <th>QR</th>
+                <th>Imagen</th> <!-- Nueva columna para la imagen -->
             </tr>
         </thead>
         <tbody>
@@ -68,11 +68,21 @@
                     <td>{{ producto.nombre }}</td>
                     <td>{{ producto.descripcion }}</td>
                     <td>${{ producto.precio_venta }}</td>
-                    <td>{{ producto.cantidad_stock }}</td>
+                    {% comment %} <td>{{ producto.cantidad_stock }}</td> {% endcomment %}
+                    <td>
+                        {% if producto.unidad_medida == 'unidad' %}
+                            {{ producto.cantidad_stock|floatformat:0 }} uni  <!-- No muestra decimales para unidades -->
+                        {% else %}
+                            {{ producto.cantidad_stock }} kgms  <!-- Muestra los decimales para kg -->
+                        {% endif %}
+                    </td>
                     <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
                     <td>{{ producto.categoria.nombre }}</td>
                     <td>
-                        <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}">
+                        <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" style="max-width: 100px; max-height: 100px;">
+                    </td>
+                    <td>
+                        <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid" style="max-width: 100px; max-height: 100px;">
                     </td>
                 </tr>
             {% endfor %}
@@ -168,4 +178,5 @@
     </div>
 
 </div>
+
 {% endblock %}

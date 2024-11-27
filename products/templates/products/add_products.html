@@ -61,10 +61,18 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="form-fieldset">
+                {% comment %} <fieldset class="form-fieldset">
                     <legend class="form-legend">Cantidad de Stock</legend>
                     <div class="form-group">
                         <label for="{{ form.cantidad_stock.id_for_label }}" class="form-label">Cantidad de Stock</label>
+                        {{ form.cantidad_stock|add_class:"form-input" }}
+                    </div>
+                </fieldset> {% endcomment %}
+
+                <fieldset class="form-fieldset">
+                    <legend class="form-legend">Cantidad de Stock</legend>
+                    <div class="form-group">
+                        <label for="{{ form.cantidad_stock.id_for_label }}" class="form-label" id="stock-label">Cantidad de Stock (unidades)</label>
                         {{ form.cantidad_stock|add_class:"form-input" }}
                     </div>
                 </fieldset>
@@ -135,6 +143,29 @@
             preview.style.display = "block";
         }
     };
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const seVendeFraccionadoCheckbox = document.getElementById('{{ form.se_vende_fraccionado.id_for_label }}');
+        const cantidadStockInput = document.getElementById('{{ form.cantidad_stock.id_for_label }}');
+        const stockLabel = document.getElementById('stock-label');
+
+        // Función para cambiar la etiqueta y el tipo de cantidad según si se vende fraccionado
+        function actualizarCantidadStock() {
+            if (seVendeFraccionadoCheckbox.checked) {
+                stockLabel.textContent = "Cantidad de Stock (kg)";
+            } else {
+                stockLabel.textContent = "Cantidad de Stock (unidad)";
+            }
+        }
+
+        // Inicializa el estado al cargar
+        actualizarCantidadStock();
+
+        // Cambia cuando se marca o desmarca el checkbox
+        seVendeFraccionadoCheckbox.addEventListener('change', actualizarCantidadStock);
+    });
 </script>
 
 {% endblock %}
