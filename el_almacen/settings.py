@@ -10,23 +10,23 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
-
 from pathlib import Path
+from decouple import config, Csv
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-%93rb%$^v2z*1vr9f61j&bm!+8gsb19)*ui5=^!0n_t=xsy8o3"
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+
+
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="", cast=Csv())
 
 
 # Application definition
@@ -82,14 +82,24 @@ WSGI_APPLICATION = "el_almacen.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+
+"""DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'el_almacen',
-        'USER': 'el_almacen',
-        'PASSWORD': 'el_almacen010203',
-        'HOST': 'localhost',
-        'PORT': ''
+        'NAME': config("DB_NAME"),
+        'USER': config("DB_USER"),
+        'PASSWORD': config("DB_PASSWORD"),
+        'HOST': config("DB_HOST", default="localhost"),
+        'PORT': config("DB_PORT", default=""),
+    }
+}
+"""
+
+# Use default SQLite database for local testing
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -151,9 +161,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'tu_email@gmail.com'  # Tu dirección de correo
-EMAIL_HOST_PASSWORD = 'tu_contraseña'
-
+EMAIL_HOST = config("EMAIL_HOST")
+EMAIL_PORT = config("EMAIL_PORT", cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")

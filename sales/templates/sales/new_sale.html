@@ -14,6 +14,9 @@
 
 {% block content %}
 
+<button id="botonVoz">Activar Voz</button>
+<div id="indicador" style="display:none;">🎤 Escuchando...</div>
+
 <div class="container">
   <form method="post" id="sale-form">
     {% csrf_token %}
@@ -101,7 +104,6 @@
         <button type="submit" name="close_sale" class="button success">Cerrar Venta</button>
       </div>
     </div>
-  
   <div class="row">
     <div class="section text-right">
       <a href="{% url 'cashier_dashboard' %}" class="button primary">Volver al Dashboard</a>
@@ -113,8 +115,40 @@
 <script src="{% static 'js/jsQR.js' %}"></script>
 
 <script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const modoVozBtn = document.getElementById('modo-voz');
+    const indicador = document.getElementById('indicador');
+    
+    let modoVozActivo = false;
+
+    // Función para activar/desactivar modo de voz
+    modoVozBtn.addEventListener('click', function() {
+        modoVozActivo = !modoVozActivo;
+        
+        if (modoVozActivo) {
+            modoVozBtn.textContent = 'Desactivar Voz'; // Cambia el texto del botón
+            indicador.style.display = 'inline'; // Muestra el indicador de voz
+        } else {
+            modoVozBtn.textContent = 'Activar Voz'; // Cambia el texto del botón
+            indicador.style.display = 'none'; // Oculta el indicador de voz
+        }
+
+        // Aquí puedes agregar la lógica para iniciar o detener el reconocimiento de voz
+    });
+  });
+
+
   document.addEventListener('DOMContentLoaded', () => {
-    const videoBg = document.getElementById('video-bg');
+    const videoBg = document.getElementById('video-bg');;
+
+    modoSelect.addEventListener('change', () => {
+      if (modoSelect.value === 'voz') {
+        modoVozButton.disabled = false;  // Habilitar el botón
+      } else {
+        modoVozButton.disabled = true;   // Deshabilitar el botón
+      }
+    });
     
     // Asegurarse de que el video de fondo se reproduzca al cargar la página
     const playVideo = () => {
@@ -177,111 +211,138 @@
     // Continuamos escaneando
     requestAnimationFrame(scanQRCode);
   }
-  
-  function agregarProductoALista(productId) {
+
+  function agregarProductoALista(productId, cantidad = 1, esFraccionado = false) {
     const productIdStr = String(productId);
     const productList = document.getElementById("product-list");
-  
+
     if (productosEscaneados.has(productIdStr)) {
-      return;
+        return;
     }
 
     // Mostrar la animación de fondo al iniciar el escaneo
     showBackgroundVideo();
 
     fetch(`/sales/api/productos/${productIdStr}/`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Error al obtener el producto");
-        }
-        return response.json();
-      })
-      .then(producto => {
-        if (!producto || !producto.nombre || !producto.precio_venta) {
-          console.error("Producto no válido:", producto);
-          return;
-        }
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener el producto");
+            }
+            return response.json();
+        })
+        .then(producto => {
+            if (!producto || !producto.nombre || !producto.precio_venta) {
+                console.error("Producto no válido:", producto);
+                return;
+            }
 
-        // Actualizar el fondo de la cámara con la imagen del producto
-        if (producto.imagen) {
-          const cameraContainer = document.querySelector('.camera-container');
-          cameraContainer.style.backgroundImage = `url(${producto.imagen})`;
-          cameraContainer.style.backgroundColor = "transparent";
+            // Depurar la cantidad recibida
+            console.log(`Producto: ${producto.nombre}, Cantidad: ${cantidad}`);
 
-          // Vuelve a mostrar la animación después de 2 segundos
-          setTimeout(() => {
-            cameraContainer.style.backgroundImage = '';
-            showBackgroundVideo();
-          }, 2000);
-        }
+            // Actualizar el fondo de la cámara con la imagen del producto
+            if (producto.imagen) {
+                const cameraContainer = document.querySelector('.camera-container');
+                cameraContainer.style.backgroundImage = `url(${producto.imagen})`;
+                cameraContainer.style.backgroundColor = "transparent";
 
-        const li = document.createElement("li");
-        li.className = "list-group-item";
-        li.dataset.productId = productIdStr;
+                // Vuelve a mostrar la animación después de 2 segundos
+                setTimeout(() => {
+                    cameraContainer.style.backgroundImage = '';
+                    showBackgroundVideo();
+                }, 2000);
+            }
 
-        const precio = parseFloat(producto.precio_venta.replace(',', '.'));
-        const cantidad = 1;
-        let totalInicial = precio * cantidad;
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            li.dataset.productId = productIdStr;
 
-        if (producto.se_vende_fraccionado) {
-          totalInicial = precio * (cantidad / 1000);
-        } else {
-          totalInicial = precio * cantidad;
-        }
+            const precio = parseFloat(producto.precio_venta.replace(',', '.'));
+            let totalInicial;
 
-        const precioTexto = producto.se_vende_fraccionado ? "Precio x Kg" : "Precio x unidad";
-        const unidadTexto = producto.se_vende_fraccionado ? "grs" : "unidades";
+            // Si el producto es fraccionado, usa el valor de esFraccionado (para comando de voz)
+            if (esFraccionado) {
+                totalInicial = precio * (cantidad / 1000); // Si es fraccionado, dividir por 1000
+            } else {
+                totalInicial = precio * cantidad; // Si no, multiplicar directamente
+            }
 
-        let inputCantidad;
-        if (producto.se_vende_fraccionado) {
-          inputCantidad = `
-            <input type="number" min="10" max="5000" step="10" value="${cantidad}" 
-              onchange="actualizarCantidad('${productIdStr}', this.value, true)">
-            ${unidadTexto}
-          `;
-        } else {
-          inputCantidad = `
-            <input type="number" min="1" value="${cantidad}" 
-              onchange="actualizarCantidad('${productIdStr}', this.value, false)">
-            unidades
-          `;
-        }
+            const precioTexto = esFraccionado ? "Precio x Kg" : "Precio x unidad";
+            const unidadTexto = esFraccionado ? "grs" : "unidades";
 
-        li.innerHTML = `
-          <div class="product-info">
-            <span class="product-name">${producto.nombre}</span>
-            <span class="product-price">${precioTexto}: $${precio.toFixed(2)}</span>
-          </div>
-          <div class="product-quantity">
-            ${inputCantidad}
-          </div>
-          <div class="product-total">
-            $<span class="costo">${totalInicial.toFixed(2)}</span>
-          </div>
-          <i class="fas fa-trash-alt eliminar" 
-            onclick="eliminarProducto('${productIdStr}', 1)" 
-            style="cursor: pointer; color: red; font-size: 20px;">
-          </i>
-        `;
+            let inputCantidad;
+            if (esFraccionado) {
+                inputCantidad = `
+                    <input type="number" min="10" max="5000" step="10" value="${cantidad}" 
+                        onchange="actualizarCantidad('${productIdStr}', this.value, true)">
+                    ${unidadTexto}
+                `;
+            } else {
+                inputCantidad = `
+                    <input type="number" min="1" value="${cantidad}" 
+                        onchange="actualizarCantidad('${productIdStr}', this.value, false)">
+                    unidades
+                `;
+            }
 
-        productList.appendChild(li);
-        productosEscaneados.set(productIdStr, { 
-          elemento: li, 
-          cantidad: cantidad, 
-          precio_venta: precio, 
-          fraccionado: producto.se_vende_fraccionado, 
-          total: totalInicial 
+            li.innerHTML = `
+                <div class="product-info">
+                    <span class="product-name">${producto.nombre}</span>
+                    <span class="product-price">${precioTexto}: $${precio.toFixed(2)}</span>
+                </div>
+                <div class="product-quantity">
+                    ${inputCantidad}
+                </div>
+                <div class="product-total">
+                    $<span class="costo">${totalInicial.toFixed(2)}</span>
+                </div>
+                <i class="fas fa-trash-alt eliminar" 
+                    onclick="eliminarProducto('${productIdStr}', 1)" 
+                    style="cursor: pointer; color: red; font-size: 20px;">
+                </i>
+            `;
+
+            productList.appendChild(li);
+            productosEscaneados.set(productIdStr, { 
+                elemento: li, 
+                cantidad: cantidad, 
+                precio_venta: precio, 
+                fraccionado: esFraccionado,  // Usamos esFraccionado para marcar si es fraccionado o no
+                total: totalInicial 
+            });
+            actualizarTotalCompra();
+
+            // Ocultar la animación después de agregar el producto
+            hideBackgroundVideo();
+
+            // Construir el mensaje de audio
+            let mensaje = `El producto ${producto.nombre}`;
+            if (esFraccionado) {
+                mensaje += ` en ${cantidad} gramos`; // Añadir detalles de fraccionado si aplica
+            } else {
+                mensaje += ` en ${cantidad} unidades`; // Añadir cantidad de unidades
+            }
+
+            console.log(mensaje);
+
+            
+            mensaje += " ha sido agregado a la lista.";
+
+            // Llamar a la función para reproducir el mensaje en voz alta
+            reproducirAudio(mensaje);
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            hideBackgroundVideo(); // Ocultar la animación en caso de error
         });
-        actualizarTotalCompra();
-
-        // Ocultar la animación después de agregar el producto
-        hideBackgroundVideo();
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        hideBackgroundVideo(); // Ocultar la animación en caso de error
-      });
 }
+
+function reproducirAudio(mensaje) {
+  console.log("Reproduciendo mensaje:", mensaje);  // Verificar que el mensaje se está construyendo correctamente
+  const utterance = new SpeechSynthesisUtterance(mensaje);
+  utterance.lang = 'es-ES';
+  window.speechSynthesis.speak(utterance);
+}
+
 
 // Mostrar la animación
 function showBackgroundVideo() {
@@ -474,5 +535,186 @@ function hideBackgroundVideo() {
 
 </script>
 
-{% endblock %}
+<script>
+   // Función para buscar el producto por nombre y obtener su ID
+  function buscarProductoPorNombre(nombreProducto, cantidad, esFraccionado) {
+    // Realizamos una búsqueda por el nombre del producto    
+    fetch(`/sales/api/search_products/?query=${encodeURIComponent(nombreProducto)}`)
+      .then(response => response.json())
+      .then(data => {
+        let producto = null;
+        // Buscamos el primer producto en los resultados
+        if (data.products.length > 0) {
+          producto = data.products[0];  // Suponemos que solo hay un resultado relevante
+          console.log("Producto encontrado:", producto);
+          console.log("Producto encontrado ID:", producto.id);
+          // Pasamos el ID del producto a la función agregarProductoALista
+          agregarProductoALista(producto.id, cantidad, esFraccionado); // Llamamos con el ID del producto
+        } else {
+          console.log("Producto buscado:" . nombreProducto . cantidad . esFraccionado);
+        }
+      })
+      .catch(error => {
+        console.error("Error al buscar el producto:", error);
+      });
+  }
 
+  function procesarComandoDeVoz(comando) {
+    console.log("Comando recibido en procesarComandoDeVoz:", comando);
+  
+    // Normalizamos el comando para evitar errores por mayúsculas/minúsculas
+    const palabras = comando.trim().toLowerCase().split(' ');
+  
+    // Verificamos si el comando comienza con "madre producto"
+    if (palabras[0] !== "madre" || palabras[1] !== "producto") {
+      console.error("Comando inválido, debe comenzar con 'madre producto'");
+      return;
+    }
+  
+    // Inicializamos las variables para el nombre, cantidad y tipo de fracción
+    let nombreProducto = "";
+    let cantidad = 1; // Valor por defecto
+    let esFraccionado = false;
+  
+    // Diccionario para convertir números escritos como texto a valores numéricos
+    const numerosComoTexto = {
+      "uno": 1,
+      "dos": 2,
+      "tres": 3,
+      "cuatro": 4,
+      "cinco": 5,
+      "seis": 6,
+      "siete": 7,
+      "ocho": 8,
+      "nueve": 9,
+      "diez": 10
+    };
+  
+    // Revisamos la última palabra para determinar si es cantidad o tipo de fracción
+    const ultimaPalabra = palabras[palabras.length - 1];
+    const penultimaPalabra = palabras.length > 2 ? palabras[palabras.length - 2] : "";
+  
+    if (!isNaN(ultimaPalabra)) {
+      // Si la última palabra es un número, la tomamos como cantidad
+      cantidad = parseFloat(ultimaPalabra);
+      nombreProducto = palabras.slice(2, -1).join(" ");
+    } else if (numerosComoTexto[ultimaPalabra]) {
+      // Si la última palabra es un número en texto, lo convertimos a cantidad
+      cantidad = numerosComoTexto[ultimaPalabra];
+      nombreProducto = palabras.slice(2, -1).join(" ");
+    } else if (ultimaPalabra === "gramos" || ultimaPalabra === "kilos" || ultimaPalabra === "kilo") {
+      // Si la última palabra es "gramos" o "kilos", el producto es fraccionado
+      esFraccionado = true;
+
+      // Si la penúltima palabra es un número, la usamos como cantidad
+      if (!isNaN(penultimaPalabra)) {
+        cantidad = parseFloat(penultimaPalabra);
+      } else if (numerosComoTexto[penultimaPalabra]) {
+        cantidad = numerosComoTexto[penultimaPalabra];
+      } else {
+        console.error("No se especificó una cantidad válida para un producto fraccionado");
+        return;
+      }
+  
+      if (ultimaPalabra === "kilos") {
+        cantidad *= 1000; // Convertimos kilos a gramos
+      }
+  
+      // El nombre del producto es todo lo que está antes de la cantidad
+      nombreProducto = palabras.slice(2, -2).join(" ");
+    } else {
+      // Si no hay cantidad específica, asumimos 1 unidad
+      nombreProducto = palabras.slice(2).join(" ");
+    }
+  
+    // Validamos que al menos tengamos un nombre de producto
+    if (!nombreProducto) {
+      console.error("No se detectó un nombre de producto en el comando");
+      return;
+    }
+  
+    console.log("Nombre del producto limpio:", nombreProducto.trim());
+    console.log("Cantidad:", cantidad, "Es fraccionado:", esFraccionado);
+  
+    // Llamamos a la función para buscar y procesar el producto
+    buscarProductoPorNombre(nombreProducto, cantidad, esFraccionado);
+}
+ 
+// Reconocimiento de voz
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'es-ES'; // Configurar idioma español
+  recognition.continuous = false; // Escuchar un comando a la vez
+  recognition.interimResults = false; // Solo resultados finales
+
+  // Variables para controlar el estado del reconocimiento
+  let vozActivada = false; // Indica si el modo voz está activado
+
+  const botonVoz = document.getElementById("botonVoz"); // Botón de activación/desactivación
+  const indicador = document.getElementById("indicador"); // Indicador visual
+
+  // Activar/desactivar el reconocimiento de voz
+  botonVoz.addEventListener('click', () => {
+    if (!vozActivada) {
+      // Activar modo voz
+      vozActivada = true;
+      indicador.style.display = 'block'; // Mostrar indicador
+      botonVoz.textContent = "Modo Voz Activado";
+      console.log("Reconocimiento de voz activado.");
+      recognition.start(); // Iniciar el reconocimiento
+    } else {
+      // Desactivar manualmente
+      vozActivada = false;
+      indicador.style.display = 'none'; // Ocultar indicador
+      botonVoz.textContent = "Activar Voz";
+      recognition.stop(); // Detener reconocimiento
+      console.log("Reconocimiento de voz desactivado manualmente.");
+    }
+  });
+
+  // Procesar resultado del reconocimiento
+  recognition.addEventListener('result', (event) => {
+    const comando = event.results[0][0].transcript.toLowerCase().trim();
+    console.log(`Comando reconocido: ${comando}`);
+    
+    if (comando.startsWith("madre producto")) {
+      // Procesar comando para agregar producto
+      procesarComandoDeVoz(comando);
+    } else if (comando === "madre terminar") {
+      // Detener el modo voz
+      vozActivada = false;
+      recognition.stop();
+      indicador.style.display = 'none';
+      botonVoz.textContent = "Activar Voz";
+      console.log("Reconocimiento de voz desactivado por comando.");
+    } else {
+      console.log("Comando no reconocido.");
+    }
+  });
+
+  // Después de procesar un comando, reiniciar si el modo voz sigue activado
+  recognition.addEventListener('end', () => {
+    if (vozActivada) {
+      console.log("Esperando un nuevo comando...");
+      recognition.start(); // Reiniciar reconocimiento para un nuevo comando
+    } else {
+      console.log("Reconocimiento de voz detenido.");
+    }
+  });
+
+  // Manejo de errores de reconocimiento
+  recognition.addEventListener('error', (event) => {
+    console.error('Error en reconocimiento de voz:', event.error);
+    indicador.style.display = 'none';
+    botonVoz.textContent = "Activar Voz"; // Restaurar el texto del botón en caso de error
+  });
+} else {
+  alert('Tu navegador no soporta reconocimiento de voz.');
+  console.log('El navegador no soporta reconocimiento de voz.');
+}
+
+</script>
+
+{% endblock %}

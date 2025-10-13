@@ -297,3 +297,25 @@ ul {
 .product-result span {
   margin-right: 10px;
 }
+
+/******************************************************************************************************/
+
+#modo-voz {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+#modo-voz:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+#indicador {
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: red;
+  display: none;
+}
