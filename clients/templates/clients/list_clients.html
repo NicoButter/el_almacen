@@ -27,7 +27,7 @@
             </button>
         </form>
         <div class="actions-bar">
-            <a href="{% url 'admin_dashboard' %}" class="button secondary">Volver al Dashboard</a>
+            <a href="{% url 'dashboard:admin_dashboard' %}" class="button secondary">Volver al Dashboard</a>
             {% if is_admin %}
                 <a href="{% url 'agregar_cliente' %}" class="button primary">Agregar Cliente</a>
             {% endif %}

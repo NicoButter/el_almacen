@@ -169,11 +169,11 @@
     <!-- Botón para volver al dashboard -->
     <div class="mt-4 text-center">
         {% if is_admin %}
-            <a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard Admin</a>
+            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard Admin</a>
         {% elif is_cashier %}
-            <a href="{% url 'cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard Cajero</a>
+            <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard Cajero</a>
         {% else %}
-            <a href="{% url 'user_dashboard' %}" class="btn btn-primary">Volver al Dashboard Usuario</a>
+            <a href="{% url 'dashboard:user_dashboard' %}" class="btn btn-primary">Volver al Dashboard Usuario</a>
         {% endif %}
     </div>
 

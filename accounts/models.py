@@ -5,9 +5,19 @@ from django.core.validators import EmailValidator
 class CustomUser(AbstractUser):
     is_admin = models.BooleanField(default=False)
     is_cashier = models.BooleanField(default=False)
+    is_client = models.BooleanField(default=False)
 
     def __str__(self):
         return self.username
+
+    def get_dashboard_url(self):
+        """Return the named URL to redirect the user to after login depending on role."""
+        if self.is_admin:
+            return 'admin_dashboard'
+        if self.is_cashier:
+            return 'cashier_dashboard'
+        # default to user dashboard (clients handled separately)
+        return 'user_dashboard'
 
 class Cliente(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='cliente_profile')

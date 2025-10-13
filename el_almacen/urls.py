@@ -20,13 +20,13 @@ from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 from django.conf import settings
 from django.conf.urls.static import static
-from accounts.views import user_login 
+from accounts.views import loguin 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', user_login, name='login'), 
+    path('', loguin, name='login'), 
     path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),  
-    path('dashboard/', include('dashboards.urls')),
+    path('dashboard/', include(('dashboards.urls', 'dashboard'), namespace='dashboard')),
     path('products/', include('products.urls')),
     path('sales/', include('sales.urls')),
     path('clients/', include('clients.urls')),

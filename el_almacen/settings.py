@@ -156,6 +156,9 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 LOGOUT_REDIRECT_URL = 'accounts:login'
 
+# After login, redirect to this named URL which will further route by role
+LOGIN_REDIRECT_URL = 'accounts:post_login'
+
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_NAME = 'sessionid'
