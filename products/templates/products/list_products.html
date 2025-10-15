@@ -1,182 +1,444 @@
 {% extends 'base.html' %}
-
 {% load static %}
+{% load humanize %}
 
 {% block extra_styles %}
-    <link href="{% static 'products/css/list_products_styles.css' %}" rel="stylesheet">
+<link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block header_title %}
-    Listado de Productos
-{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 
 {% block content %}
-<div class="container">
-
-    <!-- Filtro de Categoría -->
-    <form method="GET" action="{% url 'listar_productos' %}" class="filter-form">
-        <label for="categoria">Filtrar por Categoría:</label>
-        <select name="categoria" id="categoria" onchange="this.form.submit()">
-            <option value="">Todas</option>
-            {% for categoria in categorias %}
-                <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == request.GET.categoria %}selected{% endif %}>
-                    {{ categoria.nombre }}
-                </option>
-            {% endfor %}
-        </select>
-    </form>
-
-    <table class="table">
-        <thead>
-            <tr>
-                {% if is_admin %}
-                    <th>Acciones</th>
-                {% endif %}
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Precio</th>
-                <th>Cantidad en Stock</th>
-                <th>Fraccionado</th>
-                <th>Categoría</th>
-                <th>QR</th>
-                <th>Imagen</th> <!-- Nueva columna para la imagen -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-                <tr>
-                    {% if is_admin %}
-                        <td>
-                            <a href="{% url 'edit_products' producto.pk %}" class="text-warning me-2">
-                                <i class="fa-regular fa-pen-to-square"></i> <!-- Icono de editar -->
-                            </a>
-                            <!-- Botón para abrir el modal de confirmación -->
-                            <button type="button" class="text-danger" style="border: none; background: none; padding: 0;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.pk }}">
-                                <i class="fa-solid fa-trash"></i> <!-- Icono de eliminar -->
-                            </button>
-                            <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
-                                <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
-                            </a>
-                        </td>
-                    {% else %}
-                        <td>
-                            <a href="#" class="text-info" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
-                                <i class="fa-solid fa-info-circle"></i> <!-- Icono para ver detalles -->
-                            </a>
-                        </td>
-                    {% endif %}
-                    <td>{{ producto.nombre }}</td>
-                    <td>{{ producto.descripcion }}</td>
-                    <td>${{ producto.precio_venta }}</td>
-                    {% comment %} <td>{{ producto.cantidad_stock }}</td> {% endcomment %}
-                    <td>
-                        {% if producto.unidad_medida == 'unidad' %}
-                            {{ producto.cantidad_stock|floatformat:0 }} uni  <!-- No muestra decimales para unidades -->
-                        {% else %}
-                            {{ producto.cantidad_stock }} kgms  <!-- Muestra los decimales para kg -->
-                        {% endif %}
-                    </td>
-                    <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
-                    <td>{{ producto.categoria.nombre }}</td>
-                    <td>
-                        <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" style="max-width: 100px; max-height: 100px;">
-                    </td>
-                    <td>
-                        <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid" style="max-width: 100px; max-height: 100px;">
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Modal de confirmación de eliminación -->
-    {% for producto in productos %}
-        <div class="modal fade" id="confirmDeleteModal{{ producto.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ producto.pk }}" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="confirmDeleteModalLabel{{ producto.pk }}">Confirmar Eliminación</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<div class="dashboard-fullwidth-container">
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar glass-custom">
+            <div class="sidebar-header">
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="El Almacén" class="sidebar-logo">
+                <div class="sidebar-business">
+                    <span class="business-name">El Almacén</span>
+                    <span class="business-tagline">Panel administrativo</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'admin_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                <a href="{% url 'listar_productos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_productos' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_productos' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Productos</span>
+                </a>
+                <a href="{% url 'add_products' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Agregar Producto</span>
+                </a>
+                <a href="{% url 'listar_categorias' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 3 9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 13-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 17-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Categorías</span>
+                </a>
+                <a href="{% url 'listar_clientes' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Clientes</span>
+                </a>
+                <a href="{% url 'sales:new_sale' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Nueva Venta</span>
+                </a>
+                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Tickets</span>
+                </a>
+                <a href="{% url 'reports_dashboard' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Reportes</span>
+                </a>
+                <a href="{% url 'gestion_cuentas_corrientes' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Cuentas Corrientes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-user">Sesión: {{ request.user.username }}</span>
+                <span class="sidebar-role">{% if request.user.is_admin %}Administrador{% else %}Usuario{% endif %}</span>
+            </div>
+        </aside>
+        <div class="dashboard-main-column">
+            <section class="metrics-top">
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon purple-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
                     </div>
-                    <div class="modal-body">
-                        ¿Está seguro de que desea eliminar el producto <strong>{{ producto.nombre }}</strong>? Esta acción no se puede deshacer.
+                    <div class="metric-content">
+                        <div class="metric-value">{{ productos|length }}</div>
+                        <div class="metric-label">Productos Totales</div>
+                        <div class="metric-change neutral">
+                            <span>{{ categorias|length }}</span> categorías activas
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <!-- Formulario para confirmar la eliminación -->
-                        <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Eliminar</button>
-                        </form>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon cyan-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="15.5" r="0.8" fill="currentColor"/>
+                        </svg>
                     </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_stock|floatformat:0|intcomma }}</div>
+                        <div class="metric-label">Stock Total</div>
+                        <div class="metric-change neutral">
+                            <span>{{ low_stock_count }}</span> productos con stock bajo
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon blue-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ productos.paginator.count|intcomma }}</div>
+                        <div class="metric-label">Productos en Página</div>
+                        <div class="metric-change neutral">
+                            <span>{{ productos.paginator.num_pages }}</span> páginas totales
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon yellow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">${{ total_value|floatformat:2 }}</div>
+                        <div class="metric-label">Valor Total Inventario</div>
+                        <div class="metric-change neutral">
+                            <span>Basado en precio de venta</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="dashboard-content-wrapper">
+                <section class="charts-section">
+                    <div class="chart-card glass-custom">
+                        <h3>Productos por Categoría
+                            <span class="chart-subtitle">Distribución actual</span>
+                        </h3>
+                        <div class="chart-placeholder">
+                            <canvas id="categoryChart" width="600" height="220" aria-label="Gráfico de productos por categoría"></canvas>
+                            {% if not categorias %}
+                            <div class="chart-empty">No hay categorías registradas.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="chart-card glass-custom">
+                        <h3>Stock por Producto
+                            <span class="chart-subtitle">Top 10 productos con más stock</span>
+                        </h3>
+                        <div class="chart-placeholder">
+                            <canvas id="stockChart" width="600" height="220" aria-label="Gráfico de stock por producto"></canvas>
+                            {% if not productos %}
+                            <div class="chart-empty">No hay productos registrados.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+                <section class="activity-panel glass-custom">
+                    <h3>Lista de Productos
+                        <span class="section-subtitle">Gestiona tu inventario</span>
+                    </h3>
+                    <div class="activity-feed">
+                        <!-- Filtro de Categoría -->
+                        <div class="filter-section" style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; margin-bottom: 1rem;">
+                            <form method="GET" action="{% url 'listar_productos' %}" class="filter-form" style="display: flex; align-items: center; gap: 1rem;">
+                                <label for="categoria" style="font-weight: 500; color: var(--foreground);">Filtrar por Categoría:</label>
+                                <select name="categoria" id="categoria" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--foreground);">
+                                    <option value="">Todas</option>
+                                    {% for categoria in categorias %}
+                                        <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == request.GET.categoria %}selected{% endif %}>
+                                            {{ categoria.nombre }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <!-- Tabla de Productos -->
+                        <div class="products-table" style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="background: rgba(255,255,255,0.05);">
+                                        {% if is_admin %}
+                                            <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Acciones</th>
+                                        {% endif %}
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Nombre</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Descripción</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Precio</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Stock</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Fraccionado</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Categoría</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">QR</th>
+                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Imagen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for producto in productos %}
+                                        <tr style="border-bottom: 1px solid var(--border);">
+                                            {% if is_admin %}
+                                                <td style="padding: 0.75rem;">
+                                                    <a href="{% url 'edit_products' producto.pk %}" style="color: var(--app-accent); margin-right: 0.5rem;">
+                                                        <i class="fa-regular fa-pen-to-square"></i>
+                                                    </a>
+                                                    <button type="button" style="border: none; background: none; padding: 0; color: #ef4444; margin-right: 0.5rem;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.pk }}">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                    <a href="#" style="color: var(--neon-blue);" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                                                        <i class="fa-solid fa-info-circle"></i>
+                                                    </a>
+                                                </td>
+                                            {% else %}
+                                                <td style="padding: 0.75rem;">
+                                                    <a href="#" style="color: var(--neon-blue);" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                                                        <i class="fa-solid fa-info-circle"></i>
+                                                    </a>
+                                                </td>
+                                            {% endif %}
+                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.nombre }}</td>
+                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.descripcion }}</td>
+                                            <td style="padding: 0.75rem; color: var(--foreground);">${{ producto.precio_venta }}</td>
+                                            <td style="padding: 0.75rem; color: var(--foreground);">
+                                                {% if producto.unidad_medida == 'unidad' %}
+                                                    {{ producto.cantidad_stock|floatformat:0 }} uni
+                                                {% else %}
+                                                    {{ producto.cantidad_stock }} kg
+                                                {% endif %}
+                                            </td>
+                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
+                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.categoria.nombre }}</td>
+                                            <td style="padding: 0.75rem;">
+                                                <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" style="max-width: 50px; max-height: 50px;">
+                                            </td>
+                                            <td style="padding: 0.75rem;">
+                                                <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" style="max-width: 50px; max-height: 50px;">
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Paginación -->
+                        <div class="pagination" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: var(--foreground);">
+                                Página {{ productos.number }} de {{ productos.paginator.num_pages }}
+                            </span>
+                            <div>
+                                {% if productos.has_previous %}
+                                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.previous_page_number }}" style="color: var(--app-accent); margin-right: 1rem;">Anterior</a>
+                                {% endif %}
+                                {% for num in productos.paginator.page_range %}
+                                    {% if productos.number == num %}
+                                        <span style="color: var(--foreground); font-weight: 600;">{{ num }}</span>
+                                    {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
+                                        <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ num }}" style="color: var(--app-accent); margin: 0 0.25rem;">{{ num }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if productos.has_next %}
+                                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.next_page_number }}" style="color: var(--app-accent); margin-left: 1rem;">Siguiente</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+{% for producto in productos %}
+    <div class="modal fade" id="confirmDeleteModal{{ producto.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ producto.pk }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: rgba(15,23,42,0.95); border: 1px solid var(--border); color: var(--foreground);">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel{{ producto.pk }}">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro de que desea eliminar el producto <strong>{{ producto.nombre }}</strong>? Esta acción no se puede deshacer.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </form>
                 </div>
             </div>
         </div>
-    {% endfor %}
+    </div>
+{% endfor %}
 
-    <!-- Modal para mostrar detalles -->
-    {% for producto in productos %}
-        <div class="modal fade" id="detalleModal{{ producto.pk }}" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="detalleModalLabel">Detalles del Producto: {{ producto.nombre }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <!-- Imagen del Producto -->
-                            <div class="col-md-4">
-                                <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid">
-                            </div>
-                            <div class="col-md-8">
-                                <!-- Descripción del Producto -->
-                                <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
-                                <p><strong>Precio:</strong> ${{ producto.precio_venta }}</p>
-                                <p><strong>Stock disponible:</strong> {{ producto.cantidad_stock }}</p>
-                                <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
-                            </div>
+<!-- Modal para mostrar detalles -->
+{% for producto in productos %}
+    <div class="modal fade" id="detalleModal{{ producto.pk }}" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background: rgba(15,23,42,0.95); border: 1px solid var(--border); color: var(--foreground);">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleModalLabel">Detalles del Producto: {{ producto.nombre }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" class="img-fluid">
+                        </div>
+                        <div class="col-md-8">
+                            <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
+                            <p><strong>Precio:</strong> ${{ producto.precio_venta }}</p>
+                            <p><strong>Stock disponible:</strong> {{ producto.cantidad_stock }}</p>
+                            <p><strong>Categoría:</strong> {{ producto.categoria.nombre }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    {% endfor %}
-
-    <div class="pagination">
-        <span class="page-info">
-            Página {{ productos.number }} de {{ productos.paginator.num_pages }}
-        </span>
-        <div class="page-links">
-            {% if productos.has_previous %}
-                <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.previous_page_number }}">Anterior</a>
-            {% endif %}
-    
-            {% for num in productos.paginator.page_range %}
-                {% if productos.number == num %}
-                    <span class="current">{{ num }}</span>
-                {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
-                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ num }}">{{ num }}</a>
-                {% endif %}
-            {% endfor %}
-    
-            {% if productos.has_next %}
-                <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.next_page_number }}">Siguiente</a>
-            {% endif %}
-        </div>
     </div>
+{% endfor %}
 
-    <!-- Botón para volver al dashboard -->
-    <div class="mt-4 text-center">
-        {% if is_admin %}
-            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-primary">Volver al Dashboard Admin</a>
-        {% elif is_cashier %}
-            <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn btn-primary">Volver al Dashboard Cajero</a>
-        {% else %}
-            <a href="{% url 'dashboard:user_dashboard' %}" class="btn btn-primary">Volver al Dashboard Usuario</a>
-        {% endif %}
-    </div>
+{{ category_data|json_script:"category-data" }}
+{{ stock_data|json_script:"stock-data" }}
+{% endblock %}
 
-</div>
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const categoryElement = document.getElementById('category-data');
+    const categoryCanvas = document.getElementById('categoryChart');
+    if (categoryElement && categoryCanvas) {
+        const payload = JSON.parse(categoryElement.textContent);
+        if (payload.labels.length) {
+            new Chart(categoryCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: payload.labels,
+                    datasets: [{
+                        label: 'Productos',
+                        data: payload.data,
+                        backgroundColor: [
+                            'rgba(127,60,255,0.8)',
+                            'rgba(34,211,238,0.8)',
+                            'rgba(96,165,250,0.8)',
+                            'rgba(251,191,36,0.8)',
+                            'rgba(110,231,183,0.8)',
+                        ],
+                        borderColor: [
+                            'rgba(127,60,255,1)',
+                            'rgba(34,211,238,1)',
+                            'rgba(96,165,250,1)',
+                            'rgba(251,191,36,1)',
+                            'rgba(110,231,183,1)',
+                        ],
+                        borderWidth: 2,
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: true, labels: { color: 'rgba(255,255,255,0.8)' } } },
+                    responsive: true,
+                }
+            });
+        }
+    }
 
+    const stockElement = document.getElementById('stock-data');
+    const stockCanvas = document.getElementById('stockChart');
+    if (stockElement && stockCanvas) {
+        const payload = JSON.parse(stockElement.textContent);
+        if (payload.labels.length) {
+            new Chart(stockCanvas, {
+                type: 'bar',
+                data: {
+                    labels: payload.labels,
+                    datasets: [{
+                        label: 'Stock',
+                        data: payload.data,
+                        backgroundColor: 'rgba(34,211,238,0.45)',
+                        borderColor: '#22d3ee',
+                        borderWidth: 1.5,
+                        borderRadius: 8,
+                    }]
+                },
+                options: {
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.65)' },
+                            grid: { display: false }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.65)' },
+                            grid: { color: 'rgba(255,255,255,0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
 {% endblock %}

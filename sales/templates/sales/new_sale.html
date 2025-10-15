@@ -3,19 +3,103 @@
 {% load static %}
 
 {% block extra_styles %}
-  <link href="{% static 'sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
+    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+    <link href="{% static 'sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{% block title %}Terminal de Venta{% endblock %}
-
-{% block header_title %}
-    Terminal de venta
-{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 
 {% block content %}
+<div class="dashboard-fullwidth-container">
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar glass-custom">
+            <div class="sidebar-header">
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="El Almacén" class="sidebar-logo">
+                <div class="sidebar-business">
+                    <span class="business-name">El Almacén</span>
+                    <span class="business-tagline">Panel administrativo</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'admin_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                <a href="{% url 'listar_productos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_productos' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_productos' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Productos</span>
+                </a>
+                <a href="{% url 'listar_clientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_clientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_clientes' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Clientes</span>
+                </a>
+                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link{% if request.resolver_match.url_name == 'ticket_list' or request.resolver_match.url_name == 'new_sale' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'ticket_list' or request.resolver_match.url_name == 'new_sale' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Ventas</span>
+                </a>
+                <a href="{% url 'reports_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'reports_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'reports_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 19v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Reportes</span>
+                </a>
+            </nav>
+        </aside>
 
-<button id="botonVoz">Activar Voz</button>
-<div id="indicador" style="display:none;">🎤 Escuchando...</div>
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <h1 class="page-title">
+                        <span class="title-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M4 12h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </span>
+                        Terminal de Venta
+                    </h1>
+                    <p class="page-subtitle">Procesa ventas eficientemente con escáner QR y control de inventario</p>
+                </div>
+            </header>
+
+            <div class="content-section">
+                <div class="sale-terminal glass-custom">
+                    <button id="botonVoz" class="btn-secondary" style="margin-bottom: 20px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="btn-icon">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M19 10v1a7 7 0 0 1-14 0v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.5"/>
+                            <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        Activar Voz
+                    </button>
+                    <div id="indicador" style="display:none; margin-bottom: 20px; color: #17a2b8;">🎤 Escuchando...</div>
 
 <div class="container">
   <form method="post" id="sale-form">
@@ -101,14 +185,19 @@
       <div class="section flex-row">
         <h4>Total de la compra:</h4>
         <span id="total-compra">${{ total_amount }}</span> <!-- Se reemplaza con el total real -->
-        <button type="submit" name="close_sale" class="button success">Cerrar Venta</button>
+        <button type="submit" name="close_sale" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Cerrar Venta</button>
       </div>
     </div>
   <div class="row">
     <div class="section text-right">
-  <a href="{% url 'dashboard:cashier_dashboard' %}" class="button primary">Volver al Dashboard</a>
+  <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn-custom">Volver al Dashboard Cajero</a>
     </div>
   </div>
+</div>
+                </div>
+            </div>
+        </main>
+    </div>
 </div>
 
 <!-- Incluye la biblioteca jsQR -->
@@ -716,5 +805,10 @@ if (SpeechRecognition) {
 }
 
 </script>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 
 {% endblock %}

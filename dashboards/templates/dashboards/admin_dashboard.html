@@ -1,71 +1,365 @@
 {% extends 'base.html' %}
-
 {% load static %}
-
-{% block header_title %}
-    Panel de Gestión
-{% endblock %}
+{% load humanize %}
 
 {% block extra_styles %}
-    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+<link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block body_class %}dashboard-page{% endblock %}
+
 {% block content %}
-<div class="dashboard-container">
-    <div class="card">
-        <h5 class="card-title">Agregar Producto</h5>
-        <p class="card-text">Añade un nuevo producto.</p>
-        <a href="{% url 'add_products' %}" class="btn-custom">Agregar Producto</a>
+<div class="dashboard-fullwidth-container">
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar glass-custom">
+            <div class="sidebar-header">
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="{{ business_name }}" class="sidebar-logo">
+                <div class="sidebar-business">
+                    <span class="business-name">{{ business_name }}</span>
+                    <span class="business-tagline">Panel administrativo</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                {% for item in sidebar_links %}
+                <a href="{{ item.url }}" class="sidebar-link{% if item.active %} is-active{% endif %}" {% if item.active %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        {% if item.icon == 'grid' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        {% elif item.icon == 'package' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                        {% elif item.icon == 'plus' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                        {% elif item.icon == 'layers' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 3 9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 13-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 17-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                        {% elif item.icon == 'users' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                        {% elif item.icon == 'cart' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% elif item.icon == 'receipt' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                        {% elif item.icon == 'chart' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% elif item.icon == 'wallet' %}
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% endif %}
+                    </span>
+                    <span class="sidebar-label">{{ item.label }}</span>
+                </a>
+                {% endfor %}
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-user">Sesión: {{ request.user.username }}</span>
+                <span class="sidebar-role">{% if request.user.is_admin %}Administrador{% else %}Usuario{% endif %}</span>
+            </div>
+        </aside>
+        <div class="dashboard-main-column">
+            <section class="metrics-top">
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon purple-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">${{ total_revenue_last_month|floatformat:2 }}</div>
+                        <div class="metric-label">Ventas del Mes</div>
+                        <div class="metric-change {% if sales_growth_percent >= 0 %}positive{% else %}negative{% endif %}">
+                            <span>{{ sales_growth_percent|floatformat:1 }}%</span> vs mes anterior
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon cyan-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_products|intcomma }}</div>
+                        <div class="metric-label">Productos Activos</div>
+                        <div class="metric-change neutral">
+                            <span>{{ total_stock_amount|floatformat:0|intcomma }}</span> unidades totales en stock
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon blue-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_clients|intcomma }}</div>
+                        <div class="metric-label">Clientes Activos</div>
+                        <div class="metric-change neutral">
+                            <span>{{ credit_sales_last_month|intcomma }}</span> ventas fiadas este mes
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon yellow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="15.5" r="0.8" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ low_stock_count|intcomma }}</div>
+                        <div class="metric-label">Stock Crítico</div>
+                        <div class="metric-change negative">
+                            {{ low_stock_count|intcomma }} productos por debajo de 10 unidades
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="dashboard-content-wrapper">
+                <section class="charts-section">
+                    <div class="chart-card glass-custom">
+                        <h3>Tendencia de Ventas
+                            <span class="chart-subtitle">Últimos 30 días</span>
+                        </h3>
+                        <div class="chart-placeholder">
+                            <canvas id="salesTrendChart" width="600" height="220" aria-label="Gráfico de tendencia de ventas"></canvas>
+                            {% if not sales_trend.labels %}
+                            <div class="chart-empty">Sin datos suficientes en los últimos 30 días.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="chart-card glass-custom">
+                        <h3>Productos Más Vendidos
+                            <span class="chart-subtitle">Ingresos últimos 30 días</span>
+                        </h3>
+                        <div class="chart-placeholder">
+                            <canvas id="topProductsChart" width="600" height="220" aria-label="Gráfico de productos más vendidos"></canvas>
+                            {% if not top_products.labels %}
+                            <div class="chart-empty">Aún no hay ventas registradas para mostrar.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+                <div class="dashboard-bottom-row">
+                    <section class="quick-actions-section glass-custom">
+                        <h3>Acciones Rápidas</h3>
+                        <div class="quick-actions-grid">
+                            <a href="{% url 'sales:new_sale' %}" class="action-card glass-custom">
+                                <div class="action-icon cyan-bg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="action-content">
+                                    <div class="action-title">Nueva Venta</div>
+                                    <div class="action-desc">Registrar venta rápida</div>
+                                </div>
+                            </a>
+                            <a href="{% url 'add_products' %}" class="action-card glass-custom">
+                                <div class="action-icon purple-bg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                        <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <div class="action-content">
+                                    <div class="action-title">Agregar Producto</div>
+                                    <div class="action-desc">Nuevo producto al inventario</div>
+                                </div>
+                            </a>
+                            <a href="{% url 'listar_clientes' %}" class="action-card glass-custom">
+                                <div class="action-icon blue-bg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                                    </svg>
+                                </div>
+                                <div class="action-content">
+                                    <div class="action-title">Gestionar Clientes</div>
+                                    <div class="action-desc">Ver y editar clientes</div>
+                                </div>
+                            </a>
+                            <a href="{% url 'reports_dashboard' %}" class="action-card glass-custom">
+                                <div class="action-icon yellow-bg">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <div class="action-content">
+                                    <div class="action-title">Ver Reportes</div>
+                                    <div class="action-desc">Análisis detallado de ventas</div>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                    <section class="activity-panel glass-custom">
+                        <h3>Actividad Reciente
+                            <span class="section-subtitle">Últimas ventas registradas</span>
+                        </h3>
+                        <div class="activity-feed">
+                            {% for sale in recent_sales %}
+                            <div class="activity-item">
+                                <div class="activity-icon cyan-bg">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.3"/>
+                                        <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.3"/>
+                                    </svg>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Venta #{{ sale.id }}</div>
+                                    <div class="activity-desc">
+                                        {{ sale.cliente.nombre|default:'Cliente' }} · ${{ sale.total|floatformat:2 }}
+                                    </div>
+                                    <div class="activity-time">{{ sale.fecha_venta|timesince }} atrás</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="activity-empty">Aún no hay ventas registradas.</div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+                {% if low_stock_products %}
+                <section class="alert-section glass-custom">
+                    <h3>
+                        <svg class="h-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10.29 3.86 1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.42 0z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 9v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M12 17h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                        Productos con Stock Bajo
+                    </h3>
+                    <div class="low-stock-list">
+                        {% for product in low_stock_products %}
+                        <div class="low-stock-item">
+                            <span>{{ product.nombre }}</span>
+                            <span class="stock-count">{{ product.cantidad_stock|floatformat:0|intcomma }} {{ product.unidad_medida }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+        </div>
     </div>
-
-    <div class="card">
-        <h5 class="card-title">Listar Productos</h5>
-        <p class="card-text">Revisa, tus productos.</p>
-        <a href="{% url 'list_products' %}" class="btn-custom">Listar Productos</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Agregar Cliente</h5>
-        <p class="card-text">Añade un nuevo cliente al sistema.</p>
-        <a href="{% url 'agregar_cliente' %}" class="btn-custom">Agregar Cliente</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Listar Clientes</h5>
-        <p class="card-text">Revisa, edita o elimina tus clientes.</p>
-        <a href="{% url 'listar_clientes' %}" class="btn-custom">Listar Clientes</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Crear Nueva Categoría</h5>
-        <p class="card-text">Añade una nueva categoría para tus productos.</p>
-        <a href="{% url 'add_category' %}" class="btn-custom">Crear Categoría</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Gestionar Categorías</h5>
-        <p class="card-text">Ver, editar o eliminar categorías.</p>
-        <a href="{% url 'listar_categorias' %}" class="btn-custom">Gestionar Categorías</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Reportes</h5>
-        <p class="card-text">Genera reportes detallados del inventario y más.</p>
-        <a href="{% url 'reports_dashboard' %}" class="btn-custom">Ir a Reportes</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Impresion de QR Codes</h5>
-        <p class="card-text">Imprime los QR necesarios para tus productos.</p>
-        <a href="{% url 'imprimir_qr' %}" class="btn-custom">QR Codes</a>
-    </div>
-
-    <div class="card">
-        <h5 class="card-title">Gestión de Cuentas Corrientes</h5>
-        <p class="card-text">Gestiona las cuentas corrientes de tu almacén.</p>
-        <a href="{% url 'gestion_cuentas_corrientes' %}" class="btn-custom">Cuentas</a>
-    </div>
-
 </div>
 
+{{ sales_trend|json_script:"sales-trend-data" }}
+{{ top_products|json_script:"top-products-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const salesDataElement = document.getElementById('sales-trend-data');
+        const salesCanvas = document.getElementById('salesTrendChart');
+        if (salesDataElement && salesCanvas) {
+            const payload = JSON.parse(salesDataElement.textContent);
+            if (payload.labels.length) {
+                new Chart(salesCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: payload.labels,
+                        datasets: [{
+                            label: 'Ingresos',
+                            data: payload.data,
+                            borderColor: '#c084fc',
+                            backgroundColor: 'rgba(192,132,252,0.15)',
+                            tension: 0.35,
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                        }]
+                    },
+                    options: {
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                ticks: { color: 'rgba(255,255,255,0.65)' },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            },
+                            y: {
+                                ticks: { color: 'rgba(255,255,255,0.65)' },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        const topProductsElement = document.getElementById('top-products-data');
+        const productsCanvas = document.getElementById('topProductsChart');
+        if (topProductsElement && productsCanvas) {
+            const payload = JSON.parse(topProductsElement.textContent);
+            if (payload.labels.length) {
+                new Chart(productsCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: payload.labels,
+                        datasets: [{
+                            label: 'Ingresos',
+                            data: payload.data,
+                            backgroundColor: 'rgba(34,211,238,0.45)',
+                            borderColor: '#22d3ee',
+                            borderWidth: 1.5,
+                            borderRadius: 8,
+                        }]
+                    },
+                    options: {
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                ticks: { color: 'rgba(255,255,255,0.65)' },
+                                grid: { display: false }
+                            },
+                            y: {
+                                ticks: { color: 'rgba(255,255,255,0.65)' },
+                                grid: { color: 'rgba(255,255,255,0.05)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    });
+</script>
 {% endblock %}

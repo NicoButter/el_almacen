@@ -8,6 +8,9 @@ from .models import CustomUser
 
 def get_dashboard_redirect(user):
     """Helper function to get the correct dashboard redirect for a user."""
+    if not user.is_authenticated:
+        return redirect('accounts:login')
+        
     if isinstance(user, CustomUser):
         if user.is_admin:
             return redirect('dashboard:admin_dashboard')
@@ -38,7 +41,10 @@ def loguin(request):
     else:
         form = AuthenticationForm()
 
-    return render(request, 'accounts/login.html', {'form': form})
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'page_title': 'Iniciar Sesión'
+    })
 
 
 @login_required

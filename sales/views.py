@@ -3,7 +3,7 @@ import json
 import weasyprint
 import logging
 
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.template.loader import render_to_string
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
@@ -35,15 +35,33 @@ def parse_decimal(value):
 # ---------------------------------------------------------------------------------------------------------------
 
 def ticket_list(request):
-    tickets = Ticket.objects.all().order_by('-date') 
-    return render(request, 'sales/ticket_list.html', {'tickets': tickets})
+    tickets = Ticket.objects.all().order_by('-date')
+
+    # Calcular métricas
+    total_tickets = Ticket.objects.count()
+    total_ventas = Ticket.objects.aggregate(total=Sum('total'))['total'] or 0
+    tickets_hoy = Ticket.objects.filter(date__date=timezone.now().date()).count()
+    promedio_ticket = total_ventas / total_tickets if total_tickets > 0 else 0
+
+    return render(request, 'sales/ticket_list.html', {
+        'page_title': 'Lista de Tickets',
+        'tickets': tickets,
+        'total_tickets': total_tickets,
+        'total_ventas': total_ventas,
+        'tickets_hoy': tickets_hoy,
+        'promedio_ticket': promedio_ticket,
+    })
 
 # ---------------------------------------------------------------------------------------------------------------
 
 def reprint_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
     line_items = ticket.line_items.all()
-    return render(request, 'sales/reprint_ticket.html', {'ticket': ticket, 'line_items': line_items})
+    return render(request, 'sales/reprint_ticket.html', {
+        'page_title': 'Reimprimir Ticket',
+        'ticket': ticket,
+        'line_items': line_items
+    })
 
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -92,6 +110,9 @@ def new_sale(request):
                     producto_id = producto_data.get('id')
                     cantidad = Decimal(producto_data.get('cantidad'))
                     precio_unitario = Decimal(producto_data.get('precio_unitario'))
+                    
+                    # Obtener el producto para verificar si se vende fraccionado
+                    producto = Product.objects.get(id=producto_id)
                     total_producto = precio_unitario * cantidad if not producto.se_vende_fraccionado else precio_unitario * (cantidad / 1000)
                     
                     DetalleVenta.objects.create(
@@ -109,9 +130,9 @@ def new_sale(request):
             if venta_fiada:
                 venta.realizar_venta_fiada()
 
-            logger.info(f"Venta procesada con éxito. ID de venta: {venta.id}")
+            logger.info(f"Venta procesada con éxito. ID de venta: {venta.pk}")
 
-            return JsonResponse({'success': True, 'ticket_id': venta.id})
+            return JsonResponse({'success': True, 'ticket_id': venta.pk})
 
         except (ValueError, TypeError, InvalidOperation) as e:
             logger.error(f"Error en la solicitud de venta: {str(e)}")
@@ -126,7 +147,11 @@ def new_sale(request):
     # Si es un GET request, renderiza el formulario
     productos = Product.objects.all()
     clientes = Cliente.objects.all()
-    return render(request, 'sales/new_sale.html', {'productos': productos, 'clientes': clientes})
+    return render(request, 'sales/new_sale.html', {
+        'page_title': 'Nueva Venta',
+        'productos': productos,
+        'clientes': clientes
+    })
 
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -179,6 +204,7 @@ def buscar_venta(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'sales/buscar_venta.html', {
+        'page_title': 'Buscar Ventas',
         'ventas': page_obj.object_list,
         'page_obj': page_obj,
         'per_page': per_page
@@ -216,6 +242,7 @@ def ticket_detail(request, ticket_id):
     venta = ticket.venta
 
     return render(request, 'sales/ticket_detail.html', {
+        'page_title': 'Detalle del Ticket',
         'ticket': ticket,
         'line_items': line_items,
         'venta': venta  # Pasamos la venta para acceder a 'es_fiada'
@@ -267,7 +294,7 @@ def realizar_venta(request):
             if tipo_pago == 'CUENTA_CORRIENTE':
                 # Verificar si la venta es fiada
                 if not cuenta_corriente:
-                    logger.warning(f"El cliente con ID {cliente.id} no tiene cuenta corriente.")
+                    logger.warning(f"El cliente con ID {cliente.pk} no tiene cuenta corriente.")
                     return JsonResponse({
                         "success": False,
                         "message": f"El cliente '{cliente.nombre}' no tiene cuenta corriente asociada. No se puede realizar la venta fiada."
@@ -277,7 +304,7 @@ def realizar_venta(request):
             # Iniciar transacción para asegurar consistencia
             with transaction.atomic():
                 # Crear la venta
-                logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.id})")
+                logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.pk})")
 
                 venta = Venta.objects.create(
                     cliente=cliente,
@@ -295,7 +322,7 @@ def realizar_venta(request):
                     cashier_id=request.user.id
                 )
 
-                logger.debug(f"Ticket creado para la venta ID: {venta.id}, Ticket ID: {ticket.id}")
+                logger.debug(f"Ticket creado para la venta ID: {venta.pk}, Ticket ID: {ticket.pk}")
 
                 # Procesar productos de la venta (detalles de la venta)
                 for item in productos_data:
@@ -341,6 +368,11 @@ def realizar_venta(request):
                     # Asegurarse de que total_compra es un Decimal
                     total_compra_decimal = Decimal(str(total_compra))
                     
+                    # Verificar que cuenta_corriente existe (debería existir si es_fiada=True)
+                    if cuenta_corriente is None:
+                        logger.error("Error interno: venta marcada como fiada pero sin cuenta corriente")
+                        raise ValueError("Cuenta corriente requerida para venta fiada")
+                    
                     # Actualizamos el saldo de la cuenta corriente
                     cuenta_corriente.saldo += total_compra_decimal
                     cuenta_corriente.save()
@@ -350,14 +382,14 @@ def realizar_venta(request):
                 # Crear el pago asociado al ticket (si es necesario)
                 pago = Pago.objects.create(ticket=ticket, cliente=cliente, monto=total_compra)
 
-                logger.debug(f"Pago registrado para el ticket ID: {ticket.id}, Monto: {pago.monto}")
+                logger.debug(f"Pago registrado para el ticket ID: {ticket.pk}, Monto: {pago.monto}")
 
                 # Confirmar la venta
-                logger.info(f"Venta procesada correctamente, Ticket ID: {ticket.id}")
+                logger.info(f"Venta procesada correctamente, Ticket ID: {ticket.pk}")
                 return JsonResponse({
                     "success": True,
                     "message": "Venta procesada correctamente",
-                    "ticket_id": ticket.id
+                    "ticket_id": ticket.pk
                 })
 
         except Exception as e:
@@ -371,6 +403,13 @@ def realizar_venta(request):
                 "error": str(e),
                 "traceback": error_details
             }, status=500)
+    
+    else:
+        # Método HTTP no soportado
+        return JsonResponse({
+            "success": False,
+            "message": "Método HTTP no permitido. Use POST."
+        }, status=405)
 
 
 
@@ -526,18 +565,28 @@ def enviar_ticket_email(request, ticket_id):
 
     # Convertir el HTML a PDF
     pdf = weasyprint.HTML(string=html).write_pdf()
+    
+    # Verificar que el PDF se generó correctamente
+    if pdf is None:
+        logger.error(f"Error al generar PDF para el ticket {ticket_id}")
+        return HttpResponse("Error al generar el PDF del ticket", status=500)
 
     # Crear un archivo en memoria con el PDF
     pdf_file = io.BytesIO(pdf)
+
+    # Verificar que el ticket tiene un cliente asociado
+    if ticket.cliente is None:
+        logger.error(f"El ticket {ticket_id} no tiene un cliente asociado")
+        return HttpResponse("El ticket no tiene un cliente asociado", status=400)
 
     # Crear el correo electrónico
     email = EmailMessage(
         'Detalles de tu Ticket de Compra',  # Asunto
         'Adjunto encontrarás el PDF con los detalles de tu compra.',  # Cuerpo del correo
         'from@example.com',  # Dirección de envío
-        [ticket.cliente.email]  # Dirección de destino (cliente)
+        [ticket.cliente.user.email]  # Dirección de destino (cliente)
     )
-    email.attach(f'ticket_{ticket.id}.pdf', pdf_file.getvalue(), 'application/pdf')
+    email.attach(f'ticket_{ticket.pk}.pdf', pdf_file.getvalue(), 'application/pdf')
 
     # Enviar el correo
     email.send()
@@ -560,7 +609,7 @@ def generar_pdf(request, ticket_id):
 
     # Crear una respuesta HTTP con el PDF como adjunto
     response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.pk}.pdf"'
     return response
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -578,7 +627,7 @@ def generar_pdf_whatsapp(request, ticket_id):
 
     # Crear una respuesta con el archivo PDF
     response = HttpResponse(pdf, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.id}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.pk}.pdf"'
     return response
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -599,7 +648,7 @@ def search_products(request):
     products_data = []
     for product in products:
         products_data.append({
-            'id': product.id,
+            'id': product.pk,
             'nombre': product.nombre,  # Cambiado de 'name' a 'nombre'
             'precio_venta': product.precio_venta,
         })

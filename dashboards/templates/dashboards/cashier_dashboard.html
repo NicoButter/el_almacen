@@ -2,37 +2,51 @@
 
 {% load static %}
 
-{% block header_title %}
-    Gestión de Ventas
-{% endblock %}
-
 {% block extra_styles %}
-    <link href="{% static 'dashboards/css/cashier_dashboard_styles.css' %}" rel="stylesheet">
+    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
-
-{% block title %}Dashboard Cajero{% endblock %}
 
 {% block content %}
-    <div class="dashboard-container">
-        <!-- Nueva Venta -->
-        <div class="card">
-            <h5 class="card-title">Nueva Venta</h5>
-            <p class="card-text">Inicia una nueva transacción de venta.</p>
-            <a href="{% url 'sales:new_sale' %}" class="btn-custom">Iniciar Venta</a>
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h2>💰 Panel de Cajero</h2>
+        <p>Gestiona las ventas y transacciones de manera eficiente</p>
+    </div>
+
+    <!-- Acciones principales del cajero -->
+    <div class="actions-grid">
+        <div class="action-card">
+            <h4>🛒 Nueva Venta</h4>
+            <p>Inicia una nueva transacción de venta con productos del inventario.</p>
+            <div class="action-buttons">
+                <a href="{% url 'sales:new_sale' %}" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Iniciar Venta</a>
+            </div>
         </div>
 
-        <!-- Buscar Venta -->
-        <div class="card">
-            <h5 class="card-title">Buscar Venta</h5>
-            <p class="card-text">Localiza ventas anteriores en el sistema.</p>
-            <a href="{% url 'sales:buscar_venta' %}" class="btn-custom">Buscar Venta</a>
+        <div class="action-card">
+            <h4>🔍 Buscar Venta</h4>
+            <p>Localiza y consulta ventas anteriores en el sistema.</p>
+            <div class="action-buttons">
+                <a href="{% url 'sales:buscar_venta' %}" class="btn-custom" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">Buscar Venta</a>
+            </div>
         </div>
 
-        <!-- Listar Productos -->
-        <div class="card">
-            <h5 class="card-title">Listar Productos</h5>
-            <p class="card-text">Consulta los productos disponibles en inventario.</p>
-            <a href="{% url 'listar_productos' %}" class="btn-custom">Ver Productos</a>
+        <div class="action-card">
+            <h4>📦 Consultar Productos</h4>
+            <p>Revisa los productos disponibles en el inventario.</p>
+            <div class="action-buttons">
+                <a href="{% url 'listar_productos' %}" class="btn-custom" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #212529;">Ver Productos</a>
+            </div>
         </div>
     </div>
+
+    <!-- Navegación -->
+    <div class="action-card" style="margin-top: 30px;">
+        <h4>🏠 Navegación</h4>
+        <div class="action-buttons">
+            <a href="{% url 'dashboard:user_dashboard' %}" class="btn-custom">Volver al Dashboard Usuario</a>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

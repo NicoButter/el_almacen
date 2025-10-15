@@ -11,7 +11,9 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib.units import inch
-
+from typing import cast
+from django.core.files import File
+from django.db.models import Sum, Count
 from datetime import datetime
 
 
@@ -35,11 +37,36 @@ def listar_productos(request):
     is_admin = request.user.is_admin
     is_cashier = request.user.is_cashier
 
+    # Calcular métricas para el dashboard
+    total_stock = Product.objects.aggregate(total=Sum('cantidad_stock'))['total'] or 0
+    low_stock_count = Product.objects.filter(cantidad_stock__lt=10).count()
+    total_value = sum(producto.precio_venta * producto.cantidad_stock for producto in Product.objects.all())
+
+    # Datos para gráfico de productos por categoría
+    category_counts = Categoria.objects.annotate(product_count=Count('productos')).values('nombre', 'product_count')
+    category_data = {
+        'labels': [cat['nombre'] for cat in category_counts],
+        'data': [cat['product_count'] for cat in category_counts]
+    }
+
+    # Datos para gráfico de stock por producto (top 10)
+    top_stock_products = Product.objects.order_by('-cantidad_stock')[:10]
+    stock_data = {
+        'labels': [prod.nombre[:20] + '...' if len(prod.nombre) > 20 else prod.nombre for prod in top_stock_products],
+        'data': [prod.cantidad_stock for prod in top_stock_products]
+    }
+
     return render(request, 'products/list_products.html', {
+        'page_title': 'Productos',
         'productos': page_obj,  # Pasar el objeto de página al template
         'categorias': categorias,  # Enviar categorías al template
         'is_admin': is_admin,
-        'is_cashier': is_cashier
+        'is_cashier': is_cashier,
+        'total_stock': total_stock,
+        'low_stock_count': low_stock_count,
+        'total_value': total_value,
+        'category_data': category_data,
+        'stock_data': stock_data,
     })
 
 # -----------------------------------------------------------------------------------------------------------------
@@ -71,8 +98,21 @@ def agregar_producto(request):
     # Guardar datos en la sesión al redirigir a la creación de categorías
     if request.GET.get('from_category') == 'true':
         form = ProductForm(initial=request.session.get('product_form_data', None))
-    
-    return render(request, 'products/add_products.html', {'form': form})
+
+    # Calcular métricas para el dashboard
+    total_stock = Product.objects.aggregate(total=Sum('cantidad_stock'))['total'] or 0
+    low_stock_count = Product.objects.filter(cantidad_stock__lt=10).count()
+    total_value = sum(producto.precio_venta * producto.cantidad_stock for producto in Product.objects.all())
+    categorias = Categoria.objects.all()
+
+    return render(request, 'products/add_products.html', {
+        'page_title': 'Agregar Producto',
+        'form': form,
+        'total_stock': total_stock,
+        'low_stock_count': low_stock_count,
+        'total_value': total_value,
+        'categorias': categorias,
+    })
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -85,7 +125,11 @@ def editar_producto(request, pk):
             return redirect('list_products')
     else:
         form = ProductForm(instance=producto)
-    return render(request, 'products/edit_products.html', {'form': form, 'producto': producto})
+    return render(request, 'products/edit_products.html', {
+        'page_title': 'Editar Producto',
+        'form': form,
+        'producto': producto
+    })
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -100,7 +144,10 @@ def eliminar_producto(request, pk):
         producto.delete()
         return redirect('listar_productos')
 
-    return render(request, 'products/delete_product.html', {'producto': producto})
+    return render(request, 'products/delete_product.html', {
+        'page_title': 'Eliminar Producto',
+        'producto': producto
+    })
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -115,15 +162,55 @@ def crear_categoria(request):
             messages.error(request, 'Error al crear la categoría. Por favor, inténtalo nuevamente.')
     else:
         form = CategoriaForm()
-    
-    return render(request, 'products/add_category.html', {'form': form})
+
+    # Calcular métricas para el dashboard
+    categorias = Categoria.objects.all()
+    total_categorias = categorias.count()
+    categorias_con_productos = categorias.annotate(product_count=Count('productos')).filter(product_count__gt=0).count()
+    categorias_vacias = total_categorias - categorias_con_productos
+    total_stock = Product.objects.aggregate(total=Sum('cantidad_stock'))['total'] or 0
+    total_value = sum(producto.precio_venta * producto.cantidad_stock for producto in Product.objects.all())
+
+    return render(request, 'products/add_category.html', {
+        'page_title': 'Crear Categoría',
+        'form': form,
+        'total_categorias': total_categorias,
+        'categorias_con_productos': categorias_con_productos,
+        'categorias_vacias': categorias_vacias,
+        'total_stock': total_stock,
+        'total_value': total_value,
+    })
 
 # -----------------------------------------------------------------------------------------------------------------
 
 # Vista para listar categorías
 def listar_categorias(request):
     categorias = Categoria.objects.all()  # Obtener todas las categorías
-    return render(request, 'products/list_category.html', {'categorias': categorias})
+
+    # Calcular métricas para el dashboard
+    total_categorias = categorias.count()
+    categorias_con_productos = categorias.annotate(product_count=Count('productos')).filter(product_count__gt=0).count()
+    categorias_vacias = total_categorias - categorias_con_productos
+    total_stock = Product.objects.aggregate(total=Sum('cantidad_stock'))['total'] or 0
+    total_value = sum(producto.precio_venta * producto.cantidad_stock for producto in Product.objects.all())
+
+    # Datos para gráfico de categorías con productos
+    category_counts = categorias.annotate(product_count=Count('productos')).values('nombre', 'product_count')
+    category_data = {
+        'labels': [cat['nombre'] for cat in category_counts],
+        'data': [cat['product_count'] for cat in category_counts]
+    }
+
+    return render(request, 'products/list_category.html', {
+        'page_title': 'Categorías',
+        'categorias': categorias,
+        'total_categorias': total_categorias,
+        'categorias_con_productos': categorias_con_productos,
+        'categorias_vacias': categorias_vacias,
+        'total_stock': total_stock,
+        'total_value': total_value,
+        'category_data': category_data,
+    })
 
 # -----------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +224,10 @@ def editar_categoria(request, categoria_id):
         messages.success(request, "Categoría actualizada con éxito.")
         return redirect('listar_categorias')
 
-    return render(request, 'products/edit_category.html', {'categoria': categoria})
+    return render(request, 'products/edit_category.html', {
+        'page_title': 'Editar Categoría',
+        'categoria': categoria
+    })
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -210,8 +300,13 @@ def imprimir_qr(request):
             c.rect(qr_x, qr_y, cell_width, cell_height)  # Dibujar el marco
 
             # Usar el archivo de imagen QR que ya existe para este producto
-            qr_image_path = producto.qr_code.path
-            c.drawImage(qr_image_path, qr_x, qr_y + 10, width=cell_width, height=cell_height - 10)
+            if producto.qr_code:
+                qr_image_path = producto.qr_code.path  # type: ignore
+                c.drawImage(qr_image_path, qr_x, qr_y + 10, width=cell_width, height=cell_height - 10)
+            else:
+                # Si no hay QR code, mostrar un mensaje de error o placeholder
+                c.setFont("Helvetica", 8)
+                c.drawString(qr_x + 5, qr_y + cell_height/2, "Sin QR")
 
             # Dibujar el nombre del producto debajo del QR dentro del mismo marco
             c.setFont("Helvetica", 8)  # Fuente más pequeña
@@ -233,5 +328,8 @@ def imprimir_qr(request):
     else:
         # Si no es un POST, mostrar el formulario
         productos = Product.objects.all()
-        return render(request, 'products/imprimir_qr.html', {'productos': productos})
+        return render(request, 'products/imprimir_qr.html', {
+            'productos': productos,
+            'page_title': 'Imprimir QR de Productos'
+        })
 

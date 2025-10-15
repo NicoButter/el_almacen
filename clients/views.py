@@ -48,7 +48,7 @@ def agregar_cliente(request):
 
             # Agregar un mensaje de éxito
             messages.success(request, 'Cliente agregado correctamente.')
-            return redirect('admin_dashboard')
+            return redirect('dashboard:admin_dashboard')
     else:
         cliente_form = ClienteForm()
         telefono_form = TelefonoForm()
@@ -56,6 +56,7 @@ def agregar_cliente(request):
         email_form = EmailForm()
 
     context = {
+        'page_title': 'Agregar Cliente',
         'cliente_form': cliente_form,
         'telefono_form': telefono_form,
         'direccion_form': direccion_form,
@@ -86,9 +87,20 @@ def listar_clientes(request):
     
     is_admin = request.user.is_admin  
 
+    # Calcular métricas
+    total_clientes = Cliente.objects.count()
+    clientes_con_telefonos = Cliente.objects.filter(telefonos__isnull=False).distinct().count()
+    clientes_con_emails = Cliente.objects.filter(emails__isnull=False).distinct().count()
+    clientes_con_cuentas = Cliente.objects.filter(cuenta_corriente_cc__isnull=False).distinct().count()
+
     return render(request, 'clients/list_clients.html', {
         'clientes': clientes_page,
-        'is_admin': is_admin
+        'is_admin': is_admin,
+        'page_title': 'Listado de Clientes',
+        'total_clientes': total_clientes,
+        'clientes_con_telefonos': clientes_con_telefonos,
+        'clientes_con_emails': clientes_con_emails,
+        'clientes_con_cuentas': clientes_con_cuentas,
     })
 
 # --------------------------------------------------------------------------------------------------------------
@@ -100,7 +112,7 @@ def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
     # Verificar si el cliente tiene una cuenta corriente asociada
-    cuenta_corriente = cliente.cuenta_corriente_cc if hasattr(cliente, 'cuenta_corriente_cc') else None
+    cuenta_corriente = cliente.cuenta_corriente_cc if hasattr(cliente, 'cuenta_corriente_cc') else None  # type: ignore
     
     logger.debug(f"Cliente encontrado: {cliente}")
     logger.debug(f"Cuenta corriente asociada: {cuenta_corriente}")
@@ -142,8 +154,8 @@ def editar_cliente(request, pk):
         'form': form,
         'cuenta_corriente_form': cuenta_corriente_form,  
         'cliente': cliente,
+        'page_title': 'Editar Cliente'
     })
-
 
 # --------------------------------------------------------------------------------------------------------------
 
@@ -156,4 +168,7 @@ def eliminar_cliente(request, pk):
         messages.success(request, 'Cliente eliminado correctamente.')  # Agregar un mensaje de éxito
         return redirect('listar_clientes')  # Redirige a la lista de clientes
     
-    return render(request, 'clients/delete_client.html', {'cliente': cliente})
+    return render(request, 'clients/delete_client.html', {
+        'cliente': cliente,
+        'page_title': 'Eliminar Cliente'
+    })

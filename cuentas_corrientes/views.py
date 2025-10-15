@@ -25,7 +25,11 @@ def gestion_cuentas_corrientes(request):
             'saldo': cuenta_corriente.saldo if cuenta_corriente else None,
         })
 
-    return render(request, 'cuentas_corrientes/gestion_cuentas_corrientes.html', {'clientes_con_estado': clientes_con_estado, 'page_obj': page_obj})
+    return render(request, 'cuentas_corrientes/gestion_cuentas_corrientes.html', {
+        'page_title': 'Cuentas Corrientes',
+        'clientes_con_estado': clientes_con_estado,
+        'page_obj': page_obj
+    })
 
 # -------------------------------------------------------------------------------------------------------------------
 
@@ -37,7 +41,10 @@ def crear_cuenta_corriente(request):
             return redirect('lista_cuentas_corrientes')  # Asegúrate de definir esta URL
     else:
         form = CuentaCorrienteForm()
-    return render(request, 'cuentas_corrientes/crear_cuenta.html', {'form': form})
+    return render(request, 'cuentas_corrientes/crear_cuenta.html', {
+        'page_title': 'Crear Cuenta Corriente',
+        'form': form
+    })
 
 # -------------------------------------------------------------------------------------------------------------------
 
@@ -54,7 +61,11 @@ def editar_cuenta_corriente(request, pk):
     else:
         form = CuentaCorrienteForm(instance=cuenta_corriente)
 
-    return render(request, 'cuentas_corrientes/edit_cuenta.html', {'form': form, 'cuenta_corriente': cuenta_corriente})
+    return render(request, 'cuentas_corrientes/edit_cuenta.html', {
+        'page_title': 'Editar Cuenta Corriente',
+        'form': form,
+        'cuenta_corriente': cuenta_corriente
+    })
 
 # -------------------------------------------------------------------------------------------------------------------
 
@@ -68,7 +79,10 @@ def agregar_saldo(request, cuenta_id):
             return redirect('detalle_cuenta_corriente', cuenta_id=cuenta.id)  # Asegúrate de definir esta URL
         else:
             messages.error(request, 'El monto debe ser positivo.')
-    return render(request, 'cuentas_corrientes/agregar_saldo.html', {'cuenta': cuenta})
+    return render(request, 'cuentas_corrientes/agregar_saldo.html', {
+        'page_title': 'Agregar Saldo',
+        'cuenta': cuenta
+    })
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -82,7 +96,10 @@ def pagar_cuenta(request, cuenta_id):
             return redirect('detalle_cuenta_corriente', cuenta_id=cuenta.id)  # Asegúrate de definir esta URL
         except ValueError as e:
             messages.error(request, str(e))
-    return render(request, 'cuentas_corrientes/pagar_cuenta.html', {'cuenta': cuenta})
+    return render(request, 'cuentas_corrientes/pagar_cuenta.html', {
+        'page_title': 'Pagar Cuenta',
+        'cuenta': cuenta
+    })
 
 # --------------------------------------------------------------------------------------------------------------------
 
@@ -107,7 +124,11 @@ def asignar_cuenta_corriente(request, cliente_id):
     else:
         form = CuentaCorrienteForm()
 
-    return render(request, 'cuentas_corrientes/asignar_cuenta_corriente.html', {'form': form, 'cliente': cliente})
+    return render(request, 'cuentas_corrientes/asignar_cuenta_corriente.html', {
+        'page_title': 'Asignar Cuenta Corriente',
+        'form': form,
+        'cliente': cliente
+    })
 
 # --------------------------------------------------------------------------------------------------------------------
 

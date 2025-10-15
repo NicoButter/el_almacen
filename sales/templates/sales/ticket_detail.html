@@ -4,6 +4,7 @@
 
 {% block extra_styles %}
     <link href="{% static 'sales/css/ticket_details_styles.css' %}" rel="stylesheet"/>
+    <link href="{% static 'dashboards/css/dashboard.css' %}" rel="stylesheet"/>
 {% endblock %}
 
 {% block title %}Detalle del Ticket{% endblock %}
@@ -11,6 +12,18 @@
 {% block header %}Detalle del Ticket{% endblock %}
 
 {% block content %}
+<div class="dashboard-container">
+    <!-- Sección de bienvenida -->
+    <div class="welcome-section">
+        <h1 class="welcome-title">
+            <i class="fas fa-receipt"></i>
+            Detalle del Ticket
+        </h1>
+        <p class="welcome-subtitle">
+            Información completa del ticket de venta
+        </p>
+    </div>
+
 <div class="ticket-container">
     <div class="ticket-header">
         <h1>El Almacén</h1>
@@ -89,10 +102,11 @@
         </a>
     
         <!-- Volver al dashboard -->
-    <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn btn-primary">
+    <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn btn-custom">
             <i class="fas fa-arrow-left"></i> <!-- Icono de Volver -->
         </a>
     </div>
 
 </div>
+</div> <!-- Cierre del dashboard-container -->
 {% endblock %}

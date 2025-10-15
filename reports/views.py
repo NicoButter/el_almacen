@@ -21,7 +21,7 @@ from datetime import date, datetime, timedelta
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 def reports_dashboard(request):
-    return render(request, 'reports/reports_dashboard.html')
+    return render(request, 'reports/reports_dashboard.html', {'page_title': 'Reportes'})
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -42,10 +42,11 @@ def inventory_report_pdf(request):
         productos = productos.filter(cantidad_stock__gte=min_stock)
 
     # Configurar el PDF
+    buffer = BytesIO()
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="inventory_report.pdf"'
 
-    p = canvas.Canvas(response, pagesize=landscape(A4))
+    p = canvas.Canvas(buffer, pagesize=landscape(A4))
 
     # Agregar encabezado y pie
     almacen_nombre = "Almacén Central"
@@ -119,6 +120,9 @@ def inventory_report_pdf(request):
     # Finalizar y guardar el PDF
     p.showPage()
     p.save()
+
+    buffer.seek(0)
+    response.write(buffer.getvalue())
     return response
 
 #-----------------------------------------------------------------------------------------------------------------------------------
@@ -254,6 +258,7 @@ def inventory_report(request):
         'productos': productos,
         'categorias': categorias,
         'request': request,  # Para mantener los filtros seleccionados
+        'page_title': 'Reporte de Inventario'
     })
 
 #-----------------------------------------------------------------------------------------------------------------------------------
@@ -323,6 +328,7 @@ def reporte_ventas(request):
         'total_fiado_periodo': total_fiado_periodo,
         'ventas_periodo': ventas_periodo,
         'grafico_datos': grafico_datos,
+        'page_title': 'Reporte de Ventas'
     })
 
 #-----------------------------------------------------------------------------------------------------------------------------------
@@ -349,6 +355,7 @@ def reporte_cuentas_corrientes(request):
         'busqueda': busqueda,
         'total_cuentas': total_cuentas,
         'saldo_total': saldo_total,
+        'page_title': 'Reporte de Cuentas Corrientes'
     }
 
     return render(request, 'reports/reporte_cuentas_corrientes.html', context)
@@ -357,7 +364,10 @@ def reporte_cuentas_corrientes(request):
 
 def cuenta_detalle(request, id):
     cuenta = get_object_or_404(CuentaCorriente, id=id)
-    return render(request, 'reports/cuenta_detalle.html', {'cuenta': cuenta})
+    return render(request, 'reports/cuenta_detalle.html', {
+        'cuenta': cuenta,
+        'page_title': 'Detalle de Cuenta Corriente'
+    })
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -373,7 +383,11 @@ def buscar_cliente(request):
             Q(telefonos__numero__icontains=busqueda)  # Busca en el teléfono relacionado
         ).distinct()  # Distinct para evitar duplicados si un cliente tiene más de un teléfono
 
-    return render(request, 'nombre_del_template.html', {'clientes': clientes, 'busqueda': busqueda})
+    return render(request, 'nombre_del_template.html', {
+        'clientes': clientes,
+        'busqueda': busqueda,
+        'page_title': 'Buscar Clientes'
+    })
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 

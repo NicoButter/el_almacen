@@ -2,43 +2,41 @@
 
 {% load static %}
 
-{% block header_title %}
-    Imprimir QR de Productos
-{% endblock %}
-
 {% block extra_styles %}
-    <link href="{% static 'products/css/imprimir_qr_styles.css' %}" rel="stylesheet">
+    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <h1>Imprimir QR para Productos</h1>
-
-    <form method="POST">
-        {% csrf_token %}
-    
-        <div class="form-group">
-            <label for="producto">Seleccionar Producto:</label>
-            <select name="producto" id="producto" required>
-                {% for producto in productos %}
-                    <option value="{{ producto.id }}">{{ producto.nombre }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    
-        <div class="form-group">
-            <label for="cantidad">Cantidad de QR a Imprimir:</label>
-            <input type="number" name="cantidad" id="cantidad" min="1" max="100" required>
-        </div>
-    
-        <button type="submit" id="btn-generar-qr" class="btn">Generar QR</button>
-
-         <!-- Botón para volver al Dashboard -->
-    <div class="back-button-container">
-    <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-back-dashboard">Volver al Dashboard</a>
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h2>🏷️ Imprimir Códigos QR</h2>
+        <p>Genera códigos QR para tus productos</p>
     </div>
-    </form>
-    
-   
+
+    <div class="action-card">
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="producto" style="font-weight: bold; margin-bottom: 8px; display: block;">Seleccionar Producto:</label>
+                <select name="producto" id="producto" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+                    {% for producto in productos %}
+                        <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label for="cantidad" style="font-weight: bold; margin-bottom: 8px; display: block;">Cantidad de QR a Imprimir:</label>
+                <input type="number" name="cantidad" id="cantidad" min="1" max="100" required style="width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd;">
+            </div>
+
+            <div class="action-buttons">
+                <button type="submit" id="btn-generar-qr" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Generar QR</button>
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-custom">Volver al Dashboard</a>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

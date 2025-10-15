@@ -2,7 +2,10 @@ from django.db import models
 from django.conf import settings
 from products.models import Product
 from accounts.models import Cliente
-from products.models import Product
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.db.models import Manager
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +30,7 @@ class Venta(models.Model):
     es_fiada = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Venta {self.id} - {self.cliente.nombre}"
+        return f"Venta {self.pk} - {self.cliente.nombre}"
 
     def realizar_venta_fiada(self):
         """Método para realizar la venta, agregar el total a la cuenta corriente del cliente y marcar la venta como fiada."""
@@ -49,8 +52,12 @@ class Ticket(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
+    if TYPE_CHECKING:
+        # Type hint for Pylance to recognize the line_items related manager
+        line_items: 'Manager[LineItem]'
+
     def __str__(self):
-        return f'Ticket {self.id} - {self.date}'
+        return f'Ticket {self.pk} - {self.date}'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 

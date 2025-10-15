@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import EmailValidator
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
 
 class CustomUser(AbstractUser):
     is_admin = models.BooleanField(default=False)
@@ -13,15 +17,21 @@ class CustomUser(AbstractUser):
     def get_dashboard_url(self):
         """Return the named URL to redirect the user to after login depending on role."""
         if self.is_admin:
-            return 'admin_dashboard'
+            return 'dashboard:admin_dashboard'
         if self.is_cashier:
-            return 'cashier_dashboard'
+            return 'dashboard:cashier_dashboard'
         # default to user dashboard (clients handled separately)
-        return 'user_dashboard'
+        return 'dashboard:user_dashboard'
 
 class Cliente(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='cliente_profile')
     nombre = models.CharField(max_length=100)
+
+    if TYPE_CHECKING:
+        # Type hint for Pylance to recognize the email property through user relationship
+        @property
+        def email(self) -> str:
+            return self.user.email
 
     def __str__(self):
         return self.nombre

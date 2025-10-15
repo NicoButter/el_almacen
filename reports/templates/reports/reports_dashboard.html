@@ -1,45 +1,53 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard de Reportes{% endblock %}
+{% load static %}
 
-{% block header %}Dashboard de Reportes{% endblock %}
+{% block extra_styles %}
+    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
-    <h2 class="text-center">Reportes Disponibles</h2>
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Reporte de Inventario</h5>
-                        <p class="card-text">Genera un reporte detallado del stock actual.</p>
-                        <a href="{% url 'inventory_report' %}" class="btn btn-primary">Generar Reporte de Inventario</a>
-                    </div>
-                </div>
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h2>📊 Dashboard de Reportes</h2>
+        <p>Genera y consulta reportes detallados de tu negocio</p>
+    </div>
+
+    <!-- Reportes Disponibles -->
+    <div class="actions-grid">
+        <div class="action-card">
+            <h4>📦 Reporte de Inventario</h4>
+            <p>Genera un reporte detallado del stock actual de productos.</p>
+            <div class="action-buttons">
+                <a href="{% url 'inventory_report' %}" class="btn-custom" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">Generar Reporte</a>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Reporte de Ventas</h5>
-                        <p class="card-text">Consulta las ventas por día, semana, mes, año o rango personalizado.</p>
-                        <a href="{% url 'reporte_ventas' %}" class="btn btn-primary">Generar Reporte de Ventas</a>
-                    </div>
-                </div>
+        </div>
+
+        <div class="action-card">
+            <h4>💰 Reporte de Ventas</h4>
+            <p>Consulta las ventas por día, semana, mes, año o rango personalizado.</p>
+            <div class="action-buttons">
+                <a href="{% url 'reporte_ventas' %}" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Generar Reporte</a>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Reporte de Cuentas Corrientes</h5>
-                        <p class="card-text">Consulta las cuentas corrientes.</p>
-                        <a href="{% url 'reporte_cuentas_corrientes' %}" class="btn btn-primary">Generar Reporte de Cuentas Corrientes</a>
-                    </div>
-                </div>
+        </div>
+
+        <div class="action-card">
+            <h4>💳 Reporte de Cuentas Corrientes</h4>
+            <p>Consulta el estado de las cuentas corrientes de clientes.</p>
+            <div class="action-buttons">
+                <a href="{% url 'reporte_cuentas_corrientes' %}" class="btn-custom" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #212529;">Generar Reporte</a>
             </div>
         </div>
     </div>
 
-    <div class="d-flex justify-content-center mt-4">
-    <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-primary mx-2 btn-lg">Volver al Dashboard</a>
+    <!-- Botón para volver al Dashboard -->
+    <div class="action-card" style="margin-top: 30px;">
+        <h4>🏠 Navegación</h4>
+        <div class="action-buttons">
+            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-custom">Volver al Dashboard Admin</a>
+        </div>
     </div>
+</div>
+
 {% endblock %}
 

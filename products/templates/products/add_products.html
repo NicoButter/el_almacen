@@ -1,171 +1,373 @@
 {% extends 'base.html' %}
-
 {% load static %}
-
+{% load humanize %}
 {% load custom_tags %}
 
-{% block header_title %}
-    Agregar Productos
+{% block extra_styles %}
+<link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block extra_styles %}
-    <link href="{% static 'products/css/add_product_styles.css' %}" rel="stylesheet">
-{% endblock %}
+{% block body_class %}dashboard-page{% endblock %}
 
 {% block content %}
-<div class="form-container">
-    <form method="post" enctype="multipart/form-data" class="form" id="product-form">
-        {% csrf_token %}
-        
-        <div class="form-details-container">
-            <!-- Columna izquierda: Nombre, Descripción, Costo, Porcentaje -->
-            <div class="form-column-left">
-                <fieldset class="form-fieldset">
-                    <legend class="form-legend">Detalles del Producto</legend>
-                    
-                    <div class="form-group">
-                        <label for="{{ form.nombre.id_for_label }}" class="form-label">Nombre</label>
-                        {{ form.nombre|add_class:"form-input" }}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.descripcion.id_for_label }}" class="form-label">Descripción</label>
-                        {{ form.descripcion|add_class:"form-input descripcion" }}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.costo.id_for_label }}" class="form-label">Costo</label>
-                        {{ form.costo|add_class:"form-input" }}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="{{ form.porcentaje_ganancia.id_for_label }}" class="form-label">Porcentaje de Ganancia</label>
-                        {{ form.porcentaje_ganancia|add_class:"form-input" }}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="precio_venta" class="form-label">Precio de Venta</label>
-                        <input type="text" id="precio_venta" class="form-input readonly-input" readonly>
-                    </div>
-
-                </fieldset>
+<div class="dashboard-fullwidth-container">
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar glass-custom">
+            <div class="sidebar-header">
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="El Almacén" class="sidebar-logo">
+                <div class="sidebar-business">
+                    <span class="business-name">El Almacén</span>
+                    <span class="business-tagline">Panel administrativo</span>
+                </div>
             </div>
-
-            <!-- Columna derecha: Resto de los campos (Stock, Categoría, Opciones adicionales, Imagen) -->
-            <div class="form-column-right">
-                <fieldset class="form-fieldset">
-                    <legend class="form-legend">Opciones adicionales</legend>
-                    <div class="form-group">
-                        <label for="{{ form.se_vende_fraccionado.id_for_label }}" class="form-label">¿El producto se vende fraccionado?</label>
-                        {{ form.se_vende_fraccionado|add_class:"custom-checkbox" }}
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'admin_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                <a href="{% url 'listar_productos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_productos' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_productos' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Productos</span>
+                </a>
+                <a href="{% url 'add_products' %}" class="sidebar-link{% if request.resolver_match.url_name == 'add_products' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'add_products' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Agregar Producto</span>
+                </a>
+                <a href="{% url 'listar_categorias' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 3 9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 13-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 17-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Categorías</span>
+                </a>
+                <a href="{% url 'listar_clientes' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Clientes</span>
+                </a>
+                <a href="{% url 'sales:new_sale' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Nueva Venta</span>
+                </a>
+                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Tickets</span>
+                </a>
+                <a href="{% url 'reports_dashboard' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Reportes</span>
+                </a>
+                <a href="{% url 'gestion_cuentas_corrientes' %}" class="sidebar-link">
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Cuentas Corrientes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-user">Sesión: {{ request.user.username }}</span>
+                <span class="sidebar-role">{% if request.user.is_admin %}Administrador{% else %}Usuario{% endif %}</span>
+            </div>
+        </aside>
+        <div class="dashboard-main-column">
+            <section class="metrics-top">
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon purple-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
                     </div>
-                </fieldset>
-
-                {% comment %} <fieldset class="form-fieldset">
-                    <legend class="form-legend">Cantidad de Stock</legend>
-                    <div class="form-group">
-                        <label for="{{ form.cantidad_stock.id_for_label }}" class="form-label">Cantidad de Stock</label>
-                        {{ form.cantidad_stock|add_class:"form-input" }}
+                    <div class="metric-content">
+                        <div class="metric-value">{{ categorias|length }}</div>
+                        <div class="metric-label">Categorías Disponibles</div>
+                        <div class="metric-change neutral">
+                            <span>Para clasificar productos</span>
+                        </div>
                     </div>
-                </fieldset> {% endcomment %}
-
-                <fieldset class="form-fieldset">
-                    <legend class="form-legend">Cantidad de Stock</legend>
-                    <div class="form-group">
-                        <label for="{{ form.cantidad_stock.id_for_label }}" class="form-label" id="stock-label">Cantidad de Stock (unidades)</label>
-                        {{ form.cantidad_stock|add_class:"form-input" }}
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon cyan-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="15.5" r="0.8" fill="currentColor"/>
+                        </svg>
                     </div>
-                </fieldset>
-
-                <fieldset class="form-fieldset">
-                    <legend class="form-legend">Categoría</legend>
-                    <div class="form-group">
-                        <label for="{{ form.categoria.id_for_label }}" class="font-weight-bold">Categoría</label>
-                        {{ form.categoria|add_class:"form-control" }}
-                        {% if form.categoria.errors %}
-                            <div class="text-danger">{{ form.categoria.errors|striptags }}</div>
-                        {% endif %}
-                        <a href="{% url 'add_category' %}" class="btn btn-link mt-2">Nueva Categoría</a> <!-- Botón para crear categoría -->
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_stock|floatformat:0|intcomma }}</div>
+                        <div class="metric-label">Stock Total Actual</div>
+                        <div class="metric-change neutral">
+                            <span>{{ low_stock_count }}</span> productos con stock bajo
+                        </div>
                     </div>
-                </fieldset>
-
-                <fieldset class="form-fieldset">
-                    <legend class="form-legend">Imagen del Producto</legend>
-                    <div class="form-group">
-                        <label for="{{ form.imagen.id_for_label }}" class="form-label">Subir Imagen</label>
-                        {{ form.imagen|add_class:"form-file-input" }}
-                        {% if form.imagen.errors %}
-                            <div class="form-error">{{ form.imagen.errors|striptags }}</div>
-                        {% endif %}
-                        {% if form.imagen.help_text %}
-                            <small class="form-help-text">{{ form.imagen.help_text }}</small>
-                        {% endif %}
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon blue-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
                     </div>
-                </fieldset>
+                    <div class="metric-content">
+                        <div class="metric-value">Nuevo</div>
+                        <div class="metric-label">Producto en Creación</div>
+                        <div class="metric-change neutral">
+                            <span>Complete el formulario</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon yellow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">${{ total_value|floatformat:2 }}</div>
+                        <div class="metric-label">Valor Total Inventario</div>
+                        <div class="metric-change neutral">
+                            <span>Basado en precio de venta</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="dashboard-content-wrapper">
+                <section class="activity-panel glass-custom">
+                    <h3>Agregar Nuevo Producto
+                        <span class="section-subtitle">Registra un nuevo producto en tu inventario</span>
+                    </h3>
+                    <div class="activity-feed">
+                        <form method="post" enctype="multipart/form-data" class="product-form" id="product-form" style="padding: 1rem;">
+                            {% csrf_token %}
+
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                                <!-- Columna izquierda: Detalles básicos -->
+                                <div class="form-section">
+                                    <h4 style="color: var(--foreground); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.5"/>
+                                        </svg>
+                                        Detalles del Producto
+                                    </h4>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label for="{{ form.nombre.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Nombre del Producto</label>
+                                        {{ form.nombre|add_class:"form-input" }}
+                                        {% if form.nombre.errors %}
+                                            <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.nombre.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label for="{{ form.descripcion.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Descripción</label>
+                                        {{ form.descripcion|add_class:"form-input descripcion" }}
+                                        {% if form.descripcion.errors %}
+                                            <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.descripcion.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                                        <div class="form-group">
+                                            <label for="{{ form.costo.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Costo</label>
+                                            {{ form.costo|add_class:"form-input" }}
+                                            {% if form.costo.errors %}
+                                                <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.costo.errors|striptags }}</div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="{{ form.porcentaje_ganancia.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">% Ganancia</label>
+                                            {{ form.porcentaje_ganancia|add_class:"form-input" }}
+                                            {% if form.porcentaje_ganancia.errors %}
+                                                <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.porcentaje_ganancia.errors|striptags }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label for="precio_venta" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Precio de Venta (Calculado)</label>
+                                        <input type="text" id="precio_venta" class="form-input readonly-input" readonly style="background: rgba(255,255,255,0.05); cursor: not-allowed;">
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: Configuración adicional -->
+                                <div class="form-section">
+                                    <h4 style="color: var(--foreground); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        </svg>
+                                        Configuración
+                                    </h4>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label for="{{ form.categoria.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Categoría</label>
+                                        {{ form.categoria|add_class:"form-control" }}
+                                        {% if form.categoria.errors %}
+                                            <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.categoria.errors|striptags }}</div>
+                                        {% endif %}
+                                        <a href="{% url 'add_category' %}" class="btn-link" style="display: inline-block; margin-top: 0.5rem; color: var(--app-accent); text-decoration: none; font-size: 0.875rem;">+ Crear nueva categoría</a>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label for="{{ form.cantidad_stock.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;" id="stock-label">Cantidad de Stock (unidades)</label>
+                                        {{ form.cantidad_stock|add_class:"form-input" }}
+                                        {% if form.cantidad_stock.errors %}
+                                            <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.cantidad_stock.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label class="checkbox-label" style="display: flex; align-items: center; gap: 0.5rem; color: var(--foreground); font-weight: 500; cursor: pointer;">
+                                            {{ form.se_vende_fraccionado|add_class:"custom-checkbox" }}
+                                            <span>¿El producto se vende fraccionado?</span>
+                                        </label>
+                                        {% if form.se_vende_fraccionado.errors %}
+                                            <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.se_vende_fraccionado.errors|striptags }}</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                        <label for="{{ form.imagen.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Imagen del Producto</label>
+                                        {{ form.imagen|add_class:"form-file-input" }}
+                                        {% if form.imagen.errors %}
+                                            <div class="form-error" style="color: #ef4444; font-size: 0.875rem; margin-top: 0.25rem;">{{ form.imagen.errors|striptags }}</div>
+                                        {% endif %}
+                                        {% if form.imagen.help_text %}
+                                            <small class="form-help-text" style="color: var(--foreground-muted); font-size: 0.75rem;">{{ form.imagen.help_text }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de acción -->
+                            <div class="form-actions" style="display: flex; gap: 1rem; justify-content: center; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                <button type="submit" class="btn-custom" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; padding: 0.75rem 2rem; border-radius: 0.5rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline; margin-right: 0.5rem;">
+                                        <path d="M12 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                    Agregar Producto
+                                </button>
+                                <a href="{% url 'listar_productos' %}" class="btn-custom" style="background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); border: none; padding: 0.75rem 2rem; border-radius: 0.5rem; color: white; font-weight: 600; text-decoration: none; transition: all 0.2s ease;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline; margin-right: 0.5rem;">
+                                        <path d="M19 12H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                    Volver al Listado
+                                </a>
+                                <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-custom" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; padding: 0.75rem 2rem; border-radius: 0.5rem; color: white; font-weight: 600; text-decoration: none; transition: all 0.2s ease;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline; margin-right: 0.5rem;">
+                                        <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                                        <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                                        <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                                        <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                                    </svg>
+                                    Ir al Dashboard
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </section>
             </div>
         </div>
-
-        <!-- Botones -->
-        <div class="form-buttons">
-            <button type="submit" class="form-btn form-btn-success">Agregar Producto</button>
-            <a href="{% url 'listar_productos' %}" class="form-btn form-btn-secondary">Volver al listado</a>
-            <a href="{% url 'dashboard:admin_dashboard' %}" class="form-btn form-btn-primary">Volver al Dashboard</a>
-        </div>
-    </form>
+    </div>
 </div>
 
-<!-- Scripts para el precio de venta y previsualización de imagen -->
+{% endblock %}
+
+{% block extra_scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const costoInput = document.getElementById('{{ form.costo.id_for_label }}');
-        const porcentajeInput = document.getElementById('{{ form.porcentaje_ganancia.id_for_label }}');
-        const precioVentaField = document.getElementById('precio_venta');
+document.addEventListener('DOMContentLoaded', function() {
+    const costoInput = document.getElementById('{{ form.costo.id_for_label }}');
+    const porcentajeInput = document.getElementById('{{ form.porcentaje_ganancia.id_for_label }}');
+    const precioVentaField = document.getElementById('precio_venta');
 
-        function calcularPrecioVenta() {
-            const costo = parseFloat(costoInput.value) || 0; // Si está vacío, toma 0
-            const porcentaje = parseFloat(porcentajeInput.value) || 0; // Si está vacío, toma 0
-            const precioVenta = costo * (1 + (porcentaje / 100));
-            precioVentaField.value = precioVenta.toFixed(2); // Formato a 2 decimales
-        }
+    function calcularPrecioVenta() {
+        const costo = parseFloat(costoInput.value) || 0;
+        const porcentaje = parseFloat(porcentajeInput.value) || 0;
+        const precioVenta = costo * (1 + (porcentaje / 100));
+        precioVentaField.value = precioVenta.toFixed(2);
+    }
 
-        // Listeners para cambios en los campos de costo y porcentaje
+    if (costoInput && porcentajeInput && precioVentaField) {
         costoInput.addEventListener('input', calcularPrecioVenta);
         porcentajeInput.addEventListener('input', calcularPrecioVenta);
-    });
-</script>
+        calcularPrecioVenta(); // Calcular inicialmente
+    }
 
-<script>
-    document.getElementById("imagen").onchange = function (event) {
-        const [file] = event.target.files;
-        if (file) {
-            const preview = document.getElementById("preview");
-            preview.src = URL.createObjectURL(file);
-            preview.style.display = "block";
-        }
-    };
-</script>
+    // Manejar el cambio de fraccionado
+    const seVendeFraccionadoCheckbox = document.getElementById('{{ form.se_vende_fraccionado.id_for_label }}');
+    const stockLabel = document.getElementById('stock-label');
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const seVendeFraccionadoCheckbox = document.getElementById('{{ form.se_vende_fraccionado.id_for_label }}');
-        const cantidadStockInput = document.getElementById('{{ form.cantidad_stock.id_for_label }}');
-        const stockLabel = document.getElementById('stock-label');
-
-        // Función para cambiar la etiqueta y el tipo de cantidad según si se vende fraccionado
+    if (seVendeFraccionadoCheckbox && stockLabel) {
         function actualizarCantidadStock() {
             if (seVendeFraccionadoCheckbox.checked) {
                 stockLabel.textContent = "Cantidad de Stock (kg)";
             } else {
-                stockLabel.textContent = "Cantidad de Stock (unidad)";
+                stockLabel.textContent = "Cantidad de Stock (unidades)";
             }
         }
 
-        // Inicializa el estado al cargar
         actualizarCantidadStock();
-
-        // Cambia cuando se marca o desmarca el checkbox
         seVendeFraccionadoCheckbox.addEventListener('change', actualizarCantidadStock);
-    });
-</script>
+    }
 
+    // Preview de imagen
+    const imagenInput = document.getElementById('{{ form.imagen.id_for_label }}');
+    if (imagenInput) {
+        imagenInput.addEventListener('change', function(event) {
+            const [file] = event.target.files;
+            if (file) {
+                // Aquí podrías agregar preview de imagen si lo deseas
+                console.log('Imagen seleccionada:', file.name);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

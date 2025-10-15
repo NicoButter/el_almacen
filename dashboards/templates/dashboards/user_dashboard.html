@@ -1,9 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard Usuario{% endblock %}
+{% load static %}
 
-{% block header %}Dashboard Usuario{% endblock %}
+{% block extra_styles %}
+    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
-    <p>Aquí puedes ver tus datos y realizar otras acciones permitidas.</p>
+<div class="dashboard-container">
+    <div class="welcome-section">
+        <h2>👤 Panel de Usuario</h2>
+        <p>Bienvenido a tu panel personal - aquí puedes acceder a tus funciones disponibles</p>
+    </div>
+
+    <!-- Acciones disponibles para usuarios -->
+    <div class="actions-grid">
+        <div class="action-card">
+            <h4>📦 Ver Productos</h4>
+            <p>Consulta el catálogo de productos disponibles.</p>
+            <div class="action-buttons">
+                <a href="{% url 'listar_productos' %}" class="btn-custom" style="background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">Ver Productos</a>
+            </div>
+        </div>
+
+        <div class="action-card">
+            <h4>📋 Mi Perfil</h4>
+            <p>Accede a tu información personal y preferencias.</p>
+            <div class="action-buttons">
+                <a href="#" class="btn-custom" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">Ver Perfil</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="action-card" style="margin-top: 30px;">
+        <h4>ℹ️ Información</h4>
+        <p>Si necesitas acceso a funciones adicionales, contacta con un administrador del sistema.</p>
+    </div>
+</div>
+
 {% endblock %}
