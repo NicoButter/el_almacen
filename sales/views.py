@@ -26,6 +26,24 @@ logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------------------------------------------
 
+@login_required
+def sales_dashboard(request):
+    """
+    Redirige al usuario a la vista apropiada según su rol:
+    - Admin: Dashboard de ventas con estadísticas (ticket_list)
+    - Cajero: Formulario de nueva venta (new_sale)
+    """
+    user = request.user
+    
+    # Si es admin, mostrar estadísticas de ventas
+    if hasattr(user, 'is_admin') and user.is_admin:
+        return ticket_list(request)
+    
+    # Si es cajero o cualquier otro rol, mostrar formulario de venta
+    return new_sale(request)
+
+# ---------------------------------------------------------------------------------------------------------------
+
 def parse_decimal(value):
     # Elimina cualquier separador de miles (por ejemplo, coma)
     value = value.replace('.', '')  # Quitar los puntos de los miles

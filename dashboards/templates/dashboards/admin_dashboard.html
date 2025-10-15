@@ -177,7 +177,7 @@
                     <section class="quick-actions-section glass-custom">
                         <h3>Acciones Rápidas</h3>
                         <div class="quick-actions-grid">
-                            <a href="{% url 'sales:new_sale' %}" class="action-card glass-custom">
+                            <a href="{% url 'sales:sales_dashboard' %}" class="action-card glass-custom">
                                 <div class="action-icon cyan-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -187,32 +187,33 @@
                                     </svg>
                                 </div>
                                 <div class="action-content">
-                                    <div class="action-title">Nueva Venta</div>
-                                    <div class="action-desc">Registrar venta rápida</div>
+                                    <div class="action-title">Ventas</div>
+                                    <div class="action-desc">Ver estadísticas de ventas</div>
                                 </div>
                             </a>
-                            <a href="{% url 'add_products' %}" class="action-card glass-custom">
+                            <a href="{% url 'sales:ticket_list' %}" class="action-card glass-custom">
                                 <div class="action-icon purple-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M12 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                                        <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                                        <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                                        <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                                        <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
                                     </svg>
                                 </div>
                                 <div class="action-content">
-                                    <div class="action-title">Agregar Producto</div>
-                                    <div class="action-desc">Nuevo producto al inventario</div>
+                                    <div class="action-title">Ver Tickets</div>
+                                    <div class="action-desc">Historial de ventas</div>
                                 </div>
                             </a>
-                            <a href="{% url 'listar_clientes' %}" class="action-card glass-custom">
+                            <a href="{% url 'gestion_cuentas_corrientes' %}" class="action-card glass-custom">
                                 <div class="action-icon blue-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
-                                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                                        <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                                        <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </div>
                                 <div class="action-content">
-                                    <div class="action-title">Gestionar Clientes</div>
-                                    <div class="action-desc">Ver y editar clientes</div>
+                                    <div class="action-title">Cuentas Corrientes</div>
+                                    <div class="action-desc">Gestionar cuentas</div>
                                 </div>
                             </a>
                             <a href="{% url 'reports_dashboard' %}" class="action-card glass-custom">
@@ -224,7 +225,7 @@
                                 </div>
                                 <div class="action-content">
                                     <div class="action-title">Ver Reportes</div>
-                                    <div class="action-desc">Análisis detallado de ventas</div>
+                                    <div class="action-desc">Análisis de ventas</div>
                                 </div>
                             </a>
                         </div>

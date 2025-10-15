@@ -22,10 +22,17 @@ from datetime import datetime
 
 def listar_productos(request):
     categoria_id = request.GET.get('categoria')
+    search_query = request.GET.get('search', '').strip()
+
+    # Filtrar productos por categoría
     if categoria_id:
-        productos = Product.objects.filter(categoria_id=categoria_id)
+        productos = Product.objects.filter(categoria_id=categoria_id).order_by('nombre')
     else:
-        productos = Product.objects.all()
+        productos = Product.objects.all().order_by('nombre')
+
+    # Filtrar productos por búsqueda de nombre
+    if search_query:
+        productos = productos.filter(nombre__icontains=search_query)
 
     categorias = Categoria.objects.all()  # Obtener todas las categorías
 
@@ -67,6 +74,7 @@ def listar_productos(request):
         'total_value': total_value,
         'category_data': category_data,
         'stock_data': stock_data,
+        'search_query': search_query,  # Pasar el término de búsqueda al template
     })
 
 # -----------------------------------------------------------------------------------------------------------------

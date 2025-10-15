@@ -79,10 +79,9 @@ def admin_dashboard(request):
         links = [
             {'label': 'Dashboard', 'url': reverse('dashboard:admin_dashboard'), 'icon': 'grid'},
             {'label': 'Productos', 'url': reverse('list_products'), 'icon': 'package'},
-            {'label': 'Agregar Producto', 'url': reverse('add_products'), 'icon': 'plus'},
             {'label': 'Categorías', 'url': reverse('listar_categorias'), 'icon': 'layers'},
             {'label': 'Clientes', 'url': reverse('listar_clientes'), 'icon': 'users'},
-            {'label': 'Nueva Venta', 'url': reverse('sales:new_sale'), 'icon': 'cart'},
+            {'label': 'Ventas', 'url': reverse('sales:sales_dashboard'), 'icon': 'cart'},
             {'label': 'Tickets', 'url': reverse('sales:ticket_list'), 'icon': 'receipt'},
             {'label': 'Reportes', 'url': reverse('reports_dashboard'), 'icon': 'chart'},
             {'label': 'Cuentas Corrientes', 'url': reverse('gestion_cuentas_corrientes'), 'icon': 'wallet'},

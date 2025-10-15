@@ -40,6 +40,16 @@
                     </span>
                     <span class="sidebar-label">Productos</span>
                 </a>
+                <a href="{% url 'listar_categorias' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_categorias' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_categorias' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 3 9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 13-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 17-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Categorías</span>
+                </a>
                 <a href="{% url 'listar_clientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_clientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_clientes' %}aria-current="page"{% endif %}>
                     <span class="sidebar-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,24 +59,44 @@
                     </span>
                     <span class="sidebar-label">Clientes</span>
                 </a>
-                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link{% if request.resolver_match.url_name == 'ticket_list' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'ticket_list' %}aria-current="page"{% endif %}>
+                <a href="{% url 'sales:sales_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'sales_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'sales_dashboard' %}aria-current="page"{% endif %}>
                     <span class="sidebar-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="1.5"/>
-                            <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="1.5"/>
-                            <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </span>
                     <span class="sidebar-label">Ventas</span>
                 </a>
+                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link{% if request.resolver_match.url_name == 'ticket_list' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'ticket_list' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Tickets</span>
+                </a>
                 <a href="{% url 'reports_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'reports_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'reports_dashboard' %}aria-current="page"{% endif %}>
                     <span class="sidebar-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 19v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </span>
                     <span class="sidebar-label">Reportes</span>
+                </a>
+                <a href="{% url 'gestion_cuentas_corrientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'gestion_cuentas_corrientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'gestion_cuentas_corrientes' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Cuentas Corrientes</span>
                 </a>
             </nav>
         </aside>

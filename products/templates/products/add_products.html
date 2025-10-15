@@ -5,6 +5,163 @@
 
 {% block extra_styles %}
 <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+<style>
+/* Estilos para formularios con glass morphism */
+.form-input, .form-control, .form-file-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    color: var(--foreground);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    line-height: 1.5;
+}
+
+.form-input:focus, .form-control:focus, .form-file-input:focus {
+    outline: none;
+    border-color: var(--app-accent);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder, .form-control::placeholder {
+    color: var(--foreground-muted);
+    opacity: 0.7;
+}
+
+.form-input.readonly-input {
+    background: rgba(255, 255, 255, 0.05);
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+.custom-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--app-accent);
+    cursor: pointer;
+}
+
+.checkbox-label {
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label:hover {
+    color: var(--app-accent);
+}
+
+/* Estilos para el contenedor del formulario */
+.activity-panel {
+    min-height: 90vh;
+    max-height: none;
+    overflow-y: visible;
+    padding: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.form-section {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    margin-top: 3rem;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 3rem 2rem;
+    border-radius: 0 0 0.75rem 0.75rem;
+    backdrop-filter: blur(10px);
+}
+
+.btn-custom {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 3rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    min-width: 180px;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-custom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-custom:hover::before {
+    left: 100%;
+}
+
+.btn-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.btn-custom:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-link {
+    color: var(--app-accent);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s ease;
+}
+
+.btn-link:hover {
+    color: var(--app-accent-hover);
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-custom {
+        width: 100%;
+    }
+}
+</style>
 {% endblock %}
 
 {% block body_class %}dashboard-page{% endblock %}
@@ -41,15 +198,6 @@
                     </span>
                     <span class="sidebar-label">Productos</span>
                 </a>
-                <a href="{% url 'add_products' %}" class="sidebar-link{% if request.resolver_match.url_name == 'add_products' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'add_products' %}aria-current="page"{% endif %}>
-                    <span class="sidebar-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4v16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                            <path d="M4 12h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                        </svg>
-                    </span>
-                    <span class="sidebar-label">Agregar Producto</span>
-                </a>
                 <a href="{% url 'listar_categorias' %}" class="sidebar-link">
                     <span class="sidebar-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -69,15 +217,16 @@
                     </span>
                     <span class="sidebar-label">Clientes</span>
                 </a>
-                <a href="{% url 'sales:new_sale' %}" class="sidebar-link">
+                <a href="{% url 'sales:sales_dashboard' %}" class="sidebar-link">
                     <span class="sidebar-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                             <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
                             <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </span>
-                    <span class="sidebar-label">Nueva Venta</span>
+                    <span class="sidebar-label">Ventas</span>
                 </a>
                 <a href="{% url 'sales:ticket_list' %}" class="sidebar-link">
                     <span class="sidebar-icon">
@@ -182,10 +331,10 @@
                         <span class="section-subtitle">Registra un nuevo producto en tu inventario</span>
                     </h3>
                     <div class="activity-feed">
-                        <form method="post" enctype="multipart/form-data" class="product-form" id="product-form" style="padding: 1rem;">
+                        <form method="post" enctype="multipart/form-data" class="product-form" id="product-form" style="padding: 2rem;">
                             {% csrf_token %}
 
-                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
                                 <!-- Columna izquierda: Detalles básicos -->
                                 <div class="form-section">
                                     <h4 style="color: var(--foreground); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -203,7 +352,7 @@
                                         {% endif %}
                                     </div>
 
-                                    <div class="form-group" style="margin-bottom: 1rem;">
+                                    <div class="form-group" style="margin-bottom: 1.5rem;">
                                         <label for="{{ form.descripcion.id_for_label }}" class="form-label" style="display: block; margin-bottom: 0.5rem; color: var(--foreground); font-weight: 500;">Descripción</label>
                                         {{ form.descripcion|add_class:"form-input descripcion" }}
                                         {% if form.descripcion.errors %}
