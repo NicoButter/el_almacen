@@ -2,52 +2,209 @@
 
 {% load static %}
 
+{% load humanize %}
+
 {% block extra_styles %}
     <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+    <link href="{% static 'reports/css/reports_dashboard_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block body_class %}dashboard-page{% endblock %}
+
 {% block content %}
-<div class="dashboard-container">
-    <div class="welcome-section">
-        <h2>📊 Dashboard de Reportes</h2>
-        <p>Genera y consulta reportes detallados de tu negocio</p>
-    </div>
-
-    <!-- Reportes Disponibles -->
-    <div class="actions-grid">
-        <div class="action-card">
-            <h4>📦 Reporte de Inventario</h4>
-            <p>Genera un reporte detallado del stock actual de productos.</p>
-            <div class="action-buttons">
-                <a href="{% url 'inventory_report' %}" class="btn-custom" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">Generar Reporte</a>
+<div class="dashboard-fullwidth-container">
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar glass-custom">
+            <div class="sidebar-header">
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="El Almacén" class="sidebar-logo">
+                <div class="sidebar-business">
+                    <span class="business-name">El Almacén</span>
+                    <span class="business-tagline">Panel administrativo</span>
+                </div>
             </div>
-        </div>
-
-        <div class="action-card">
-            <h4>💰 Reporte de Ventas</h4>
-            <p>Consulta las ventas por día, semana, mes, año o rango personalizado.</p>
-            <div class="action-buttons">
-                <a href="{% url 'reporte_ventas' %}" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Generar Reporte</a>
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'admin_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                <a href="{% url 'listar_productos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_productos' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_productos' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Productos</span>
+                </a>
+                <a href="{% url 'listar_categorias' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_categorias' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_categorias' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 3 9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 13-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 17-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Categorías</span>
+                </a>
+                <a href="{% url 'listar_clientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_clientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_clientes' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Clientes</span>
+                </a>
+                <a href="{% url 'sales:sales_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'sales_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'sales_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Ventas</span>
+                </a>
+                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link{% if request.resolver_match.url_name == 'ticket_list' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'ticket_list' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Tickets</span>
+                </a>
+                <a href="{% url 'reports_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'reports_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'reports_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Reportes</span>
+                </a>
+                <a href="{% url 'gestion_cuentas_corrientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'gestion_cuentas_corrientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'gestion_cuentas_corrientes' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Cuentas Corrientes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-user">Sesión: {{ request.user.username }}</span>
+                <span class="sidebar-role">{% if request.user.is_admin %}Administrador{% else %}Usuario{% endif %}</span>
             </div>
-        </div>
+        </aside>
+        <div class="dashboard-main-column">
+            <section class="metrics-top">
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon purple-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_reportes|intcomma }}</div>
+                        <div class="metric-label">Reportes Generados</div>
+                        <div class="metric-change neutral">
+                            <span>{{ reportes_hoy|intcomma }}</span> generados hoy
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon cyan-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="15.5" r="0.8" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_ventas_reportadas|floatformat:2 }}</div>
+                        <div class="metric-label">Ventas Reportadas</div>
+                        <div class="metric-change neutral">
+                            <span>En los últimos 30 días</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon blue-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ clientes_con_cuentas|intcomma }}</div>
+                        <div class="metric-label">Clientes con Cuentas</div>
+                        <div class="metric-change neutral">
+                            <span>{{ total_saldo_pendiente|floatformat:2 }}</span> saldo pendiente total
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon yellow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ productos_bajo_stock|intcomma }}</div>
+                        <div class="metric-label">Productos Bajo Stock</div>
+                        <div class="metric-change negative">
+                            Requieren atención inmediata
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="dashboard-content-wrapper">
+                <section class="activity-panel glass-custom">
+                    <h3>📊 Dashboard de Reportes</h3>
+                    <p>Genera y consulta reportes detallados de tu negocio</p>
 
-        <div class="action-card">
-            <h4>💳 Reporte de Cuentas Corrientes</h4>
-            <p>Consulta el estado de las cuentas corrientes de clientes.</p>
-            <div class="action-buttons">
-                <a href="{% url 'reporte_cuentas_corrientes' %}" class="btn-custom" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #212529;">Generar Reporte</a>
+                    <!-- Reportes Disponibles -->
+                    <div class="actions-grid">
+                        <div class="action-card">
+                            <h4>📦 Reporte de Inventario</h4>
+                            <p>Genera un reporte detallado del stock actual de productos.</p>
+                            <div class="action-buttons">
+                                <a href="{% url 'inventory_report' %}" class="btn-custom btn-info">Generar Reporte</a>
+                            </div>
+                        </div>
+
+                        <div class="action-card">
+                            <h4>💰 Reporte de Ventas</h4>
+                            <p>Consulta las ventas por día, semana, mes, año o rango personalizado.</p>
+                            <div class="action-buttons">
+                                <a href="{% url 'reporte_ventas' %}" class="btn-custom btn-success">Generar Reporte</a>
+                            </div>
+                        </div>
+
+                        <div class="action-card">
+                            <h4>💳 Reporte de Cuentas Corrientes</h4>
+                            <p>Consulta el estado de las cuentas corrientes de clientes.</p>
+                            <div class="action-buttons">
+                                <a href="{% url 'reporte_cuentas_corrientes' %}" class="btn-custom btn-warning">Generar Reporte</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
-    </div>
-
-    <!-- Botón para volver al Dashboard -->
-    <div class="action-card" style="margin-top: 30px;">
-        <h4>🏠 Navegación</h4>
-        <div class="action-buttons">
-            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-custom">Volver al Dashboard Admin</a>
         </div>
     </div>
 </div>
-
 {% endblock %}
 

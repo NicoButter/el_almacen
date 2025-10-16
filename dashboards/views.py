@@ -75,26 +75,11 @@ def admin_dashboard(request):
         'data': [float(entry['total_revenue'] or 0) for entry in top_products_queryset],
     }
 
-    def build_sidebar_links(req):
-        links = [
-            {'label': 'Dashboard', 'url': reverse('dashboard:admin_dashboard'), 'icon': 'grid'},
-            {'label': 'Productos', 'url': reverse('list_products'), 'icon': 'package'},
-            {'label': 'Categorías', 'url': reverse('listar_categorias'), 'icon': 'layers'},
-            {'label': 'Clientes', 'url': reverse('listar_clientes'), 'icon': 'users'},
-            {'label': 'Ventas', 'url': reverse('sales:sales_dashboard'), 'icon': 'cart'},
-            {'label': 'Tickets', 'url': reverse('sales:ticket_list'), 'icon': 'receipt'},
-            {'label': 'Reportes', 'url': reverse('reports_dashboard'), 'icon': 'chart'},
-            {'label': 'Cuentas Corrientes', 'url': reverse('gestion_cuentas_corrientes'), 'icon': 'wallet'},
-        ]
-        current_path = req.path
-        for link in links:
-            link['active'] = current_path.startswith(link['url'])
-        return links
-
+    # Contexto específico del admin dashboard
+    # Nota: business_name y sidebar_links se añaden automáticamente
+    # por el context processor en el_almacen.context_processors.sidebar_context
     context = {
         'page_title': 'Dashboard Administrador',
-        'business_name': 'El Almacén',
-        'sidebar_links': build_sidebar_links(request),
         'total_products': total_products,
         'total_stock_amount': total_stock_amount,
         'total_clients': total_clients,

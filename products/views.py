@@ -63,6 +63,9 @@ def listar_productos(request):
         'data': [prod.cantidad_stock for prod in top_stock_products]
     }
 
+    # Contexto específico de la vista de productos
+    # Nota: business_name y sidebar_links se añaden automáticamente
+    # por el context processor en el_almacen.context_processors.sidebar_context
     return render(request, 'products/list_products.html', {
         'page_title': 'Productos',
         'productos': page_obj,  # Pasar el objeto de página al template
@@ -192,26 +195,47 @@ def crear_categoria(request):
 # -----------------------------------------------------------------------------------------------------------------
 
 # Vista para listar categorías
+from django.db.models import Sum, Count, F
+
+# ...
+
+# Vista para listar categorías
 def listar_categorias(request):
-    categorias = Categoria.objects.all()  # Obtener todas las categorías
+    # Obtener todas las categorías con cálculos agregados
+    categorias = Categoria.objects.annotate(
+        product_count=Count('productos'),
+        total_stock=Sum('productos__cantidad_stock'),
+        total_value=Sum(F('productos__precio_venta') * F('productos__cantidad_stock'))
+    ).order_by('nombre')
+
+    # Crear lista de categorías con valores calculados
+    categorias_con_valores = []
+    for categoria in categorias:
+        categorias_con_valores.append({
+            'categoria': categoria,
+            'total_value': categoria.total_value or 0  # type: ignore
+        })
 
     # Calcular métricas para el dashboard
     total_categorias = categorias.count()
-    categorias_con_productos = categorias.annotate(product_count=Count('productos')).filter(product_count__gt=0).count()
+    categorias_con_productos = categorias.filter(product_count__gt=0).count()
     categorias_vacias = total_categorias - categorias_con_productos
     total_stock = Product.objects.aggregate(total=Sum('cantidad_stock'))['total'] or 0
     total_value = sum(producto.precio_venta * producto.cantidad_stock for producto in Product.objects.all())
 
     # Datos para gráfico de categorías con productos
-    category_counts = categorias.annotate(product_count=Count('productos')).values('nombre', 'product_count')
+    category_counts = categorias.values('nombre', 'product_count')
     category_data = {
         'labels': [cat['nombre'] for cat in category_counts],
         'data': [cat['product_count'] for cat in category_counts]
     }
 
+    # Contexto específico de la vista de categorías
+    # Nota: business_name y sidebar_links se añaden automáticamente
+    # por el context processor en el_almacen.context_processors.sidebar_context
     return render(request, 'products/list_category.html', {
         'page_title': 'Categorías',
-        'categorias': categorias,
+        'categorias_con_valores': categorias_con_valores,
         'total_categorias': total_categorias,
         'categorias_con_productos': categorias_con_productos,
         'categorias_vacias': categorias_vacias,

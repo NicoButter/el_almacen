@@ -1,70 +1,233 @@
 {% extends 'base.html' %}
-
 {% load static %}
+{% load humanize %}
 
 {% block extra_styles %}
-    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+<link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+<link href="{% static 'cuentas_corrientes/css/gestion_cuentas_styles.css' %}" rel="stylesheet">
 {% endblock %}
 
+{% block body_class %}dashboard-page{% endblock %}
+
 {% block content %}
-<div class="dashboard-container">
-    <div class="welcome-section">
-        <h2>💳 Gestión de Cuentas Corrientes</h2>
-        <p>Administra las cuentas corrientes de tus clientes</p>
-    </div>
+<div class="dashboard-fullwidth-container">
+    <div class="dashboard-shell">
+        <aside class="dashboard-sidebar glass-custom">
+            <div class="sidebar-header">
+                <img src="{% static 'images/el_almacen_logo.png' %}" alt="El Almacén" class="sidebar-logo">
+                <div class="sidebar-business">
+                    <span class="business-name">El Almacén</span>
+                    <span class="business-tagline">Panel administrativo</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'admin_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Dashboard</span>
+                </a>
+                <a href="{% url 'listar_productos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_productos' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_productos' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Productos</span>
+                </a>
+                <a href="{% url 'listar_categorias' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_categorias' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_categorias' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="m12 3 9 5-9 5-9-5 9-5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 13-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="m21 17-9 5-9-5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Categorías</span>
+                </a>
+                <a href="{% url 'listar_clientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_clientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_clientes' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Clientes</span>
+                </a>
+                <a href="{% url 'sales:sales_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'sales_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'sales_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.4"/>
+                            <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Ventas</span>
+                </a>
+                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link{% if request.resolver_match.url_name == 'ticket_list' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'ticket_list' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                            <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Tickets</span>
+                </a>
+                <a href="{% url 'reports_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'reports_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'reports_dashboard' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Reportes</span>
+                </a>
+                <a href="{% url 'gestion_cuentas_corrientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'gestion_cuentas_corrientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'gestion_cuentas_corrientes' %}aria-current="page"{% endif %}>
+                    <span class="sidebar-icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="sidebar-label">Cuentas Corrientes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="sidebar-user">Sesión: {{ request.user.username }}</span>
+                <span class="sidebar-role">{% if request.user.is_admin %}Administrador{% else %}Usuario{% endif %}</span>
+            </div>
+        </aside>
+        <div class="dashboard-main-column">
+            <section class="metrics-top">
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon purple-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ total_cuentas|intcomma }}</div>
+                        <div class="metric-label">Cuentas Activas</div>
+                        <div class="metric-change neutral">
+                            <span>{{ clientes_con_cuentas|intcomma }}</span> clientes con cuentas
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon cyan-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
+                            <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="12" cy="15.5" r="0.8" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">${{ total_saldo_pendiente|floatformat:2 }}</div>
+                        <div class="metric-label">Saldo Pendiente Total</div>
+                        <div class="metric-change neutral">
+                            <span>{{ cuentas_con_saldo|intcomma }}</span> cuentas con saldo
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon blue-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ pagos_hoy|intcomma }}</div>
+                        <div class="metric-label">Pagos Realizados Hoy</div>
+                        <div class="metric-change neutral">
+                            <span>${{ monto_pagado_hoy|floatformat:2 }}</span> total pagado
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card glass-custom" tabindex="0">
+                    <div class="metric-icon yellow-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="metric-content">
+                        <div class="metric-value">{{ cuentas_vencidas|intcomma }}</div>
+                        <div class="metric-label">Cuentas Vencidas</div>
+                        <div class="metric-change negative">
+                            Requieren atención inmediata
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="dashboard-content-wrapper">
+                <section class="activity-panel glass-custom">
+                    <h3>💳 Gestión de Cuentas Corrientes</h3>
+                    <p>Administra las cuentas corrientes de tus clientes</p>
 
-    <!-- Tabla de Cuentas Corrientes -->
-    <div class="recent-sales-section">
-        <h3>Cuentas Corrientes de Clientes</h3>
-        <div class="sales-table">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Cuenta Corriente</th>
-                        <th>Saldo Actual</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in clientes_con_estado %}
-                    <tr>
-                        <td>{{ item.cliente.nombre }}</td>
-                        <td>
-                            {% if item.tiene_cuenta %}
-                                <span style="color: #28a745; font-weight: bold;">Sí</span>
-                            {% else %}
-                                <span style="color: #dc3545; font-weight: bold;">No</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.tiene_cuenta %}
-                                ${{ item.saldo|floatformat:2 }}
-                            {% else %}
-                                N/A
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if item.tiene_cuenta %}
-                                <!-- Botón para abrir el modal de eliminación -->
-                                <button class="btn-custom" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); padding: 8px 12px; font-size: 0.9em;" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.cliente.pk }}">Eliminar</button>
-                            {% else %}
-                                <!-- Botón para abrir el modal de asignación -->
-                                <button class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 8px 12px; font-size: 0.9em;" data-bs-toggle="modal" data-bs-target="#asignarModal{{ item.cliente.pk }}">Asignar</button>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Botón para volver al Dashboard -->
-    <div class="action-card" style="margin-top: 30px;">
-        <h4>🏠 Navegación</h4>
-        <div class="action-buttons">
-            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-custom">Volver al Dashboard Admin</a>
+                    <!-- Tabla de Cuentas Corrientes -->
+                    <div class="recent-sales-section">
+                        <h4>Cuentas Corrientes de Clientes</h4>
+                        <div class="sales-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Cuenta Corriente</th>
+                                        <th>Saldo Actual</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in clientes_con_estado %}
+                                    <tr>
+                                        <td>{{ item.cliente.nombre }}</td>
+                                        <td>
+                                            {% if item.tiene_cuenta %}
+                                                <span style="color: #28a745; font-weight: bold;">Sí</span>
+                                            {% else %}
+                                                <span style="color: #dc3545; font-weight: bold;">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item.tiene_cuenta %}
+                                                ${{ item.saldo|floatformat:2 }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item.tiene_cuenta %}
+                                                <!-- Botón para abrir el modal de eliminación -->
+                                                <button class="btn-custom" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); padding: 8px 12px; font-size: 0.9em;" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.cliente.pk }}">Eliminar</button>
+                                                <a href="{% url 'pagar_cuenta' item.cliente.pk %}" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 8px 12px; font-size: 0.9em; margin-left: 5px;">Pagar</a>
+                                                <a href="{% url 'agregar_saldo' item.cliente.pk %}" class="btn-custom" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: #212529; padding: 8px 12px; font-size: 0.9em; margin-left: 5px;">Agregar Saldo</a>
+                                            {% else %}
+                                                <a href="{% url 'asignar_cuenta_corriente' item.cliente.pk %}" class="btn-custom" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); padding: 8px 12px; font-size: 0.9em;">Asignar Cuenta</a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" style="text-align: center; padding: 2rem; color: var(--foreground);">
+                                            No hay clientes registrados.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
     </div>
 </div>
@@ -73,13 +236,14 @@
 {% for item in clientes_con_estado %}
 <div class="modal fade" id="eliminarModal{{ item.cliente.pk }}" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem;">
             <div class="modal-header">
                 <h5 class="modal-title" id="eliminarModalLabel">Eliminar Cuenta Corriente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar la cuenta corriente de {{ item.cliente.nombre }}? Esta acción no se puede deshacer.
+                <p>¿Estás seguro de que deseas eliminar la cuenta corriente de <strong>{{ item.cliente.nombre }}</strong>?</p>
+                <p style="color: #dc3545; font-weight: bold;">Esta acción no se puede deshacer.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -95,13 +259,13 @@
 <!-- Modal de advertencia para asignar cuenta corriente -->
 <div class="modal fade" id="asignarModal{{ item.cliente.pk }}" tabindex="-1" aria-labelledby="asignarModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="background: var(--card); border: 1px solid var(--border); border-radius: 0.5rem;">
             <div class="modal-header">
                 <h5 class="modal-title" id="asignarModalLabel">Asignar Cuenta Corriente</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ¿Estás seguro de que deseas asignar una cuenta corriente a {{ item.cliente.nombre }}?
+                <p>¿Estás seguro de que deseas asignar una cuenta corriente a <strong>{{ item.cliente.nombre }}</strong>?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

@@ -1,0 +1,340 @@
+/* ==============================================
+   BASE DASHBOARD STYLES
+   Estos estilos definen la estructura base del dashboard
+   y NO deben ser modificados por los templates hijos
+============================================== */
+
+/* ==============================================
+   VARIABLES GLOBALES DEL DASHBOARD
+============================================== */
+:root {
+    /* Colores principales */
+    --base-background: #020617;
+    --base-foreground: #f8fafc;
+    --base-card: rgba(15,23,42,0.7);
+    --base-card-foreground: #f8fafc;
+    --base-popover: #020617;
+    --base-popover-foreground: #f8fafc;
+    --base-primary: #7f3cff;
+    --base-primary-foreground: #f8fafc;
+    --base-secondary: #1e293b;
+    --base-secondary-foreground: #f8fafc;
+    --base-muted: rgba(51,65,85,0.4);
+    --base-muted-foreground: #94a3b8;
+    --base-accent: #6ee7b7;
+    --base-accent-foreground: #020617;
+    --base-destructive: #ef4444;
+    --base-destructive-foreground: #f8fafc;
+    --base-border: rgba(148,163,184,0.2);
+    --base-input: rgba(148,163,184,0.3);
+    --base-ring: #7f3cff;
+    --base-glass-border: rgba(255,255,255,0.18);
+    --base-radius: 12px;
+}
+
+/* ==============================================
+   RESET Y ESTILOS GLOBALES
+============================================== */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body.base-dashboard {
+    font-family: "Raleway", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+    color: var(--base-foreground);
+    overflow-x: hidden;
+}
+
+/* ==============================================
+   CONTENEDOR PRINCIPAL DEL DASHBOARD
+============================================== */
+.base-dashboard-container {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.base-dashboard-shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: 100vh;
+    gap: 0;
+}
+
+/* ==============================================
+   SIDEBAR - PANEL LATERAL DE NAVEGACIÓN
+============================================== */
+.base-sidebar {
+    background: var(--base-card);
+    border-right: 1px solid var(--base-glass-border);
+    backdrop-filter: blur(10px) saturate(140%);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    box-shadow: 4px 0 24px rgba(2,6,23,0.3);
+}
+
+/* Glassmorphism effect */
+.glass-custom {
+    background: rgba(15,23,42,0.7);
+    backdrop-filter: blur(10px) saturate(140%);
+    border: 1px solid var(--base-glass-border);
+    box-shadow: 0 8px 32px rgba(2,6,23,0.4);
+}
+
+/* Header del sidebar */
+.base-sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--base-border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, var(--base-primary), rgba(127,60,255,0.8));
+}
+
+.base-sidebar-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.base-sidebar-business {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.base-business-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.base-business-tagline {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Navegación del sidebar */
+.base-sidebar-nav {
+    padding: 16px 12px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.base-sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    border-radius: var(--base-radius);
+    color: var(--base-muted-foreground);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.base-sidebar-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--base-accent);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+}
+
+.base-sidebar-link:hover {
+    background: var(--base-muted);
+    color: var(--base-foreground);
+    transform: translateX(4px);
+}
+
+.base-sidebar-link:hover::before {
+    transform: scaleY(1);
+}
+
+.base-sidebar-link.is-active {
+    background: linear-gradient(135deg, rgba(127,60,255,0.15), rgba(110,231,183,0.1));
+    color: var(--base-accent);
+    border-left: 3px solid var(--base-accent);
+    font-weight: 600;
+}
+
+.base-sidebar-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+}
+
+.base-sidebar-label {
+    flex: 1;
+}
+
+/* Footer del sidebar */
+.base-sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--base-border);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(15,23,42,0.5);
+}
+
+.base-sidebar-user {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--base-foreground);
+}
+
+.base-sidebar-role {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--base-muted-foreground);
+}
+
+/* ==============================================
+   ÁREA DE CONTENIDO PRINCIPAL
+============================================== */
+.base-content-area {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: transparent;
+    position: relative;
+}
+
+.page-wrapper {
+    padding: 32px;
+    min-height: 100%;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Scrollbar personalizado para el área de contenido */
+.base-content-area::-webkit-scrollbar {
+    width: 10px;
+}
+
+.base-content-area::-webkit-scrollbar-track {
+    background: rgba(15,23,42,0.3);
+}
+
+.base-content-area::-webkit-scrollbar-thumb {
+    background: rgba(127,60,255,0.5);
+    border-radius: 5px;
+}
+
+.base-content-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(127,60,255,0.7);
+}
+
+/* ==============================================
+   RESPONSIVE DESIGN
+============================================== */
+@media (max-width: 1024px) {
+    .base-dashboard-shell {
+        grid-template-columns: 240px 1fr;
+    }
+    
+    .page-wrapper {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .base-dashboard-shell {
+        grid-template-columns: 1fr;
+    }
+    
+    .base-sidebar {
+        position: fixed;
+        left: -280px;
+        z-index: 1000;
+        transition: left 0.3s ease;
+    }
+    
+    .base-sidebar.is-open {
+        left: 0;
+    }
+    
+    .page-wrapper {
+        padding: 16px;
+    }
+}
+
+/* ==============================================
+   UTILIDADES COMUNES DEL DASHBOARD
+============================================== */
+.base-page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--base-foreground);
+    margin: 0 0 24px 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.base-section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--base-foreground);
+    margin: 0 0 16px 0;
+}
+
+.base-card {
+    background: var(--base-card);
+    border: 1px solid var(--base-border);
+    border-radius: var(--base-radius);
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(2,6,23,0.3);
+}
+
+/* ==============================================
+   ANIMACIONES
+============================================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.base-content-area {
+    animation: fadeIn 0.3s ease;
+}

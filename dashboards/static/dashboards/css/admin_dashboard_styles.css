@@ -1,28 +1,7 @@
 /* ==============================================
-   VARIABLES GLOBALES
+   ADMIN DASHBOARD SPECIFIC STYLES
+   (Estilos específicos del dashboard de administración)
 ============================================== */
-:root {
-    --header-total-height: 60px;
-    --footer-total-height: 40px;
-
-    /* Theme colors */
-    --app-accent: #6EE7B7; /* soft mint */
-    --app-muted: rgba(255,255,255,0.85);
-    --background: #0b0f17;
-    --foreground: #e6eef6;
-    --card: rgba(20,24,32,0.45);
-    --card-foreground: #e6eef6;
-    --primary: #7f3cff; /* purple */
-    --accent: #6EE7B7; /* mint */
-    --muted: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.04);
-    --neon-cyan: #22d3ee;
-    --neon-magenta: #c084fc;
-    --neon-yellow: #fbbf24;
-    --neon-blue: #60a5fa;
-    --radius: 0.9rem;
-    --glass-border: rgba(255,255,255,0.08);
-}
 
 /* ==============================================
    GLASS UTILITY
