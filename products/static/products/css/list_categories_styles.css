@@ -4,18 +4,25 @@
 ============================================== */
 
 /* ==============================================
-   GLASS UTILITY
+   GLASS UTILITY - Solo para elementos específicos de categorías
 ============================================== */
-.glass-custom {
+
+/* Estilos base de glassmorphism para elementos de categorías */
+body.page-categories .page-metric-card.glass-custom,
+body.page-categories .page-action-btn.glass-custom,
+body.page-categories .page-table-container.glass-custom,
+body.page-categories .page-chart-card.glass-custom {
     backdrop-filter: blur(10px) saturate(140%);
     background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
     border: 1px solid var(--base-glass-border);
-    border-radius: var(--base-radius);
     position: relative;
     box-shadow: 0 12px 40px rgba(2,6,23,0.55);
 }
 
-.glass-custom::before {
+body.page-categories .page-metric-card.glass-custom::before,
+body.page-categories .page-action-btn.glass-custom::before,
+body.page-categories .page-table-container.glass-custom::before,
+body.page-categories .page-chart-card.glass-custom::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -23,6 +30,23 @@
     background: linear-gradient(130deg, rgba(255,255,255,0.12), transparent 45%);
     opacity: 0.25;
     pointer-events: none;
+}
+
+/* Aplicar border-radius solo donde sea necesario */
+body.page-categories .page-metric-card.glass-custom {
+    border-radius: var(--base-radius);
+}
+
+body.page-categories .page-action-btn.glass-custom {
+    border-radius: var(--base-radius);
+}
+
+body.page-categories .page-table-container.glass-custom {
+    border-radius: var(--base-radius);
+}
+
+body.page-categories .page-chart-card.glass-custom {
+    border-radius: var(--base-radius);
 }
 
 /* ==============================================
@@ -34,7 +58,7 @@
     100% { transform: translateY(0); }
 }
 
-.float-slow {
+body.page-categories .float-slow {
     animation: float-slow 6s ease-in-out infinite;
 }
 
@@ -63,8 +87,8 @@
 /* ==============================================
    METRIC CARDS
 ============================================== */
-.page-metric-card,
-.metric-card {
+body.page-categories .page-metric-card,
+body.page-categories .metric-card {
     display: flex;
     align-items: center;
     gap: 1.25rem;
@@ -72,18 +96,18 @@
     transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
-.page-metric-card:hover,
-.metric-card:hover {
+body.page-categories .page-metric-card:hover,
+body.page-categories .metric-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 30px 90px -20px rgba(2,6,23,0.8),
                 0 8px 30px rgba(110,231,183,0.12);
     border-color: rgba(110,231,183,0.14);
 }
 
-.page-metric-card:focus,
-.page-metric-card:focus-visible,
-.metric-card:focus,
-.metric-card:focus-visible {
+body.page-categories .page-metric-card:focus,
+body.page-categories .page-metric-card:focus-visible,
+body.page-categories .metric-card:focus,
+body.page-categories .metric-card:focus-visible {
     outline: 3px solid rgba(110,231,183,0.18);
     outline-offset: 4px;
 }
@@ -91,7 +115,7 @@
 /* ==============================================
    METRIC ICONS
 ============================================== */
-.metric-icon {
+body.page-categories .metric-icon {
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -101,27 +125,27 @@
     flex-shrink: 0;
 }
 
-.metric-icon svg {
+body.page-categories .metric-icon svg {
     width: 28px;
     height: 28px;
 }
 
-.purple-icon {
+body.page-categories .purple-icon {
     background: linear-gradient(135deg, rgba(127,60,255,0.25), rgba(139,92,246,0.15));
     color: #8b5cf6;
 }
 
-.cyan-icon {
+body.page-categories .cyan-icon {
     background: linear-gradient(135deg, rgba(34,211,238,0.25), rgba(6,182,212,0.15));
     color: #06b6d4;
 }
 
-.blue-icon {
+body.page-categories .blue-icon {
     background: linear-gradient(135deg, rgba(96,165,250,0.25), rgba(59,130,246,0.15));
     color: #3b82f6;
 }
 
-.yellow-icon {
+body.page-categories .yellow-icon {
     background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15));
     color: #f59e0b;
 }
@@ -129,56 +153,56 @@
 /* ==============================================
    METRIC CONTENT
 ============================================== */
-.metric-content {
+body.page-categories .metric-content {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 }
 
-.metric-value {
+body.page-categories .metric-value {
     font-size: 2rem;
     font-weight: 700;
     color: var(--base-foreground);
     line-height: 1;
 }
 
-.metric-label {
+body.page-categories .metric-label {
     font-size: 0.85rem;
     color: rgba(255,255,255,0.65);
     font-weight: 500;
 }
 
-.metric-change {
+body.page-categories .metric-change {
     font-size: 0.75rem;
     margin-top: 0.25rem;
 }
 
-.metric-change span {
+body.page-categories .metric-change span {
     font-weight: 600;
 }
 
-.metric-change.positive {
+body.page-categories .metric-change.positive {
     color: var(--base-accent);
 }
 
-.metric-change.negative {
+body.page-categories .metric-change.negative {
     color: #ef4444;
 }
 
-.metric-change.neutral {
+body.page-categories .metric-change.neutral {
     color: rgba(255,255,255,0.65);
 }
 
 /* ==============================================
    CONTENT SECTIONS
 ============================================== */
-.page-content-section {
+body.page-categories .page-content-section {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-.page-content-header {
+body.page-categories .page-content-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -190,14 +214,14 @@
     box-shadow: 0 8px 32px rgba(2,6,23,0.4);
 }
 
-.page-section-title {
+body.page-categories .page-section-title {
     font-size: 1.5rem;
     font-weight: 600;
     color: var(--base-foreground);
     margin: 0;
 }
 
-.page-action-btn {
+body.page-categories .page-action-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -211,13 +235,13 @@
     box-shadow: 0 4px 15px rgba(110,231,183,0.3);
 }
 
-.page-action-btn:hover {
+body.page-categories .page-action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(34,197,94,0.4);
     background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
 }
 
-.page-action-btn:active {
+body.page-categories .page-action-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 8px rgba(34,197,94,0.3);
 }
@@ -225,19 +249,19 @@
 /* ==============================================
    TABLE STYLES
 ============================================== */
-.page-table-container {
+body.page-categories .page-table-container {
     overflow-x: auto;
     border-radius: var(--base-radius);
 }
 
-.page-categories-table {
+body.page-categories .page-categories-table {
     width: 100%;
     border-collapse: collapse;
     background: transparent;
     color: var(--base-foreground);
 }
 
-.page-categories-table thead th {
+body.page-categories .page-categories-table thead th {
     padding: 1rem 1.25rem;
     text-align: left;
     font-weight: 600;
@@ -249,57 +273,57 @@
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.page-categories-table tbody td {
+body.page-categories .page-categories-table tbody td {
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--base-border);
     vertical-align: middle;
 }
 
-.page-categories-table tbody tr:nth-child(odd) {
+body.page-categories .page-categories-table tbody tr:nth-child(odd) {
     background: var(--base-muted);
 }
 
-.page-categories-table tbody tr:nth-child(even) {
+body.page-categories .page-categories-table tbody tr:nth-child(even) {
     background: transparent;
 }
 
-.page-categories-table tbody tr:hover {
+body.page-categories .page-categories-table tbody tr:hover {
     background: rgba(255,255,255,0.05);
     transition: background-color 0.2s ease;
 }
 
 /* Table cell specific styles */
-.category-name {
+body.page-categories .category-name {
     font-weight: 600;
     color: var(--base-foreground);
 }
 
-.category-description {
+body.page-categories .category-description {
     color: rgba(255,255,255,0.75);
     max-width: 300px;
 }
 
-.category-products {
+body.page-categories .category-products {
     font-weight: 600;
     color: var(--base-accent);
     text-align: center;
 }
 
-.category-stock,
-.category-value {
+body.page-categories .category-stock,
+body.page-categories .category-value {
     font-weight: 500;
     text-align: right;
     font-variant-numeric: tabular-nums;
 }
 
-.category-actions {
+body.page-categories .category-actions {
     text-align: center;
 }
 
 /* ==============================================
    ACTION BUTTONS
 ============================================== */
-.action-btn {
+body.page-categories .action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -311,27 +335,27 @@
     margin-right: 0.5rem;
 }
 
-.action-btn:last-child {
+body.page-categories .action-btn:last-child {
     margin-right: 0;
 }
 
-.edit-btn {
+body.page-categories .edit-btn {
     color: var(--base-accent);
     background: rgba(110,231,183,0.1);
 }
 
-.edit-btn:hover {
+body.page-categories .edit-btn:hover {
     color: white;
     background: var(--base-accent);
     transform: scale(1.1);
 }
 
-.delete-btn {
+body.page-categories .delete-btn {
     color: #ef4444;
     background: rgba(239,68,68,0.1);
 }
 
-.delete-btn:hover {
+body.page-categories .delete-btn:hover {
     color: white;
     background: #ef4444;
     transform: scale(1.1);
@@ -340,60 +364,60 @@
 /* ==============================================
    EMPTY STATE
 ============================================== */
-.empty-state {
+body.page-categories .empty-state {
     text-align: center;
     padding: 3rem 1rem;
 }
 
-.empty-state-content {
+body.page-categories .empty-state-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
 }
 
-.empty-state-content svg {
+body.page-categories .empty-state-content svg {
     opacity: 0.5;
 }
 
-.empty-state-content p {
+body.page-categories .empty-state-content p {
     color: rgba(255,255,255,0.65);
     font-size: 1.1rem;
     margin: 0;
 }
 
-.empty-state-content .page-action-btn {
+body.page-categories .empty-state-content .page-action-btn {
     margin-top: 1rem;
 }
 
 /* ==============================================
    CHART SECTION
 ============================================== */
-.page-chart-section {
+body.page-categories .page-chart-section {
     width: 100%;
 }
 
-.page-chart-card {
+body.page-categories .page-chart-card {
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.chart-header {
+body.page-categories .chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.chart-title {
+body.page-categories .chart-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--base-foreground);
     margin: 0;
 }
 
-.chart-container {
+body.page-categories .chart-container {
     position: relative;
     height: 300px;
     width: 100%;
@@ -403,52 +427,52 @@
    RESPONSIVE DESIGN
 ============================================== */
 @media (max-width: 768px) {
-    .page-categories-container {
+    body.page-categories .page-categories-container {
         padding: 1rem;
     }
 
-    .page-metrics-section {
+    body.page-categories .page-metrics-section {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
 
-    .page-content-header {
+    body.page-categories .page-content-header {
         flex-direction: column;
         gap: 1rem;
         text-align: center;
     }
 
-    .page-categories-table {
+    body.page-categories .page-categories-table {
         font-size: 0.875rem;
     }
 
-    .page-categories-table thead th,
-    .page-categories-table tbody td {
+    body.page-categories .page-categories-table thead th,
+    body.page-categories .page-categories-table tbody td {
         padding: 0.75rem 0.5rem;
     }
 
-    .category-description {
+    body.page-categories .category-description {
         max-width: 200px;
     }
 }
 
 @media (max-width: 480px) {
-    .page-metric-card,
-    .metric-card {
+    body.page-categories .page-metric-card,
+    body.page-categories .metric-card {
         padding: 1rem;
         gap: 1rem;
     }
 
-    .metric-value {
+    body.page-categories .metric-value {
         font-size: 1.5rem;
     }
 
-    .metric-icon {
+    body.page-categories .metric-icon {
         width: 48px;
         height: 48px;
     }
 
-    .metric-icon svg {
+    body.page-categories .metric-icon svg {
         width: 24px;
         height: 24px;
     }

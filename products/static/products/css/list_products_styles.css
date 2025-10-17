@@ -4,18 +4,23 @@
 ============================================== */
 
 /* ==============================================
-   GLASS UTILITY
+   GLASS UTILITY - Solo para elementos específicos de productos
 ============================================== */
-.glass-custom {
+
+/* Estilos base de glassmorphism para elementos de productos */
+body.page-products .page-metric-card.glass-custom,
+body.page-products .page-chart-card.glass-custom,
+body.page-products .page-activity-panel.glass-custom {
     backdrop-filter: blur(10px) saturate(140%);
     background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
     border: 1px solid var(--base-glass-border);
-    border-radius: var(--base-radius);
     position: relative;
     box-shadow: 0 12px 40px rgba(2,6,23,0.55);
 }
 
-.glass-custom::before {
+body.page-products .page-metric-card.glass-custom::before,
+body.page-products .page-chart-card.glass-custom::before,
+body.page-products .page-activity-panel.glass-custom::before {
     content: "";
     position: absolute;
     inset: 0;
@@ -23,6 +28,19 @@
     background: linear-gradient(130deg, rgba(255,255,255,0.12), transparent 45%);
     opacity: 0.25;
     pointer-events: none;
+}
+
+/* Aplicar border-radius solo donde sea necesario */
+body.page-products .page-metric-card.glass-custom {
+    border-radius: var(--base-radius);
+}
+
+body.page-products .page-chart-card.glass-custom {
+    border-radius: var(--base-radius);
+}
+
+body.page-products .page-activity-panel.glass-custom {
+    border-radius: var(--base-radius);
 }
 
 /* ==============================================
@@ -34,7 +52,7 @@
     100% { transform: translateY(0); }
 }
 
-.float-slow {
+body.page-products .float-slow {
     animation: float-slow 6s ease-in-out infinite;
 }
 
@@ -63,8 +81,8 @@
 /* ==============================================
    METRIC CARDS
 ============================================== */
-.page-metric-card,
-.metric-card {
+body.page-products .page-metric-card,
+body.page-products .metric-card {
     display: flex;
     align-items: center;
     gap: 1.25rem;
@@ -72,18 +90,18 @@
     transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
 }
 
-.page-metric-card:hover,
-.metric-card:hover {
+body.page-products .page-metric-card:hover,
+body.page-products .metric-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 30px 90px -20px rgba(2,6,23,0.8),
                 0 8px 30px rgba(110,231,183,0.12);
     border-color: rgba(110,231,183,0.14);
 }
 
-.page-metric-card:focus,
-.page-metric-card:focus-visible,
-.metric-card:focus,
-.metric-card:focus-visible {
+body.page-products .page-metric-card:focus,
+body.page-products .page-metric-card:focus-visible,
+body.page-products .metric-card:focus,
+body.page-products .metric-card:focus-visible {
     outline: 3px solid rgba(110,231,183,0.18);
     outline-offset: 4px;
 }
@@ -91,7 +109,7 @@
 /* ==============================================
    METRIC ICONS
 ============================================== */
-.metric-icon {
+body.page-products .metric-icon {
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -101,27 +119,27 @@
     flex-shrink: 0;
 }
 
-.metric-icon svg {
+body.page-products .metric-icon svg {
     width: 28px;
     height: 28px;
 }
 
-.purple-icon {
+body.page-products .purple-icon {
     background: linear-gradient(135deg, rgba(127,60,255,0.25), rgba(139,92,246,0.15));
     color: #8b5cf6;
 }
 
-.cyan-icon {
+body.page-products .cyan-icon {
     background: linear-gradient(135deg, rgba(34,211,238,0.25), rgba(6,182,212,0.15));
     color: #06b6d4;
 }
 
-.blue-icon {
+body.page-products .blue-icon {
     background: linear-gradient(135deg, rgba(96,165,250,0.25), rgba(59,130,246,0.15));
     color: #3b82f6;
 }
 
-.yellow-icon {
+body.page-products .yellow-icon {
     background: linear-gradient(135deg, rgba(251,191,36,0.25), rgba(245,158,11,0.15));
     color: #f59e0b;
 }
@@ -129,43 +147,43 @@
 /* ==============================================
    METRIC CONTENT
 ============================================== */
-.metric-content {
+body.page-products .metric-content {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
 }
 
-.metric-value {
+body.page-products .metric-value {
     font-size: 2rem;
     font-weight: 700;
     color: var(--base-foreground);
     line-height: 1;
 }
 
-.metric-label {
+body.page-products .metric-label {
     font-size: 0.85rem;
     color: rgba(255,255,255,0.65);
     font-weight: 500;
 }
 
-.metric-change {
+body.page-products .metric-change {
     font-size: 0.75rem;
     margin-top: 0.25rem;
 }
 
-.metric-change span {
+body.page-products .metric-change span {
     font-weight: 600;
 }
 
-.metric-change.positive {
+body.page-products .metric-change.positive {
     color: var(--base-accent);
 }
 
-.metric-change.negative {
+body.page-products .metric-change.negative {
     color: #ef4444;
 }
 
-.metric-change.neutral {
+body.page-products .metric-change.neutral {
     color: rgba(255,255,255,0.65);
 }
 
@@ -174,7 +192,7 @@
 ============================================== */
 
 /* Estilos específicos para la tabla de productos */
-.table {
+body.page-products .table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -184,42 +202,42 @@
     box-shadow: 0 12px 40px rgba(2,6,23,0.55);
 }
 
-.table th,
-.table td {
+body.page-products .table th,
+body.page-products .table td {
     padding: 16px 12px;
     text-align: left;
     border-bottom: 1px solid var(--base-border);
     color: var(--base-foreground);
 }
 
-.table th {
+body.page-products .table th {
     background: linear-gradient(135deg, var(--base-primary), rgba(127,60,255,0.8));
     color: white;
     font-weight: 600;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-.table tbody tr:nth-child(odd) {
+body.page-products .table tbody tr:nth-child(odd) {
     background: var(--base-muted);
 }
 
-.table tbody tr:nth-child(even) {
+body.page-products .table tbody tr:nth-child(even) {
     background: transparent;
 }
 
-.table tbody tr:hover {
+body.page-products .table tbody tr:hover {
     background: rgba(255,255,255,0.05);
     transition: background-color 0.2s ease;
 }
 
-.table td.descripcion {
+body.page-products .table td.descripcion {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 /* Filtro de Categoría con glassmorphism */
-.filter-form {
+body.page-products .filter-form {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -232,14 +250,14 @@
     box-shadow: 0 8px 32px rgba(2,6,23,0.4);
 }
 
-.filter-form label {
+body.page-products .filter-form label {
     font-size: 1rem;
     margin-right: 12px;
     color: var(--base-foreground);
     font-weight: 500;
 }
 
-.filter-form select {
+body.page-products .filter-form select {
     padding: 10px 14px;
     font-size: 1rem;
     border-radius: var(--base-radius);
@@ -249,22 +267,22 @@
     transition: all 0.3s ease;
 }
 
-.filter-form select:focus {
+body.page-products .filter-form select:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 2px rgba(110,231,183,0.2);
 }
 
 /* Iconos de acción */
-.action-icons {
+body.page-products .action-icons {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
 }
 
-.action-icons a,
-.action-icons button {
+body.page-products .action-icons a,
+body.page-products .action-icons button {
     margin-right: 8px;
     color: var(--base-accent);
     font-size: 1.2rem;
@@ -273,15 +291,15 @@
     border-radius: 6px;
 }
 
-.action-icons a:hover,
-.action-icons button:hover {
+body.page-products .action-icons a:hover,
+body.page-products .action-icons button:hover {
     color: #fbbf24;
     background: rgba(251,191,36,0.1);
     transform: scale(1.1);
 }
 
 /* Imagen de QR */
-.table img {
+body.page-products .table img {
     width: 80px;
     height: 80px;
     object-fit: cover;
@@ -314,7 +332,7 @@
 }
 
 /* Estilos para la paginación con glassmorphism */
-.pagination {
+body.page-products .pagination {
     margin: 20px 0;
     display: flex;
     flex-direction: column;
@@ -322,19 +340,19 @@
     font-family: Arial, sans-serif;
 }
 
-.pagination .page-info {
+body.page-products .pagination .page-info {
     margin-bottom: 10px;
     font-size: 14px;
     color: var(--base-foreground);
     opacity: 0.8;
 }
 
-.pagination .page-links {
+body.page-products .pagination .page-links {
     display: flex;
     gap: 8px;
 }
 
-.pagination .page-links a {
+body.page-products .pagination .page-links a {
     padding: 8px 14px;
     border: 1px solid var(--base-border);
     color: var(--base-accent);
@@ -345,7 +363,7 @@
     background: var(--base-muted);
 }
 
-.pagination .page-links a:hover {
+body.page-products .pagination .page-links a:hover {
     background: var(--base-accent);
     color: var(--base-accent-foreground);
     border-color: var(--base-accent);
@@ -353,7 +371,7 @@
     box-shadow: 0 4px 12px rgba(110,231,183,0.3);
 }
 
-.pagination .page-links .current {
+body.page-products .pagination .page-links .current {
     padding: 8px 14px;
     background: linear-gradient(135deg, var(--base-accent), rgba(110,231,183,0.8));
     color: var(--base-accent-foreground);
@@ -368,13 +386,77 @@
    BOTONES ESPECÍFICOS DE LIST PRODUCTS
 ============================================== */
 
-.add-product-btn:hover {
+body.page-products .add-product-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(34,197,94,0.4) !important;
     background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
 }
 
-.add-product-btn:active {
+body.page-products .add-product-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 8px rgba(34,197,94,0.3) !important;
+}
+
+/* ==============================================
+   ADDITIONAL PAGE-SPECIFIC STYLES
+============================================== */
+
+body.page-products .page-activity-panel {
+    margin-top: 2rem;
+    padding: 1.5rem;
+}
+
+body.page-products .page-section-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+}
+
+/* ==============================================
+   CHART STYLES
+============================================== */
+
+body.page-products .page-charts-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+body.page-products .page-chart-card {
+    background: var(--base-card);
+    border: 1px solid var(--base-glass-border);
+    border-radius: var(--base-radius);
+    padding: 1.5rem;
+    backdrop-filter: blur(10px) saturate(140%);
+    box-shadow: 0 12px 40px rgba(2,6,23,0.55);
+}
+
+body.page-products .page-chart-card h3 {
+    color: var(--base-foreground);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+body.page-products .page-chart-subtitle {
+    display: block;
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.6);
+    font-weight: 400;
+    margin-top: 0.25rem;
+}
+
+body.page-products .page-chart-placeholder {
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body.page-products .page-chart-empty {
+    color: rgba(255,255,255,0.5);
+    font-style: italic;
+    text-align: center;
 }

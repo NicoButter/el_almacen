@@ -28,7 +28,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="metric-card glass-custom" tabindex="0">
+                <div class="page-metric-card glass-custom" tabindex="0">
                     <div class="metric-icon cyan-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="metric-card glass-custom" tabindex="0">
+                <div class="page-metric-card glass-custom" tabindex="0">
                     <div class="metric-icon blue-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
@@ -59,7 +59,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="metric-card glass-custom" tabindex="0">
+                <div class="page-metric-card glass-custom" tabindex="0">
                     <div class="metric-icon yellow-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -75,33 +75,33 @@
                 </div>
             </section>
             <div class="dashboard-content-wrapper">
-                <section class="charts-section">
-                    <div class="chart-card glass-custom">
+                <section class="page-charts-section">
+                    <div class="page-chart-card glass-custom">
                         <h3>Productos por Categoría
-                            <span class="chart-subtitle">Distribución actual</span>
+                            <span class="page-chart-subtitle">Distribución actual</span>
                         </h3>
-                        <div class="chart-placeholder">
+                        <div class="page-chart-placeholder">
                             <canvas id="categoryChart" width="600" height="220" aria-label="Gráfico de productos por categoría"></canvas>
                             {% if not categorias %}
-                            <div class="chart-empty">No hay categorías registradas.</div>
+                            <div class="page-chart-empty">No hay categorías registradas.</div>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="chart-card glass-custom">
+                    <div class="page-chart-card glass-custom">
                         <h3>Stock por Producto
-                            <span class="chart-subtitle">Top 10 productos con más stock</span>
+                            <span class="page-chart-subtitle">Top 10 productos con más stock</span>
                         </h3>
-                        <div class="chart-placeholder">
+                        <div class="page-chart-placeholder">
                             <canvas id="stockChart" width="600" height="220" aria-label="Gráfico de stock por producto"></canvas>
                             {% if not productos %}
-                            <div class="chart-empty">No hay productos registrados.</div>
+                            <div class="page-chart-empty">No hay productos registrados.</div>
                             {% endif %}
                         </div>
                     </div>
                 </section>
-                <section class="activity-panel glass-custom">
+                <section class="page-activity-panel glass-custom">
                     <h3>Lista de Productos
-                        <span class="section-subtitle">
+                        <span class="page-section-subtitle">
                             {% if search_query or request.GET.categoria %}
                                 {% if search_query %}Búsqueda: "{{ search_query }}"{% endif %}
                                 {% if search_query and request.GET.categoria %} • {% endif %}
@@ -116,12 +116,12 @@
                             {% endif %}
                         </span>
                     </h3>
-                    <div class="activity-feed">
+                    <div class="page-activity-feed">
                         <!-- Barra de búsqueda y filtro -->
-                        <div class="filter-section" style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <div class="page-filter-section" style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; margin-bottom: 1rem;">
                             <form method="GET" action="{% url 'listar_productos' %}" class="filter-form" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
                                 <!-- Barra de búsqueda -->
-                                <div class="search-container" style="position: relative; flex: 1; min-width: 250px;">
+                                <div class="page-search-container" style="position: relative; flex: 1; min-width: 250px;">
                                     <input type="text" name="search" value="{{ search_query }}" placeholder="Buscar productos por nombre..." style="width: 100%; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--foreground); font-size: 0.9rem;">
                                     <button type="submit" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); border: none; background: none; color: var(--foreground); cursor: pointer;">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -161,7 +161,7 @@
                             </form>
                         </div>
                         <!-- Tabla de Productos -->
-                        <div class="products-table" style="overflow-x: auto;">
+                        <div class="page-products-table" style="overflow-x: auto;">
                             <table style="width: 100%; border-collapse: collapse;">
                                 <thead>
                                     <tr style="background: rgba(255,255,255,0.05);">

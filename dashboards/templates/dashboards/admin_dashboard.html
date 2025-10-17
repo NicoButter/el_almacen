@@ -10,99 +10,99 @@
 
 {% block page_content %}
 {# Contenido específico del admin dashboard #}
-            <section class="metrics-top">
-                <div class="metric-card glass-custom" tabindex="0">
-                    <div class="metric-icon purple-icon">
+            <section class="page-metrics-top">
+                <div class="page-metric-card page-glass-custom" tabindex="0">
+                    <div class="page-metric-icon page-purple-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                         </svg>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-value">${{ total_revenue_last_month|floatformat:2 }}</div>
-                        <div class="metric-label">Ventas del Mes</div>
-                        <div class="metric-change {% if sales_growth_percent >= 0 %}positive{% else %}negative{% endif %}">
+                    <div class="page-metric-content">
+                        <div class="page-metric-value">${{ total_revenue_last_month|floatformat:2 }}</div>
+                        <div class="page-metric-label">Ventas del Mes</div>
+                        <div class="page-metric-change {% if sales_growth_percent >= 0 %}positive{% else %}negative{% endif %}">
                             <span>{{ sales_growth_percent|floatformat:1 }}%</span> vs mes anterior
                         </div>
                     </div>
                 </div>
-                <div class="metric-card glass-custom" tabindex="0">
-                    <div class="metric-icon cyan-icon">
+                <div class="page-metric-card page-glass-custom" tabindex="0">
+                    <div class="page-metric-icon page-cyan-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.5"/>
                             <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.5"/>
                         </svg>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-value">{{ total_products|intcomma }}</div>
-                        <div class="metric-label">Productos Activos</div>
-                        <div class="metric-change neutral">
+                    <div class="page-metric-content">
+                        <div class="page-metric-value">{{ total_products|intcomma }}</div>
+                        <div class="page-metric-label">Productos Activos</div>
+                        <div class="page-metric-change neutral">
                             <span>{{ total_stock_amount|floatformat:0|intcomma }}</span> unidades totales en stock
                         </div>
                     </div>
                 </div>
-                <div class="metric-card glass-custom" tabindex="0">
-                    <div class="metric-icon blue-icon">
+                <div class="page-metric-card page-glass-custom" tabindex="0">
+                    <div class="page-metric-icon page-blue-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5"/>
                             <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
                         </svg>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-value">{{ total_clients|intcomma }}</div>
-                        <div class="metric-label">Clientes Activos</div>
-                        <div class="metric-change neutral">
+                    <div class="page-metric-content">
+                        <div class="page-metric-value">{{ total_clients|intcomma }}</div>
+                        <div class="page-metric-label">Clientes Activos</div>
+                        <div class="page-metric-change neutral">
                             <span>{{ credit_sales_last_month|intcomma }}</span> ventas fiadas este mes
                         </div>
                     </div>
                 </div>
-                <div class="metric-card glass-custom" tabindex="0">
-                    <div class="metric-icon yellow-icon">
+                <div class="page-metric-card page-glass-custom" tabindex="0">
+                    <div class="page-metric-icon page-yellow-icon">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 2 2 7v10c0 5.5 10 6 10 6s10-.5 10-6V7l-10-5z" stroke="currentColor" stroke-width="1.5"/>
                             <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                             <circle cx="12" cy="15.5" r="0.8" fill="currentColor"/>
                         </svg>
                     </div>
-                    <div class="metric-content">
-                        <div class="metric-value">{{ low_stock_count|intcomma }}</div>
-                        <div class="metric-label">Stock Crítico</div>
-                        <div class="metric-change negative">
+                    <div class="page-metric-content">
+                        <div class="page-metric-value">{{ low_stock_count|intcomma }}</div>
+                        <div class="page-metric-label">Stock Crítico</div>
+                        <div class="page-metric-change negative">
                             {{ low_stock_count|intcomma }} productos por debajo de 10 unidades
                         </div>
                     </div>
                 </div>
             </section>
-            <div class="dashboard-content-wrapper">
-                <section class="charts-section">
-                    <div class="chart-card glass-custom">
+            <div class="page-dashboard-content-wrapper">
+                <section class="page-charts-section">
+                    <div class="page-chart-card page-glass-custom">
                         <h3>Tendencia de Ventas
-                            <span class="chart-subtitle">Últimos 30 días</span>
+                            <span class="page-chart-subtitle">Últimos 30 días</span>
                         </h3>
-                        <div class="chart-placeholder">
+                        <div class="page-chart-placeholder">
                             <canvas id="salesTrendChart" width="600" height="220" aria-label="Gráfico de tendencia de ventas"></canvas>
                             {% if not sales_trend.labels %}
-                            <div class="chart-empty">Sin datos suficientes en los últimos 30 días.</div>
+                            <div class="page-chart-empty">Sin datos suficientes en los últimos 30 días.</div>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="chart-card glass-custom">
+                    <div class="page-chart-card page-glass-custom">
                         <h3>Productos Más Vendidos
-                            <span class="chart-subtitle">Ingresos últimos 30 días</span>
+                            <span class="page-chart-subtitle">Ingresos últimos 30 días</span>
                         </h3>
-                        <div class="chart-placeholder">
+                        <div class="page-chart-placeholder">
                             <canvas id="topProductsChart" width="600" height="220" aria-label="Gráfico de productos más vendidos"></canvas>
                             {% if not top_products.labels %}
-                            <div class="chart-empty">Aún no hay ventas registradas para mostrar.</div>
+                            <div class="page-chart-empty">Aún no hay ventas registradas para mostrar.</div>
                             {% endif %}
                         </div>
                     </div>
                 </section>
-                <div class="dashboard-bottom-row">
-                    <section class="quick-actions-section glass-custom">
+                <div class="page-dashboard-bottom-row">
+                    <section class="page-quick-actions-section page-glass-custom">
                         <h3>Acciones Rápidas</h3>
-                        <div class="quick-actions-grid">
-                            <a href="{% url 'sales:sales_dashboard' %}" class="action-card glass-custom">
-                                <div class="action-icon cyan-bg">
+                        <div class="page-quick-actions-grid">
+                            <a href="{% url 'sales:sales_dashboard' %}" class="page-action-card page-glass-custom">
+                                <div class="page-action-icon page-cyan-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                         <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.5"/>
@@ -110,80 +110,80 @@
                                         <path d="M7 7h14l-2 7H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </div>
-                                <div class="action-content">
-                                    <div class="action-title">Ventas</div>
-                                    <div class="action-desc">Ver estadísticas de ventas</div>
+                                <div class="page-action-content">
+                                    <div class="page-action-title">Ventas</div>
+                                    <div class="page-action-desc">Ver estadísticas de ventas</div>
                                 </div>
                             </a>
-                            <a href="{% url 'sales:ticket_list' %}" class="action-card glass-custom">
-                                <div class="action-icon purple-bg">
+                            <a href="{% url 'sales:ticket_list' %}" class="page-action-card page-glass-custom">
+                                <div class="page-action-icon page-purple-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M7 4h10a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2V5a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
                                         <path d="M9 9h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
                                         <path d="M9 13h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
                                     </svg>
                                 </div>
-                                <div class="action-content">
-                                    <div class="action-title">Ver Tickets</div>
-                                    <div class="action-desc">Historial de ventas</div>
+                                <div class="page-action-content">
+                                    <div class="page-action-title">Ver Tickets</div>
+                                    <div class="page-action-desc">Historial de ventas</div>
                                 </div>
                             </a>
-                            <a href="{% url 'gestion_cuentas_corrientes' %}" class="action-card glass-custom">
-                                <div class="action-icon blue-bg">
+                            <a href="{% url 'gestion_cuentas_corrientes' %}" class="page-action-card page-glass-custom">
+                                <div class="page-action-icon page-blue-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M4 7h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
                                         <path d="M19 13h-3a2 2 0 1 0 0 4h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </div>
-                                <div class="action-content">
-                                    <div class="action-title">Cuentas Corrientes</div>
-                                    <div class="action-desc">Gestionar cuentas</div>
+                                <div class="page-action-content">
+                                    <div class="page-action-title">Cuentas Corrientes</div>
+                                    <div class="page-action-desc">Gestionar cuentas</div>
                                 </div>
                             </a>
-                            <a href="{% url 'reports_dashboard' %}" class="action-card glass-custom">
-                                <div class="action-icon yellow-bg">
+                            <a href="{% url 'reports_dashboard' %}" class="page-action-card page-glass-custom">
+                                <div class="page-action-icon page-yellow-bg">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M3 3v18h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                                         <path d="M7 15l4-5 3 3 4-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     </svg>
                                 </div>
-                                <div class="action-content">
-                                    <div class="action-title">Ver Reportes</div>
-                                    <div class="action-desc">Análisis de ventas</div>
+                                <div class="page-action-content">
+                                    <div class="page-action-title">Ver Reportes</div>
+                                    <div class="page-action-desc">Análisis de ventas</div>
                                 </div>
                             </a>
                         </div>
                     </section>
-                    <section class="activity-panel glass-custom">
+                    <section class="page-activity-panel page-glass-custom">
                         <h3>Actividad Reciente
-                            <span class="section-subtitle">Últimas ventas registradas</span>
+                            <span class="page-section-subtitle">Últimas ventas registradas</span>
                         </h3>
-                        <div class="activity-feed">
+                        <div class="page-activity-feed">
                             {% for sale in recent_sales %}
-                            <div class="activity-item">
-                                <div class="activity-icon cyan-bg">
+                            <div class="page-activity-item">
+                                <div class="page-activity-icon page-cyan-bg">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M3 3h2l2 14h12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
                                         <circle cx="10" cy="20" r="1" stroke="currentColor" stroke-width="1.3"/>
                                         <circle cx="18" cy="20" r="1" stroke="currentColor" stroke-width="1.3"/>
                                     </svg>
                                 </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">Venta #{{ sale.id }}</div>
-                                    <div class="activity-desc">
+                                <div class="page-activity-content">
+                                    <div class="page-activity-title">Venta #{{ sale.id }}</div>
+                                    <div class="page-activity-desc">
                                         {{ sale.cliente.nombre|default:'Cliente' }} · ${{ sale.total|floatformat:2 }}
                                     </div>
-                                    <div class="activity-time">{{ sale.fecha_venta|timesince }} atrás</div>
+                                    <div class="page-activity-time">{{ sale.fecha_venta|timesince }} atrás</div>
                                 </div>
                             </div>
                             {% empty %}
-                            <div class="activity-empty">Aún no hay ventas registradas.</div>
+                            <div class="page-activity-empty">Aún no hay ventas registradas.</div>
                             {% endfor %}
                         </div>
                     </section>
                 </div>
                 {% if low_stock_products %}
-                <section class="alert-section glass-custom">
+                <section class="page-alert-section page-glass-custom">
                     <h3>
                         <svg class="h-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M10.29 3.86 1.82 18a1 1 0 0 0 .86 1.5h18.64a1 1 0 0 0 .86-1.5L13.71 3.86a1 1 0 0 0-1.42 0z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -192,11 +192,11 @@
                         </svg>
                         Productos con Stock Bajo
                     </h3>
-                    <div class="low-stock-list">
+                    <div class="page-low-stock-list">
                         {% for product in low_stock_products %}
-                        <div class="low-stock-item">
+                        <div class="page-low-stock-item">
                             <span>{{ product.nombre }}</span>
-                            <span class="stock-count">{{ product.cantidad_stock|floatformat:0|intcomma }} {{ product.unidad_medida }}</span>
+                            <span class="page-stock-count">{{ product.cantidad_stock|floatformat:0|intcomma }} {{ product.unidad_medida }}</span>
                         </div>
                         {% endfor %}
                     </div>
