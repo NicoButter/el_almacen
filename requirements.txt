@@ -6,4 +6,5 @@ reportlab
 weasyprint
 qrcode
 psycopg[binary]
- 
+ qrcode==8.2
+weasyprint==68.1

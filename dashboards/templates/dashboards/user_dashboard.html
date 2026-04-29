@@ -3,10 +3,10 @@
 {% load static %}
 
 {% block extra_styles %}
-    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
+    <link href="{% static 'dashboards/css/dashboard.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block content %}
+{% block page_content %}
 <div class="dashboard-container">
     <div class="welcome-section">
         <h2>👤 Panel de Usuario</h2>
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Acciones disponibles para usuarios -->
-    <div class="actions-grid">
+    <div class="action-grid">
         <div class="action-card">
             <h4>📦 Ver Productos</h4>
             <p>Consulta el catálogo de productos disponibles.</p>

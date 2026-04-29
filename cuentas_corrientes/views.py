@@ -82,8 +82,7 @@ def crear_cuenta_corriente(request):
     })
 
 # -------------------------------------------------------------------------------------------------------------------
-adm
-@login_required
+@admin_required
 def editar_cuenta_corriente(request, pk):
     cuenta_corriente = get_object_or_404(CuentaCorriente, pk=pk)
 
@@ -104,7 +103,6 @@ def editar_cuenta_corriente(request, pk):
 
 # -------------------------------------------------------------------------------------------------------------------
 @cashier_required
-
 def agregar_saldo(request, cuenta_id):
     cuenta = get_object_or_404(CuentaCorriente, pk=cuenta_id)
     if request.method == 'POST':
@@ -122,7 +120,6 @@ def agregar_saldo(request, cuenta_id):
 
 # --------------------------------------------------------------------------------------------------------------------
 @cashier_required
-
 def pagar_cuenta(request, cuenta_id):
     cuenta = get_object_or_404(CuentaCorriente, pk=cuenta_id)
     if request.method == 'POST':
@@ -141,8 +138,6 @@ def pagar_cuenta(request, cuenta_id):
 
 # --------------------------------------------------------------------------------------------------------------------
 @admin_required
-
-@login_required
 def asignar_cuenta_corriente(request, cliente_id):
     cliente = get_object_or_404(Cliente, pk=cliente_id)
 
@@ -169,10 +164,8 @@ def asignar_cuenta_corriente(request, cliente_id):
         'cliente': cliente
     })
 
-@admin_required
 # --------------------------------------------------------------------------------------------------------------------
-
-@login_required
+@admin_required
 def eliminar_cuenta_corriente(request, cliente_id):
     cliente = get_object_or_404(Cliente, pk=cliente_id)
     cuenta_corriente = getattr(cliente, 'cuenta_corriente_cc', None)  # Asume relación OneToOneField
