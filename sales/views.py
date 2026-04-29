@@ -95,6 +95,29 @@ def ticket_list(request):
 
 # ---------------------------------------------------------------------------------------------------------------
 
+@admin_required
+def tickets_section(request):
+    query = request.GET.get('q', '').strip()
+    tickets_qs = (
+        Ticket.objects
+        .select_related('cashier', 'cliente__user')
+        .prefetch_related('line_items__product', 'cliente__telefonos', 'cliente__emails')
+        .order_by('-date')
+    )
+    if query:
+        tickets_qs = tickets_qs.filter(
+            Q(id__icontains=query) |
+            Q(cashier__username__icontains=query) |
+            Q(cliente__nombre__icontains=query)
+        )
+    return render(request, 'sales/tickets_section.html', {
+        'page_title': 'Tickets',
+        'tickets': tickets_qs,
+        'query': query,
+    })
+
+# ---------------------------------------------------------------------------------------------------------------
+
 @cashier_required
 def reprint_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)

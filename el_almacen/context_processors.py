@@ -48,7 +48,7 @@ def sidebar_context(request):
                 },
                 {
                     'label': 'Tickets',
-                    'url': reverse('sales:ticket_list'),
+                    'url': reverse('sales:tickets_section'),
                     'icon': 'receipt'
                 },
                 {
