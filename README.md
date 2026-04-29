@@ -10,36 +10,35 @@
 
 ## ✨ Características Principales
 
-## ✨ Características Principales
-
 ### 👥 Gestión de Usuarios
 - Sistema de autenticación con roles (Administrador, Cajero)
 - Control de acceso basado en roles
-- Panel de administración personalizado
+- Navegación dinámica según permisos
 
 ### 📦 Gestión de Productos
 - CRUD completo de productos
 - Sistema de categorías
 - Búsqueda avanzada de productos
+- **Venta de productos fraccionados (por peso/kilo)**
 - Control de stock en tiempo real
 - Alertas de stock bajo
 
-### 👥 Gestión de Clientes
-- Base de datos de clientes
-- Sistema de cuentas corrientes
+### 👥 Gestión de Clientes y Cuentas Corrientes
+- Base de datos completa de clientes
+- **Sistema de fiado / cuentas corrientes**
+- Control del saldo de clientes y registro de abonos / pagos
 - Historial de compras por cliente
 
 ### 💰 Sistema de Ventas
-- Interfaz intuitiva para cajeros
+- Interfaz intuitiva y rápida para cajeros
+- Venta con diferentes métodos de pago (Efectivo, Tarjeta, Débito, Fiado)
 - Generación automática de tickets
-- Control de ventas fiadas
-- Estadísticas de ventas en tiempo real
+- Validación de existencias y cálculos automáticos
 
-### 📊 Dashboard Administrativo
-- Métricas clave del negocio
-- Gráficos interactivos con Chart.js
-- Vista general del inventario
-- Reportes de ventas y productos más vendidos
+### 📊 Dashboards y Reportes
+- **Dashboard Administrativo**: Métricas clave del negocio, gráficos interactivos Chart.js, estado del inventario y alertas
+- **Dashboard de Cajero**: Vista enfocada en turnos, ventas del día de acceso rápido
+- **Reportes detallados**: Exportables y filtrables (Ventas por fecha, productos más vendidos, deudores)
 
 ### 🎨 Interfaz Moderna
 - Diseño glassmorphism
@@ -49,24 +48,33 @@
 
 ## 📸 Capturas de Pantalla
 
-> **Nota**: Las capturas de pantalla deben colocarse en la carpeta `docs/screenshots/` del repositorio.
+> **Nota**: Las capturas de pantalla deben colocarse en la carpeta `docs/screenshots/` (nombres sugeridos a continuación). ¡Sube las tuyas para lucir el proyecto!
 
-### Dashboard Administrativo
+### Dashboards (Administrador / Cajero)
 <div align="center">
-  <img src="docs/screenshots/dashboard-admin.png" alt="Dashboard Administrativo" width="800"/>
-  <p><em>Vista general con métricas, gráficos y acciones rápidas</em></p>
+  <img src="docs/screenshots/dashboard-admin.png" alt="Dashboard Administrativo (Dashboard)" width="800"/>
+  <p><em>Dashboard Administrador: Métricas, Gráficos Chart.js, y alertas en tiempo real</em></p>
+
+  <img src="docs/screenshots/dashboard-cajero.png" alt="Dashboard Cajero (Dashboard)" width="800"/>
+  <p><em>Dashboard Cajero: Ventas por turno y caja diaria</em></p>
 </div>
 
-### Gestión de Productos
+### Punto de Venta (POS) y Cuentas Corrientes
 <div align="center">
-  <img src="docs/screenshots/lista-productos.png" alt="Lista de Productos" width="800"/>
-  <p><em>Interfaz de búsqueda y gestión de inventario</em></p>
+  <img src="docs/screenshots/nueva-venta.png" alt="Punto de Venta" width="800"/>
+  <p><em>Interfaz rápida para registro de ventas, cálculo de fiado y métodos de pago</em></p>
+
+  <img src="docs/screenshots/cuentas-corrientes.png" alt="Cuentas Corrientes y Fiado" width="800"/>
+  <p><em>Gestión de pagos, abonos y control del saldo pendiente por cliente</em></p>
 </div>
 
-### Sistema de Ventas
+### Inventario y Reportes
 <div align="center">
-  <img src="docs/screenshots/nueva-venta.png" alt="Nueva Venta" width="800"/>
-  <p><em>Interfaz intuitiva para cajeros</em></p>
+  <img src="docs/screenshots/lista-productos.png" alt="Gestión de Productos" width="800"/>
+  <p><em>Lista de stock con soporte para fraccionado, alertas integradas e importación/exportación</em></p>
+
+  <img src="docs/screenshots/reportes-estadisticas.png" alt="Reportes de Sistema" width="800"/>
+  <p><em>Filtros detallados y estadísticas financieras</em></p>
 </div>
 
 ## �🛠️ Tecnologías Utilizadas
@@ -213,12 +221,10 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 
 ## 👨‍💻 Autor
 
-**NicoButter**
+**Nicolas Butterfield**
 - 📧 Email: nicobutter@gmail.com
-- 💼 LinkedIn: [\www.linkedin.com/in/nicolás-butterfield-9964aa1a3\]](https://www.linkedin.com/in/nicol%C3%A1s-butterfield-9964aa1a3/)
-- 🐙 GitHub: [NicoButter](https://github.com/NicoButter)
-
-## 🙏 Agradecimientos
+- 💼 LinkedIn: [Nicolás Butterfield](https://www.linkedin.com/in/nicol%C3%A1s-butterfield-9964aa1a3/)
+- 🐙 GitHub: [nicobutter](https://github.com/nicobutter)
 
 ## 🙏 Agradecimientos
 
