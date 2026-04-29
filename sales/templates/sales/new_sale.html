@@ -1,814 +1,313 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block extra_styles %}
-    <link href="{% static 'dashboards/css/admin_dashboard_styles.css' %}" rel="stylesheet">
     <link href="{% static 'sales/css/new_sale_styles.css' %}" rel="stylesheet"/>
 {% endblock %}
 
-{% block body_class %}dashboard-page{% endblock %}
+{% block body_class %}fullscreen-terminal{% endblock %}
 
-{% block content %}
-<div class="dashboard-fullwidth-container">
-    <div class="dashboard-shell">
-        <aside class="dashboard-sidebar glass-custom">
-            <div class="sidebar-header">
-                <img src="{% static 'images/el_almacen_logo.png' %}" alt="El Almacén" class="sidebar-logo">
-                <div class="sidebar-business">
-                    <span class="business-name">El Almacén</span>
-                    <span class="business-tagline">Panel administrativo</span>
+{% block page_content %}
+<div class="terminal-container">
+    <div class="terminal-main-card glass-custom">
+        <header class="terminal-header">
+            <div class="terminal-title-group">
+                <h1 class="terminal-title">
+                    <span class="terminal-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M1 10h22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15 14h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M15 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    Terminal de Venta
+                </h1>
+                <p class="terminal-status">Caja Abierta • Atendiendo ahora</p>
+            </div>
+            <div class="terminal-header-right">
+                <div class="terminal-clock" id="live-clock">00:00:00</div>
+                <a href="javascript:history.back()" class="btn-exit-terminal" title="Cerrar terminal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Salir
+                </a>
+            </div>
+        </header>
+
+        <div class="terminal-layout">
+            <!-- Sección Izquierda: Búsqueda y Lista de Productos -->
+            <div class="terminal-left-panel">
+                <div class="search-command-bar glass-custom">
+                    <div class="search-input-group">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <input type="text" id="product-search" placeholder="Escanear código o buscar producto (F1)" autofocus>
+                    </div>
+                </div>
+
+                <div class="products-table-container">
+                    <table class="terminal-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center">Cant.</th>
+                                <th class="text-right">Precio</th>
+                                <th class="text-right">Subtotal</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cart-items">
+                            <!-- Items dinámicos aquí -->
+                            <tr>
+                                <td colspan="5" class="empty-cart-msg">
+                                    <div class="empty-state">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3">
+                                            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/>
+                                            <path d="M3 6h18"/>
+                                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                                        </svg>
+                                        <p>La terminal está lista para vender</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <nav class="sidebar-nav" aria-label="Navegación principal">
-                <a href="{% url 'dashboard:admin_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'admin_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}aria-current="page"{% endif %}>
-                    <span class="sidebar-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="3" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
-                            <rect x="14" y="3" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
-                            <rect x="3" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
-                            <rect x="14" y="14" width="7" height="7" rx="1.2" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                    </span>
-                    <span class="sidebar-label">Dashboard</span>
-                </a>
-                <a href="{% url 'listar_productos' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_productos' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_productos' %}aria-current="page"{% endif %}>
-                    <span class="sidebar-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 16V8a1 1 0 0 0-.553-.894l-8-4a1 1 0 0 0-.894 0l-8 4A1 1 0 0 0 3 8v8a1 1 0 0 0 .553.894l8 4a1 1 0 0 0 .894 0l8-4A1 1 0 0 0 21 16z" stroke="currentColor" stroke-width="1.4"/>
-                            <path d="M3.27 6.96 12 11l8.73-4.04" stroke="currentColor" stroke-width="1.4"/>
-                        </svg>
-                    </span>
-                    <span class="sidebar-label">Productos</span>
-                </a>
-                <a href="{% url 'listar_clientes' %}" class="sidebar-link{% if request.resolver_match.url_name == 'listar_clientes' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'listar_clientes' %}aria-current="page"{% endif %}>
-                    <span class="sidebar-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                    </span>
-                    <span class="sidebar-label">Clientes</span>
-                </a>
-                <a href="{% url 'sales:ticket_list' %}" class="sidebar-link{% if request.resolver_match.url_name == 'ticket_list' or request.resolver_match.url_name == 'new_sale' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'ticket_list' or request.resolver_match.url_name == 'new_sale' %}aria-current="page"{% endif %}>
-                    <span class="sidebar-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2" stroke="currentColor" stroke-width="1.5"/>
-                            <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" stroke-width="1.5"/>
-                            <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                    </span>
-                    <span class="sidebar-label">Ventas</span>
-                </a>
-                <a href="{% url 'reports_dashboard' %}" class="sidebar-link{% if request.resolver_match.url_name == 'reports_dashboard' %} is-active{% endif %}" {% if request.resolver_match.url_name == 'reports_dashboard' %}aria-current="page"{% endif %}>
-                    <span class="sidebar-icon">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 19v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                    </span>
-                    <span class="sidebar-label">Reportes</span>
-                </a>
-            </nav>
-        </aside>
 
-        <main class="dashboard-main">
-            <header class="dashboard-header">
-                <div class="header-content">
-                    <h1 class="page-title">
-                        <span class="title-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M12 4v16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M4 12h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Sección Derecha: Totales y Cobro -->
+            <aside class="terminal-right-panel">
+                <div class="scanner-card glass-custom">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0; font-size: 1rem; color: var(--base-foreground);">Cámara / QR</h3>
+                        <button id="botonVoz" class="btn-secondary" style="font-size: 0.8rem; padding: 4px 8px; display: flex; align-items: center; gap: 4px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M19 10v1a7 7 0 0 1-14 0v-1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+                                <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>
                             </svg>
-                        </span>
-                        Terminal de Venta
-                    </h1>
-                    <p class="page-subtitle">Procesa ventas eficientemente con escáner QR y control de inventario</p>
-                </div>
-            </header>
-
-            <div class="content-section">
-                <div class="sale-terminal glass-custom">
-                    <button id="botonVoz" class="btn-secondary" style="margin-bottom: 20px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="btn-icon">
-                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M19 10v1a7 7 0 0 1-14 0v-1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="1.5"/>
-                            <line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                        Activar Voz
-                    </button>
-                    <div id="indicador" style="display:none; margin-bottom: 20px; color: #17a2b8;">🎤 Escuchando...</div>
-
-<div class="container">
-  <form method="post" id="sale-form">
-    {% csrf_token %}
-    <div class="row">
-      <!-- Columna izquierda: Lista de productos escaneados -->
-      <div class="section">
-        <h2>Productos Agregados</h2>
-        <ul id="product-list" class="list-group">
-          <!-- Lista de productos agregados al carrito -->
-          {% for item in scanned_items %}
-            <li class="list-group-item">
-              <!-- Contenedor de la fila -->
-              <div class="product-info">
-                <span class="product-name">{{ item.name }}</span>
-                <div class="product-price">Precio: ${{ item.price }} / {{ item.unit }}</div>
-              </div>
-              <div class="product-quantity">
-                <input type="number" min="1" value="{{ item.quantity }}" class="quantity-input">
-              </div>
-              <div class="product-total">
-                <span class="product-subtotal">${{ item.subtotal }}</span>
-              </div>
-              <div class="product-remove">
-                <button class="delete-button" data-item-id="{{ item.id }}">🗑️</button>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>        
-      </div>
-
-      <!-- Columna derecha: Escáner QR y selección de cliente -->
-      <div class="section">
-        <h2>Escáner QR</h2>
-        <div class="camera-container">
-          <video id="video-bg" class="video-animation" autoplay loop muted>
-            <source src="/static/sales/video/qr_scanner.mp4" type="video/mp4">
-            Tu navegador no soporta el video.
-          </video>
-          <video id="video" autoplay></video> <!-- Este es el video de la cámara -->
-          <canvas id="canvas" style="display: none"></canvas>
-          <div class="laser-overlay"></div> <!-- Capa con animación de láser -->
-        </div>
-        <p id="scan-status">Esperando código QR...</p>
-      
-      <!-- Contenedor de la imagen del producto escaneado -->
-      <div id="product-image-container" style="display: none;">
-          <img id="product-image" src="" alt="Producto Escaneado">
-      </div>
-        <!-- Formulario de búsqueda de productos -->
-        <form id="search-form">
-          <input type="text" id="search-input" name="search" placeholder="Buscar producto..." oninput="searchProducts()">
-        </form>
-
-        <!-- Contenedor para mostrar los resultados -->
-        <div id="search-results"></div>
-
-        <!-- Selección de cliente y venta fiada -->
-        <div class="field-group">
-          <h4>Seleccionar Cliente</h4>
-          <select id="cliente-select" name="cliente_id" class="select-field">
-            <option value="">-- Seleccionar Cliente --</option>
-            {% for cliente in clientes %}
-              <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
-            {% endfor %}
-          </select>
-          
-          <div class="field-group">
-            <h4>Seleccionar Método de Pago</h4>
-            <select id="payment-method" name="payment_method" class="select-field">
-              <option value="">-- Seleccionar Método de Pago --</option>
-              <option value="efectivo">Efectivo</option>
-              <option value="tarjeta">Tarjeta</option>
-              <option value="credito">Crédito</option>
-              <option value="fiado">Fiado</option> <!-- Opción para pago a crédito -->
-              <option value="otros">Otros</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-    <div class="row">
-      <div class="section flex-row">
-        <h4>Total de la compra:</h4>
-        <span id="total-compra">${{ total_amount }}</span> <!-- Se reemplaza con el total real -->
-        <button type="submit" name="close_sale" class="btn-custom" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">Cerrar Venta</button>
-      </div>
-    </div>
-  <div class="row">
-    <div class="section text-right">
-  <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn-custom">Volver al Dashboard Cajero</a>
-    </div>
-  </div>
-</div>
-                </div>
-            </div>
-        </main>
-    </div>
-</div>
-
-<!-- Incluye la biblioteca jsQR -->
-<script src="{% static 'js/jsQR.js' %}"></script>
-
-<script>
-
-  document.addEventListener('DOMContentLoaded', function() {
-    const modoVozBtn = document.getElementById('modo-voz');
-    const indicador = document.getElementById('indicador');
-    
-    let modoVozActivo = false;
-
-    // Función para activar/desactivar modo de voz
-    modoVozBtn.addEventListener('click', function() {
-        modoVozActivo = !modoVozActivo;
-        
-        if (modoVozActivo) {
-            modoVozBtn.textContent = 'Desactivar Voz'; // Cambia el texto del botón
-            indicador.style.display = 'inline'; // Muestra el indicador de voz
-        } else {
-            modoVozBtn.textContent = 'Activar Voz'; // Cambia el texto del botón
-            indicador.style.display = 'none'; // Oculta el indicador de voz
-        }
-
-        // Aquí puedes agregar la lógica para iniciar o detener el reconocimiento de voz
-    });
-  });
-
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const videoBg = document.getElementById('video-bg');;
-
-    modoSelect.addEventListener('change', () => {
-      if (modoSelect.value === 'voz') {
-        modoVozButton.disabled = false;  // Habilitar el botón
-      } else {
-        modoVozButton.disabled = true;   // Deshabilitar el botón
-      }
-    });
-    
-    // Asegurarse de que el video de fondo se reproduzca al cargar la página
-    const playVideo = () => {
-      videoBg.play()
-        .then(() => {
-          console.log('Video de fondo reproduciéndose al cargar la página.');
-        })
-        .catch((error) => {
-          console.error('Error al reproducir el video de fondo:', error);
-        });
-    };
-  
-    // Intentar reproducir el video
-    playVideo();
-  
-    // Si el video no se reproduce al cargar la página, intentar nuevamente con un retraso
-    setTimeout(playVideo, 1000);
-  });
-
-  const confirmSound = new Audio("/static/sounds/confirm.wav");
-  const productosEscaneados = new Map();
-  const video = document.getElementById("video");
-  const canvas = document.getElementById("canvas");
-  const context = canvas.getContext("2d");
-  const scanStatus = document.getElementById("scan-status");
-  const totalCompraElement = document.getElementById("total-compra");
-  
-  const productImageContainer = document.getElementById("product-image-container");
-  const productImage = document.getElementById("product-image");
-  
-  let scanningEnabled = true; // Variable para controlar el escaneo
-  
-  navigator.mediaDevices.getUserMedia({ video: true })
-    .then((stream) => {
-      video.srcObject = stream;
-      requestAnimationFrame(scanQRCode); // Asegura que el escaneo comienza cuando la cámara está activa
-    })
-    .catch((err) => {
-      console.error('Error al acceder a la cámara:', err);
-      scanStatus.textContent = "No se puede acceder a la cámara";
-    });
-  
-  function scanQRCode() {
-    if (!scanningEnabled) return; // Si el escaneo está deshabilitado, no hacemos nada
-  
-    // Configuración del canvas para capturar la imagen del video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Si encuentra un código QR
-    if (qrCode) {
-      const productId = qrCode.data; // Asumiendo que el código QR contiene el ID del producto
-      agregarProductoALista(productId);
-      confirmSound.play();
-    } else {
-      scanStatus.textContent = "Esperando código QR...";
-    }
-  
-    // Continuamos escaneando
-    requestAnimationFrame(scanQRCode);
-  }
-
-  function agregarProductoALista(productId, cantidad = 1, esFraccionado = false) {
-    const productIdStr = String(productId);
-    const productList = document.getElementById("product-list");
-
-    if (productosEscaneados.has(productIdStr)) {
-        return;
-    }
-
-    // Mostrar la animación de fondo al iniciar el escaneo
-    showBackgroundVideo();
-
-    fetch(`/sales/api/productos/${productIdStr}/`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Error al obtener el producto");
-            }
-            return response.json();
-        })
-        .then(producto => {
-            if (!producto || !producto.nombre || !producto.precio_venta) {
-                console.error("Producto no válido:", producto);
-                return;
-            }
-
-            // Depurar la cantidad recibida
-            console.log(`Producto: ${producto.nombre}, Cantidad: ${cantidad}`);
-
-            // Actualizar el fondo de la cámara con la imagen del producto
-            if (producto.imagen) {
-                const cameraContainer = document.querySelector('.camera-container');
-                cameraContainer.style.backgroundImage = `url(${producto.imagen})`;
-                cameraContainer.style.backgroundColor = "transparent";
-
-                // Vuelve a mostrar la animación después de 2 segundos
-                setTimeout(() => {
-                    cameraContainer.style.backgroundImage = '';
-                    showBackgroundVideo();
-                }, 2000);
-            }
-
-            const li = document.createElement("li");
-            li.className = "list-group-item";
-            li.dataset.productId = productIdStr;
-
-            const precio = parseFloat(producto.precio_venta.replace(',', '.'));
-            let totalInicial;
-
-            // Si el producto es fraccionado, usa el valor de esFraccionado (para comando de voz)
-            if (esFraccionado) {
-                totalInicial = precio * (cantidad / 1000); // Si es fraccionado, dividir por 1000
-            } else {
-                totalInicial = precio * cantidad; // Si no, multiplicar directamente
-            }
-
-            const precioTexto = esFraccionado ? "Precio x Kg" : "Precio x unidad";
-            const unidadTexto = esFraccionado ? "grs" : "unidades";
-
-            let inputCantidad;
-            if (esFraccionado) {
-                inputCantidad = `
-                    <input type="number" min="10" max="5000" step="10" value="${cantidad}" 
-                        onchange="actualizarCantidad('${productIdStr}', this.value, true)">
-                    ${unidadTexto}
-                `;
-            } else {
-                inputCantidad = `
-                    <input type="number" min="1" value="${cantidad}" 
-                        onchange="actualizarCantidad('${productIdStr}', this.value, false)">
-                    unidades
-                `;
-            }
-
-            li.innerHTML = `
-                <div class="product-info">
-                    <span class="product-name">${producto.nombre}</span>
-                    <span class="product-price">${precioTexto}: $${precio.toFixed(2)}</span>
-                </div>
-                <div class="product-quantity">
-                    ${inputCantidad}
-                </div>
-                <div class="product-total">
-                    $<span class="costo">${totalInicial.toFixed(2)}</span>
-                </div>
-                <i class="fas fa-trash-alt eliminar" 
-                    onclick="eliminarProducto('${productIdStr}', 1)" 
-                    style="cursor: pointer; color: red; font-size: 20px;">
-                </i>
-            `;
-
-            productList.appendChild(li);
-            productosEscaneados.set(productIdStr, { 
-                elemento: li, 
-                cantidad: cantidad, 
-                precio_venta: precio, 
-                fraccionado: esFraccionado,  // Usamos esFraccionado para marcar si es fraccionado o no
-                total: totalInicial 
-            });
-            actualizarTotalCompra();
-
-            // Ocultar la animación después de agregar el producto
-            hideBackgroundVideo();
-
-            // Construir el mensaje de audio
-            let mensaje = `El producto ${producto.nombre}`;
-            if (esFraccionado) {
-                mensaje += ` en ${cantidad} gramos`; // Añadir detalles de fraccionado si aplica
-            } else {
-                mensaje += ` en ${cantidad} unidades`; // Añadir cantidad de unidades
-            }
-
-            console.log(mensaje);
-
-            
-            mensaje += " ha sido agregado a la lista.";
-
-            // Llamar a la función para reproducir el mensaje en voz alta
-            reproducirAudio(mensaje);
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            hideBackgroundVideo(); // Ocultar la animación en caso de error
-        });
-}
-
-function reproducirAudio(mensaje) {
-  console.log("Reproduciendo mensaje:", mensaje);  // Verificar que el mensaje se está construyendo correctamente
-  const utterance = new SpeechSynthesisUtterance(mensaje);
-  utterance.lang = 'es-ES';
-  window.speechSynthesis.speak(utterance);
-}
-
-
-// Mostrar la animación
-function showBackgroundVideo() {
-  const videoBg = document.getElementById('video-bg');
-  videoBg.currentTime = 0; // Reinicia el video
-  videoBg.style.display = 'block'; // Asegúrate de mostrarlo
-  videoBg.play().catch((error) => console.error('Error al reproducir el video:', error));
-}
-
-// Ocultar la animación
-function hideBackgroundVideo() {
-  const videoBg = document.getElementById('video-bg');
-  videoBg.style.display = 'none';
-  videoBg.pause(); // Pausa para evitar usar recursos innecesarios
-}
-
-  function scanQRCode() {
-    if (video.readyState === video.HAVE_ENOUGH_DATA && scanningEnabled) {
-      canvas.height = video.videoHeight;
-      canvas.width = video.videoWidth;
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, canvas.width, canvas.height);
-
-      if (code && code.data) {
-        scanStatus.textContent = `Producto escaneado: ${code.data}`;
-        agregarProductoALista(code.data);
-        confirmSound.play();
-
-        scanningEnabled = false;
-        setTimeout(() => {
-          scanningEnabled = true;
-        }, 3000);
-      } else {
-        scanStatus.textContent = "Esperando código QR...";
-      }
-    }
-
-    requestAnimationFrame(scanQRCode);
-  }
-
-  function actualizarCantidad(productIdStr, nuevaCantidad, esFraccionado) {
-    const producto = productosEscaneados.get(productIdStr);
-    if (!producto) return;
-
-    const precio = producto.precio_venta;
-    let costoTotal;
-
-    if (esFraccionado) {
-      const cantidadEnKilos = nuevaCantidad / 1000;
-      costoTotal = precio * cantidadEnKilos;
-    } else {
-      costoTotal = precio * nuevaCantidad;
-    }
-
-    producto.elemento.querySelector('.costo').textContent = costoTotal.toFixed(2);
-    producto.cantidad = nuevaCantidad;
-    producto.total = costoTotal;
-    actualizarTotalCompra();
-  }
-
-  function eliminarProducto(id, cantidad) {
-    const item = productosEscaneados.get(id);
-    if (item) {
-      if (item.cantidad > 1) {
-        item.cantidad -= cantidad;
-        actualizarLista(item);
-      } else {
-        productosEscaneados.delete(id);
-        const productList = document.getElementById("product-list");
-        const items = productList.getElementsByTagName("li");
-        for (let i = 0; i < items.length; i++) {
-          if (items[i].dataset.productId === id) {
-            productList.removeChild(items[i]);
-            break;
-          }
-        }
-      }
-      actualizarTotalCompra();
-    }
-  }
-
-  function actualizarTotalCompra() {
-    let total = 0;
-    productosEscaneados.forEach(producto => {
-      total += producto.total;
-    });
-    totalCompraElement.textContent = `$${total.toFixed(2)}`;
-  }
-
-  // Evento para procesar el formulario y enviar la venta
-  document.getElementById("sale-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const clienteId = document.getElementById("cliente-select").value;
-    if (!clienteId) {
-      alert("Debes seleccionar un cliente para continuar.");
-      return;
-    }
-
-    const productosData = Array.from(productosEscaneados.values()).map(producto => ({
-      id: parseInt(producto.elemento.dataset.productId),
-      cantidad: producto.cantidad,
-      total: producto.total,
-      precio_unitario: producto.precio_venta 
-    }));
-    
-    // Calcular el total de la compra sumando los totales de los productos
-    const totalCompra = productosData.reduce((total, producto) => total + producto.total, 0);
-    const ventaFiada = document.getElementById("venta-fiada").value || ''; 
-
-    const data = {
-      cliente_id: parseInt(clienteId),
-      productos: productosData,
-      total: parseFloat(totalCompra) || 0,
-      venta_fiada: ventaFiada
-    };
-
-    console.log("Objeto JSON que se enviará al backend:", data);
-
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-    fetch("/sales/api/realizar-venta/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert("Venta registrada con éxito");
-          window.location.href = `/sales/tickets/${data.ticket_id}/`;
-        } else {
-          alert("Error al registrar la venta");
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("Hubo un problema al procesar la venta.");
-      });
-  });
-
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  }
-
-  function searchProducts() {
-    const query = document.getElementById("search-input").value;
-
-    if (query.length > 2) {  // Solo hacer la búsqueda si el texto tiene más de 2 caracteres
-        fetch(`/sales/api/search_products/?query=${encodeURIComponent(query)}`, {
-            method: "GET",
-        })
-        .then(response => response.json())
-        .then(data => {
-            let resultsHtml = '';
-            if (data.products.length > 0) {
-                data.products.forEach(product => {
-                    resultsHtml += `
-                        <div class="product-result" onclick="agregarProductoALista(${product.id})">
-                            <span>${product.nombre}</span>
-                            <span>$${product.precio_venta}</span>
+                            <span id="voz-text">Voz</span>
+                        </button>
+                    </div>
+                    <div id="indicador" style="display:none; margin-bottom: 5px; color: var(--accent-info); font-size: 0.85rem;">🎤 Escuchando...</div>
+                    <div class="camera-container">
+                        <video id="video-bg" class="video-animation" autoplay loop muted>
+                            <source src="{% static 'sales/video/qr_scanner.mp4' %}" type="video/mp4">
+                        </video>
+                        <video id="video" autoplay style="opacity: 0; position: absolute; pointer-events: none; z-index: -1;"></video>
+                        <canvas id="canvas" style="display: none"></canvas>
+                        <div class="laser-overlay"></div>
+                        
+                        <!-- Overlay para el resultado del escaneo -->
+                        <div id="product-feedback" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); z-index: 10; flex-direction: column; align-items: center; justify-content: center; padding: 10px; box-sizing: border-box;">
+                            <img id="feedback-img" src="" style="max-height: 100px; border-radius: 8px; display: none; object-fit: cover;">
+                            <span id="feedback-text" style="color: white; font-weight: bold; margin-top: 10px; font-size: 0.9rem; text-align: center;"></span>
                         </div>
-                    `;
-                });
-            } else {
-                resultsHtml = '<p>No se encontraron productos.</p>';
-            }
-            document.getElementById("search-results").innerHTML = resultsHtml;
-        })
-        .catch(error => console.error('Error en la búsqueda:', error));
-    } else {
-        document.getElementById("search-results").innerHTML = '';  // Limpiar resultados si la búsqueda es vacía
-    }
-}
-
-</script>
-
-<script>
-   // Función para buscar el producto por nombre y obtener su ID
-  function buscarProductoPorNombre(nombreProducto, cantidad, esFraccionado) {
-    // Realizamos una búsqueda por el nombre del producto    
-    fetch(`/sales/api/search_products/?query=${encodeURIComponent(nombreProducto)}`)
-      .then(response => response.json())
-      .then(data => {
-        let producto = null;
-        // Buscamos el primer producto en los resultados
-        if (data.products.length > 0) {
-          producto = data.products[0];  // Suponemos que solo hay un resultado relevante
-          console.log("Producto encontrado:", producto);
-          console.log("Producto encontrado ID:", producto.id);
-          // Pasamos el ID del producto a la función agregarProductoALista
-          agregarProductoALista(producto.id, cantidad, esFraccionado); // Llamamos con el ID del producto
-        } else {
-          console.log("Producto buscado:" . nombreProducto . cantidad . esFraccionado);
-        }
-      })
-      .catch(error => {
-        console.error("Error al buscar el producto:", error);
-      });
-  }
-
-  function procesarComandoDeVoz(comando) {
-    console.log("Comando recibido en procesarComandoDeVoz:", comando);
-  
-    // Normalizamos el comando para evitar errores por mayúsculas/minúsculas
-    const palabras = comando.trim().toLowerCase().split(' ');
-  
-    // Verificamos si el comando comienza con "madre producto"
-    if (palabras[0] !== "madre" || palabras[1] !== "producto") {
-      console.error("Comando inválido, debe comenzar con 'madre producto'");
-      return;
-    }
-  
-    // Inicializamos las variables para el nombre, cantidad y tipo de fracción
-    let nombreProducto = "";
-    let cantidad = 1; // Valor por defecto
-    let esFraccionado = false;
-  
-    // Diccionario para convertir números escritos como texto a valores numéricos
-    const numerosComoTexto = {
-      "uno": 1,
-      "dos": 2,
-      "tres": 3,
-      "cuatro": 4,
-      "cinco": 5,
-      "seis": 6,
-      "siete": 7,
-      "ocho": 8,
-      "nueve": 9,
-      "diez": 10
-    };
-  
-    // Revisamos la última palabra para determinar si es cantidad o tipo de fracción
-    const ultimaPalabra = palabras[palabras.length - 1];
-    const penultimaPalabra = palabras.length > 2 ? palabras[palabras.length - 2] : "";
-  
-    if (!isNaN(ultimaPalabra)) {
-      // Si la última palabra es un número, la tomamos como cantidad
-      cantidad = parseFloat(ultimaPalabra);
-      nombreProducto = palabras.slice(2, -1).join(" ");
-    } else if (numerosComoTexto[ultimaPalabra]) {
-      // Si la última palabra es un número en texto, lo convertimos a cantidad
-      cantidad = numerosComoTexto[ultimaPalabra];
-      nombreProducto = palabras.slice(2, -1).join(" ");
-    } else if (ultimaPalabra === "gramos" || ultimaPalabra === "kilos" || ultimaPalabra === "kilo") {
-      // Si la última palabra es "gramos" o "kilos", el producto es fraccionado
-      esFraccionado = true;
-
-      // Si la penúltima palabra es un número, la usamos como cantidad
-      if (!isNaN(penultimaPalabra)) {
-        cantidad = parseFloat(penultimaPalabra);
-      } else if (numerosComoTexto[penultimaPalabra]) {
-        cantidad = numerosComoTexto[penultimaPalabra];
-      } else {
-        console.error("No se especificó una cantidad válida para un producto fraccionado");
-        return;
-      }
-  
-      if (ultimaPalabra === "kilos") {
-        cantidad *= 1000; // Convertimos kilos a gramos
-      }
-  
-      // El nombre del producto es todo lo que está antes de la cantidad
-      nombreProducto = palabras.slice(2, -2).join(" ");
-    } else {
-      // Si no hay cantidad específica, asumimos 1 unidad
-      nombreProducto = palabras.slice(2).join(" ");
-    }
-  
-    // Validamos que al menos tengamos un nombre de producto
-    if (!nombreProducto) {
-      console.error("No se detectó un nombre de producto en el comando");
-      return;
-    }
-  
-    console.log("Nombre del producto limpio:", nombreProducto.trim());
-    console.log("Cantidad:", cantidad, "Es fraccionado:", esFraccionado);
-  
-    // Llamamos a la función para buscar y procesar el producto
-    buscarProductoPorNombre(nombreProducto, cantidad, esFraccionado);
-}
- 
-// Reconocimiento de voz
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-if (SpeechRecognition) {
-  const recognition = new SpeechRecognition();
-  recognition.lang = 'es-ES'; // Configurar idioma español
-  recognition.continuous = false; // Escuchar un comando a la vez
-  recognition.interimResults = false; // Solo resultados finales
-
-  // Variables para controlar el estado del reconocimiento
-  let vozActivada = false; // Indica si el modo voz está activado
-
-  const botonVoz = document.getElementById("botonVoz"); // Botón de activación/desactivación
-  const indicador = document.getElementById("indicador"); // Indicador visual
-
-  // Activar/desactivar el reconocimiento de voz
-  botonVoz.addEventListener('click', () => {
-    if (!vozActivada) {
-      // Activar modo voz
-      vozActivada = true;
-      indicador.style.display = 'block'; // Mostrar indicador
-      botonVoz.textContent = "Modo Voz Activado";
-      console.log("Reconocimiento de voz activado.");
-      recognition.start(); // Iniciar el reconocimiento
-    } else {
-      // Desactivar manualmente
-      vozActivada = false;
-      indicador.style.display = 'none'; // Ocultar indicador
-      botonVoz.textContent = "Activar Voz";
-      recognition.stop(); // Detener reconocimiento
-      console.log("Reconocimiento de voz desactivado manualmente.");
-    }
-  });
-
-  // Procesar resultado del reconocimiento
-  recognition.addEventListener('result', (event) => {
-    const comando = event.results[0][0].transcript.toLowerCase().trim();
-    console.log(`Comando reconocido: ${comando}`);
-    
-    if (comando.startsWith("madre producto")) {
-      // Procesar comando para agregar producto
-      procesarComandoDeVoz(comando);
-    } else if (comando === "madre terminar") {
-      // Detener el modo voz
-      vozActivada = false;
-      recognition.stop();
-      indicador.style.display = 'none';
-      botonVoz.textContent = "Activar Voz";
-      console.log("Reconocimiento de voz desactivado por comando.");
-    } else {
-      console.log("Comando no reconocido.");
-    }
-  });
-
-  // Después de procesar un comando, reiniciar si el modo voz sigue activado
-  recognition.addEventListener('end', () => {
-    if (vozActivada) {
-      console.log("Esperando un nuevo comando...");
-      recognition.start(); // Reiniciar reconocimiento para un nuevo comando
-    } else {
-      console.log("Reconocimiento de voz detenido.");
-    }
-  });
-
-  // Manejo de errores de reconocimiento
-  recognition.addEventListener('error', (event) => {
-    console.error('Error en reconocimiento de voz:', event.error);
-    indicador.style.display = 'none';
-    botonVoz.textContent = "Activar Voz"; // Restaurar el texto del botón en caso de error
-  });
-} else {
-  alert('Tu navegador no soporta reconocimiento de voz.');
-  console.log('El navegador no soporta reconocimiento de voz.');
-}
-
-</script>
+                    </div>
+                    <p id="scan-status" style="text-align: center; margin-top: 5px; font-size: 0.85rem; color: var(--base-foreground-muted);">Esperando código QR...</p>
                 </div>
-            </div>
-        </main>
+
+                <div class="summary-card glass-custom">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="subtotal-val">$ 0,00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Descuento</span>
+                        <span id="discount-val">$ 0,00</span>
+                    </div>
+                    <div class="summary-total">
+                        <label>TOTAL A PAGAR</label>
+                        <div class="total-amount" id="total-val">$ 0,00</div>
+                    </div>
+                    
+                    <div class="payment-methods-grid">
+                        <button class="pay-method-btn active" data-method="efectivo">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Efectivo (F2)
+                        </button>
+                        <button class="pay-method-btn" data-method="tarjeta">
+                            <i class="fas fa-credit-card"></i>
+                            Tarjeta (F3)
+                        </button>
+                        <button class="pay-method-btn" data-method="cuenta">
+                            <i class="fas fa-user-tag"></i>
+                            Cta. Cte (F4)
+                        </button>
+                    </div>
+
+                    <button class="finalize-sale-btn" id="finish-sale">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        FINALIZAR VENTA (ENTER)
+                    </button>
+                </div>
+
+                <div class="shortcuts-legend glass-custom">
+                    <h3>Atajos Rápidos</h3>
+                    <ul>
+                        <li><kbd>F1</kbd> Buscar producto</li>
+                        <li><kbd>F2</kbd> Efectivo</li>
+                        <li><kbd>ENTER</kbd> Finalizar</li>
+                        <li><kbd>ESC</kbd> Cancelar Venta</li>
+                    </ul>
+                </div>
+            </aside>
+        </div>
     </div>
 </div>
 
+<script src="{% static 'js/jsQR.js' %}"></script>
+<script>
+    // Reloj en tiempo real
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('es-AR', { hour12: false });
+        document.getElementById('live-clock').textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Voice & Scanner Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const modoVozBtn = document.getElementById('botonVoz');
+        const indicador = document.getElementById('indicador');
+        const vozText = document.getElementById('voz-text');
+        
+        let modoVozActivo = false;
+
+        modoVozBtn.addEventListener('click', function() {
+            modoVozActivo = !modoVozActivo;
+            
+            if (modoVozActivo) {
+                vozText.textContent = 'Apagar Voz';
+                indicador.style.display = 'block';
+                modoVozBtn.style.color = '#ff3b3b';
+                modoVozBtn.style.borderColor = '#ff3b3b';
+            } else {
+                vozText.textContent = 'Voz';
+                indicador.style.display = 'none';
+                modoVozBtn.style.color = 'inherit';
+                modoVozBtn.style.borderColor = 'transparent';
+            }
+        });
+
+        // Background video fallback
+        const videoBg = document.getElementById('video-bg');
+        if (videoBg) {
+            const playVideo = () => {
+                videoBg.play().catch(e => console.log('Video intro err:', e));
+            };
+            playVideo();
+            setTimeout(playVideo, 1000);
+        }
+    });
+
+    // Scanner initialization
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const context = canvas ? canvas.getContext("2d") : null;
+    const scanStatus = document.getElementById("scan-status");
+    let scanningEnabled = true;
+    let isProcessingCode = false; // Bandera para evitar lecturas múltiples
+
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+        .then((stream) => {
+            if(video) {
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true);
+                if (typeof jsQR !== "undefined") {
+                    requestAnimationFrame(scanQRCode);
+                } else {
+                    scanStatus.textContent = "Librería jsQR no cargada";
+                }
+            }
+        })
+        .catch((err) => {
+            console.error('Error cámara:', err);
+            if(scanStatus) scanStatus.textContent = "No se detectó cámara";
+        });
+    }
+
+    function scanQRCode() {
+        if (!scanningEnabled || !video || !canvas || video.readyState !== video.HAVE_ENOUGH_DATA) {
+            if (!isProcessingCode) requestAnimationFrame(scanQRCode);
+            return;
+        }
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+        });
+
+        if (code && !isProcessingCode) {
+            isProcessingCode = true; // Bloquea nuevas lecturas
+            
+            scanStatus.textContent = "Procesando...";
+            scanStatus.style.color = "var(--base-foreground)";
+            
+            const feedbackOverlay = document.getElementById('product-feedback');
+            const feedbackText = document.getElementById('feedback-text');
+            const feedbackImg = document.getElementById('feedback-img');
+            
+            feedbackOverlay.style.display = 'flex';
+            feedbackText.textContent = "Buscando... (" + code.data + ")";
+            feedbackText.style.color = "var(--base-foreground)";
+            feedbackImg.style.display = 'none';
+
+            // Llamada real a la API para verificar si el producto existe
+            fetch(`/sales/api/productos/${code.data}/`)
+                .then(response => {
+                    if (!response.ok) throw new Error("Producto No Encontrado");
+                    return response.json();
+                })
+                .then(producto => {
+                    if (producto.imagen) {
+                        feedbackImg.src = producto.imagen;
+                        feedbackImg.style.display = 'block';
+                    }
+                    feedbackText.textContent = producto.nombre;
+                    feedbackText.style.color = "#10b981"; // Success (verde)
+
+                    // Llama a la función global para agregarlo (si ya existe en tu JS global)
+                    if (typeof agregarProductoALista === "function") {
+                        agregarProductoALista(code.data);
+                    }
+                })
+                .catch(err => {
+                    feedbackText.textContent = err.message;
+                    feedbackText.style.color = "#ff3b3b"; // Danger (rojo)
+                })
+                .finally(() => {
+                    // Limpia el feedback pasado un tiempo
+                    setTimeout(() => {
+                        feedbackOverlay.style.display = 'none';
+                        scanStatus.textContent = "Esperando código QR...";
+                        scanStatus.style.color = "var(--base-foreground-muted)";
+                        
+                        // Permite leer un nuevo QR tras limpiar la interfaz
+                        setTimeout(() => {
+                            isProcessingCode = false;
+                            requestAnimationFrame(scanQRCode);
+                        }, 500); 
+                    }, 2000);
+                });
+        } else {
+             requestAnimationFrame(scanQRCode);
+        }
+    }
+</script>
 {% endblock %}
