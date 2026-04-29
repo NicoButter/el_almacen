@@ -55,21 +55,42 @@ def parse_decimal(value):
 
 @admin_required
 def ticket_list(request):
-    tickets = Ticket.objects.all().order_by('-date')
+    import datetime
+    from django.db.models import Count
 
-    # Calcular métricas
-    total_tickets = Ticket.objects.count()
-    total_ventas = Ticket.objects.aggregate(total=Sum('total'))['total'] or 0
-    tickets_hoy = Ticket.objects.filter(date__date=timezone.now().date()).count()
-    promedio_ticket = total_ventas / total_tickets if total_tickets > 0 else 0
+    now = timezone.now()
+    today = now.date()
+    start_of_week = today - datetime.timedelta(days=today.weekday())
+    start_of_month = today.replace(day=1)
+
+    tickets = (
+        Ticket.objects
+        .all()
+        .order_by('-date')
+        .select_related('cashier', 'cliente')
+        .prefetch_related('line_items__product')
+    )
+
+    def _agg(qs):
+        r = qs.aggregate(total=Sum('total'), count=Count('id'))
+        return r['total'] or 0, r['count'] or 0
+
+    total_historico, count_historico = _agg(Ticket.objects.all())
+    total_mes, count_mes = _agg(Ticket.objects.filter(date__date__gte=start_of_month))
+    total_semana, count_semana = _agg(Ticket.objects.filter(date__date__gte=start_of_week))
+    total_hoy, count_hoy = _agg(Ticket.objects.filter(date__date=today))
 
     return render(request, 'sales/ticket_list.html', {
-        'page_title': 'Lista de Tickets',
+        'page_title': 'Ventas',
         'tickets': tickets,
-        'total_tickets': total_tickets,
-        'total_ventas': total_ventas,
-        'tickets_hoy': tickets_hoy,
-        'promedio_ticket': promedio_ticket,
+        'total_historico': total_historico,
+        'count_historico': count_historico,
+        'total_mes': total_mes,
+        'count_mes': count_mes,
+        'total_semana': total_semana,
+        'count_semana': count_semana,
+        'total_hoy': total_hoy,
+        'count_hoy': count_hoy,
     })
 
 # ---------------------------------------------------------------------------------------------------------------
