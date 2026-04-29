@@ -1,0 +1,8 @@
+django>=5.1.2
+python-decouple
+django-crispy-forms
+crispy-bootstrap5
+reportlab
+weasyprint
+qrcode
+psycopg[binary]
