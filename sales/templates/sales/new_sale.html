@@ -25,6 +25,14 @@
                 </h1>
                 <p class="terminal-status">Caja Abierta • Atendiendo ahora</p>
             </div>
+            
+            <div class="header-shortcuts glass-custom">
+                <div class="header-shortcut-item"><kbd>F1</kbd> Buscar producto</div>
+                <div class="header-shortcut-item"><kbd>F2</kbd> Efectivo</div>
+                <div class="header-shortcut-item"><kbd>ENTER</kbd> Finalizar</div>
+                <div class="header-shortcut-item"><kbd>ESC</kbd> Cancelar Venta</div>
+            </div>
+
             <div class="terminal-header-right">
                 <div class="terminal-clock" id="live-clock">00:00:00</div>
                 <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-exit-terminal" title="Volver al panel con menú">
@@ -162,16 +170,6 @@
                         </svg>
                         FINALIZAR VENTA (ENTER)
                     </button>
-                </div>
-
-                <div class="shortcuts-legend glass-custom">
-                    <h3>Atajos Rápidos</h3>
-                    <ul>
-                        <li><kbd>F1</kbd> Buscar producto</li>
-                        <li><kbd>F2</kbd> Efectivo</li>
-                        <li><kbd>ENTER</kbd> Finalizar</li>
-                        <li><kbd>ESC</kbd> Cancelar Venta</li>
-                    </ul>
                 </div>
             </aside>
         </div>

@@ -525,3 +525,36 @@ body.fullscreen-terminal .base-content-area {
     border-radius: 16px;
     border: 1px solid rgba(255,255,255,0.05);
 }
+
+/* Atajos Rápidos en el Header */
+.header-shortcuts {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.15);
+    padding: 0.5rem 1.5rem;
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.05);
+    margin: 0 2rem;
+}
+
+.header-shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--base-muted-foreground);
+    white-space: nowrap;
+}
+
+.header-shortcut-item kbd {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--base-primary-foreground, #fff);
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
