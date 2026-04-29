@@ -16,7 +16,19 @@ def admin_required(view_func):
     """Decorator to ensure user is admin."""
     @login_required
     def wrapper(request, *args, **kwargs):
-        if not hasattr(request.user, 'is_admin') or not request.user.is_admin:
+        if not (hasattr(request.user, 'is_admin') and request.user.is_admin):
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return redirect('dashboard:user_dashboard')
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+
+def cashier_required(view_func):
+    """Decorator to ensure user is cashier or admin."""
+    @login_required
+    def wrapper(request, *args, **kwargs):
+        if not (hasattr(request.user, 'is_cashier') and request.user.is_cashier) and \
+           not (hasattr(request.user, 'is_admin') and request.user.is_admin):
             messages.error(request, 'No tienes permisos para acceder a esta página.')
             return redirect('dashboard:user_dashboard')
         return view_func(request, *args, **kwargs)
@@ -97,14 +109,9 @@ def admin_dashboard(request):
 
     return render(request, 'dashboards/admin_dashboard.html', context)
 
-@login_required
+@cashier_required
 def cashier_dashboard(request):
     """Cashier dashboard - accessible by cashiers and admins."""
-    if not (hasattr(request.user, 'is_cashier') and request.user.is_cashier) and \
-       not (hasattr(request.user, 'is_admin') and request.user.is_admin):
-        messages.error(request, 'No tienes permisos para acceder a esta página.')
-        return redirect('dashboard:user_dashboard')
-    
     return render(request, 'dashboards/cashier_dashboard.html', {'page_title': 'Dashboard Cajero'})
 
 

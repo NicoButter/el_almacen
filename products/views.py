@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponse
 from django.contrib import messages
-from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
+from dashboards.views import admin_required, cashier_required
 from django.core.paginator import Paginator
 from io import BytesIO
 from reportlab.lib.pagesizes import letter
@@ -20,6 +21,7 @@ from datetime import datetime
 
 # -----------------------------------------------------------------------------------------------------------------
 
+@cashier_required
 def listar_productos(request):
     categoria_id = request.GET.get('categoria')
     search_query = request.GET.get('search', '').strip()
@@ -82,6 +84,7 @@ def listar_productos(request):
 
 # -----------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def agregar_producto(request):
     # Recuperar datos del formulario desde la sesión
     initial_data = request.session.pop('product_form_data', None)
@@ -127,6 +130,7 @@ def agregar_producto(request):
 
 # -----------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def editar_producto(request, pk):
     producto = Product.objects.get(pk=pk)
     if request.method == 'POST':
@@ -144,6 +148,7 @@ def editar_producto(request, pk):
 
 # -----------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def eliminar_producto(request, pk):
     producto = Product.objects.get(pk=pk)
 
@@ -161,6 +166,7 @@ def eliminar_producto(request, pk):
     })
 
 # -----------------------------------------------------------------------------------------------------------------
+@admin_required
 
 def crear_categoria(request):
     if request.method == 'POST':
@@ -198,6 +204,7 @@ def crear_categoria(request):
 from django.db.models import Sum, Count, F
 
 # ...
+@admin_required
 
 # Vista para listar categorías
 def listar_categorias(request):
@@ -245,6 +252,7 @@ def listar_categorias(request):
     })
 
 # -----------------------------------------------------------------------------------------------------------------
+@admin_required
 
 # Vista para editar una categoría
 def editar_categoria(request, categoria_id):
@@ -260,6 +268,7 @@ def editar_categoria(request, categoria_id):
         'page_title': 'Editar Categoría',
         'categoria': categoria
     })
+@admin_required
 
 #-----------------------------------------------------------------------------------------------------------------
 
@@ -274,6 +283,7 @@ def eliminar_categoria(request, categoria_id):
     categoria.delete()
     messages.success(request, "Categoría eliminada con éxito.")
     return redirect('listar_categorias')  # Redirige al listado de categorías
+@admin_required
 
 #-----------------------------------------------------------------------------------------------------------------
 

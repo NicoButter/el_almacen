@@ -6,3 +6,4 @@ reportlab
 weasyprint
 qrcode
 psycopg[binary]
+ 

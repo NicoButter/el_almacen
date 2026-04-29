@@ -4,6 +4,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.db.models import Sum, Q
 from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from dashboards.views import admin_required
 
 from reportlab.lib.pagesizes import A4, landscape, letter
 from reportlab.platypus import Table, TableStyle, Paragraph, SimpleDocTemplate
@@ -20,11 +22,13 @@ from datetime import date, datetime, timedelta
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def reports_dashboard(request):
     return render(request, 'reports/reports_dashboard.html', {'page_title': 'Reportes'})
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def inventory_report_pdf(request):
     # Obtener parámetros de filtrado desde la URL o formulario
     categoria_id = request.GET.get('categoria')
@@ -126,6 +130,7 @@ def inventory_report_pdf(request):
     return response
 
 #-----------------------------------------------------------------------------------------------------------------------------------
+@admin_required
 
 def reporte_ventas_pdf(request):
     # Fechas para los filtros
@@ -235,6 +240,7 @@ def reporte_ventas_pdf(request):
     response.write(buffer.getvalue())
     return response
 
+@admin_required
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 def inventory_report(request):
@@ -261,6 +267,7 @@ def inventory_report(request):
         'page_title': 'Reporte de Inventario'
     })
 
+@admin_required
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 def reporte_ventas(request):
@@ -331,6 +338,7 @@ def reporte_ventas(request):
         'page_title': 'Reporte de Ventas'
     })
 
+@admin_required
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 def reporte_cuentas_corrientes(request):
@@ -359,6 +367,7 @@ def reporte_cuentas_corrientes(request):
     }
 
     return render(request, 'reports/reporte_cuentas_corrientes.html', context)
+@admin_required
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -368,6 +377,7 @@ def cuenta_detalle(request, id):
         'cuenta': cuenta,
         'page_title': 'Detalle de Cuenta Corriente'
     })
+@admin_required
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 

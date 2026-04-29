@@ -10,6 +10,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
+from dashboards.views import admin_required, cashier_required
 from django.core.paginator import Paginator
 from django.core.mail import EmailMessage
 from django.db import transaction
@@ -52,6 +53,7 @@ def parse_decimal(value):
 
 # ---------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def ticket_list(request):
     tickets = Ticket.objects.all().order_by('-date')
 
@@ -72,6 +74,7 @@ def ticket_list(request):
 
 # ---------------------------------------------------------------------------------------------------------------
 
+@cashier_required
 def reprint_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id)
     line_items = ticket.line_items.all()
@@ -172,6 +175,7 @@ def new_sale(request):
     })
 
 # ---------------------------------------------------------------------------------------------------------------
+@cashier_required
 
 def buscar_venta(request):
     query = Venta.objects.all()
@@ -229,6 +233,7 @@ def buscar_venta(request):
     })
 
 # ---------------------------------------------------------------------------------------------------------------
+@cashier_required
 
 def get_product(request, product_id):
     try:
@@ -251,6 +256,7 @@ def product_detail(request, product_id):
 
 # ---------------------------------------------------------------------------------------------------------------
 
+@cashier_required
 @login_required
 def ticket_detail(request, ticket_id):
     ticket = Ticket.objects.get(id=ticket_id)
@@ -269,7 +275,7 @@ def ticket_detail(request, ticket_id):
 # ---------------------------------------------------------------------------------------------------------------
 
 @csrf_exempt
-@login_required
+@cashier_required
 def realizar_venta(request):
     if request.method == 'POST':
         try:
@@ -571,6 +577,7 @@ def realizar_venta(request):
 #                 "traceback": error_details
 #             }, status=500)
 
+@cashier_required
 # ---------------------------------------------------------------------------------------------------------------
 
 def enviar_ticket_email(request, ticket_id):
@@ -612,6 +619,7 @@ def enviar_ticket_email(request, ticket_id):
     # Redirigir a la página de confirmación o dashboard
     return HttpResponse('El ticket ha sido enviado por email.', content_type='text/plain')
 
+@cashier_required
 # ---------------------------------------------------------------------------------------------------------------
 
 def generar_pdf(request, ticket_id):
@@ -647,6 +655,7 @@ def generar_pdf_whatsapp(request, ticket_id):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="ticket_{ticket.pk}.pdf"'
     return response
+@cashier_required
 
 # ---------------------------------------------------------------------------------------------------------------
 

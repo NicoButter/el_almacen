@@ -5,6 +5,7 @@ from accounts.models import CustomUser
 from accounts.models import Cliente
 from django.db.models import Q
 from accounts.forms import ClienteForm, TelefonoForm, DireccionForm, EmailForm
+from dashboards.views import admin_required, cashier_required
 from django.core.paginator import Paginator
 from django.utils.crypto import get_random_string
 from cuentas_corrientes.forms import CuentaCorrienteForm
@@ -15,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 
 #----------------------------------------------------------------------------------------------------------------------------
 
-@login_required
+@cashier_required
 def agregar_cliente(request):
     if request.method == 'POST':
         cliente_form = ClienteForm(request.POST)
@@ -66,7 +67,7 @@ def agregar_cliente(request):
 
 # -------------------------------------------------------------------------------------------------------------------
 
-@login_required
+@cashier_required
 def listar_clientes(request):
     query = request.GET.get('query')
     
@@ -108,6 +109,7 @@ def listar_clientes(request):
 logger = logging.getLogger(__name__)
 
 @login_required
+@admin_required
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
 
@@ -159,6 +161,7 @@ def editar_cliente(request, pk):
 
 # --------------------------------------------------------------------------------------------------------------
 
+@admin_required
 @login_required
 def eliminar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)

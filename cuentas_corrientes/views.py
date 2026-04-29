@@ -15,6 +15,7 @@ from .forms import CuentaCorrienteForm
 from django.contrib import messages
 from accounts.models import Cliente
 from django.contrib.auth.decorators import login_required
+from dashboards.views import admin_required, cashier_required
 from django.core.paginator import Paginator
 from django.db.models import Sum, Count
 from datetime import date, datetime
@@ -22,7 +23,7 @@ from datetime import date, datetime
 
 # -------------------------------------------------------------------------------------------------------------------
 
-@login_required
+@cashier_required
 def gestion_cuentas_corrientes(request):
     # Obtener métricas generales
     total_cuentas = CuentaCorriente.objects.count()
@@ -66,6 +67,7 @@ def gestion_cuentas_corrientes(request):
 
 # -------------------------------------------------------------------------------------------------------------------
 
+@admin_required
 def crear_cuenta_corriente(request):
     if request.method == 'POST':
         form = CuentaCorrienteForm(request.POST)
@@ -80,7 +82,7 @@ def crear_cuenta_corriente(request):
     })
 
 # -------------------------------------------------------------------------------------------------------------------
-
+adm
 @login_required
 def editar_cuenta_corriente(request, pk):
     cuenta_corriente = get_object_or_404(CuentaCorriente, pk=pk)
@@ -101,6 +103,7 @@ def editar_cuenta_corriente(request, pk):
     })
 
 # -------------------------------------------------------------------------------------------------------------------
+@cashier_required
 
 def agregar_saldo(request, cuenta_id):
     cuenta = get_object_or_404(CuentaCorriente, pk=cuenta_id)
@@ -118,6 +121,7 @@ def agregar_saldo(request, cuenta_id):
     })
 
 # --------------------------------------------------------------------------------------------------------------------
+@cashier_required
 
 def pagar_cuenta(request, cuenta_id):
     cuenta = get_object_or_404(CuentaCorriente, pk=cuenta_id)
@@ -136,6 +140,7 @@ def pagar_cuenta(request, cuenta_id):
     })
 
 # --------------------------------------------------------------------------------------------------------------------
+@admin_required
 
 @login_required
 def asignar_cuenta_corriente(request, cliente_id):
@@ -164,6 +169,7 @@ def asignar_cuenta_corriente(request, cliente_id):
         'cliente': cliente
     })
 
+@admin_required
 # --------------------------------------------------------------------------------------------------------------------
 
 @login_required
