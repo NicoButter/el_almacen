@@ -558,3 +558,124 @@ body.fullscreen-terminal .base-content-area {
     font-size: 0.75rem;
     box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
 }
+
+/* ====== STRICT NO-SCROLL LAYOUT ====== */
+/* Bloquear el scroll en la tarjeta principal */
+.terminal-main-card {
+    overflow: hidden !important;
+}
+
+/* El layout interno debe acoplarse exactamente al espacio restante */
+.terminal-layout {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Panel Izquierdo Estricto */
+.terminal-left-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Forzar que la tabla de productos ocupe el resto y scrolee */
+.products-table-container {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    min-height: 0; /* Vital para que flexbox controle el overflow */
+}
+
+/* Panel Derecho Estricto */
+.terminal-right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Reducir gap un poco */
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto; /* Por si en pantallas mínimas no entran los 3 bloques rectos */
+}
+
+/* Empujar la sección de pago hacia abajo si hay espacio suelto */
+.payment-section-card {
+    margin-top: auto;
+}
+
+/* Reducir márgenes internos para economizar alto */
+.cart-summary-row {
+    padding: 1rem 1.5rem !important;
+}
+
+/* ====== ACHICAR ALTURAS Y MÁRGENES GLOBALES ====== */
+.terminal-container {
+    height: calc(100vh - 1rem) !important; /* Dejar un pequeño margen respecto a la pantalla */
+    padding: 0.5rem !important; /* Margen exterior mínimo */
+}
+
+.terminal-main-card {
+    padding: 0.8rem 1rem !important; /* Reducir márgenes internos de la tarjeta */
+}
+
+/* Encabezado más compacto */
+.terminal-header {
+    margin-bottom: 0.8rem !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.terminal-title {
+    font-size: 1.3rem !important; /* Achicar un poco el título principal */
+}
+
+.terminal-icon {
+    padding: 0.3rem !important;
+}
+
+.terminal-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Achicar los atajos en el header */
+.header-shortcuts {
+    padding: 0.3rem 1rem !important;
+    margin: 0 1rem !important;
+}
+
+.header-shortcut-item {
+    font-size: 0.75rem !important;
+}
+
+/* Modificar tamaño de cámara para seguir ganando espacio */
+.scanner-card .camera-container {
+    height: 110px !important;
+}
+
+/* Tabla más compacta */
+.terminal-table th {
+    padding: 0.6rem 1rem !important;
+}
+
+.terminal-table td {
+    padding: 0.6rem 1rem !important;
+}
+
+/* ====== REDUCCIÓN FINAL: MENOS FILAS / MÁS PEQUEÑO ====== */
+/* Restamos el equivalente a ~5 filas (aprox 200px) del alto total y del contenedor */
+.terminal-container {
+    height: calc(100vh - 4.5rem) !important; /* Damos 4.5 rem de margen (aire arriba y abajo) */
+}
+
+.products-table-container {
+    /* Forzamos a la lista a ser más chata (como quitarle 5 filas) */
+    max-height: 42vh !important; 
+    min-height: 150px !important;
+}
+
+/* Evitamos que la tarjeta intente llenarse mágicamente estirando las cosas */
+.terminal-main-card {
+    height: 100% !important; 
+    margin-bottom: auto !important;
+}
