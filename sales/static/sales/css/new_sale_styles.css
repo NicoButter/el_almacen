@@ -445,3 +445,83 @@ body.fullscreen-terminal .base-content-area {
     background: #dc2626 !important;
     transform: translateY(-2px);
 }
+
+/* NUEVOS ESTILOS: Layout Fila Inferior y Scroll de Tabla */
+.terminal-left-panel {
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Necesario para que flexbox permita el scroll interno */
+    height: 100%;
+}
+
+.products-table-container {
+    flex: 1; /* Toma todo el espacio disponible */
+    overflow-y: auto; /* Scroll vertical activado */
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+/* Fila de Totales Inferior */
+.cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-radius: 16px;
+    background: rgba(127, 60, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.summary-item .summary-label {
+    color: var(--base-muted-foreground);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.summary-item .summary-value {
+    font-size: 1.5rem;
+    color: var(--base-foreground);
+    font-weight: 600;
+}
+
+.summary-item.total-item .summary-label {
+    color: var(--base-primary);
+}
+
+.summary-item.total-item .summary-value {
+    font-size: 2.5rem;
+    color: white;
+    font-weight: 800;
+}
+
+/* Contenedor de Detalles de Producto */
+.product-details-card {
+    padding: 1.2rem;
+    border-radius: 16px;
+    background: rgba(16, 185, 129, 0.05); /* Tonos verdes tenues */
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    margin-bottom: 1rem;
+}
+
+.product-details-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: var(--base-foreground);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+}
+
+/* Panel Derecho: reestructuración */
+.payment-section-card {
+    background: rgba(0,0,0,0.2);
+    padding: 1.2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
