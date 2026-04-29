@@ -35,7 +35,13 @@
 
             <div class="terminal-header-right">
                 <div class="terminal-clock" id="live-clock">00:00:00</div>
-                <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-exit-terminal" title="Volver al panel con menú">
+                {% if request.user.is_admin %}
+                    <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-exit-terminal" title="Volver al panel con menú">
+                {% elif request.user.is_cashier %}
+                    <a href="{% url 'dashboard:cashier_dashboard' %}" class="btn-exit-terminal" title="Volver al panel con menú">
+                {% else %}
+                    <a href="{% url 'dashboard:user_dashboard' %}" class="btn-exit-terminal" title="Volver al panel con menú">
+                {% endif %}
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                         <polyline points="10 17 15 12 10 7"/>
