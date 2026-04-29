@@ -1,4 +1,4 @@
-/* Estilos compartidos para formularios en cards Glassmorphism */
+/* Estilos compartidos para formularios en cards Dark Glassmorphism */
 
 .form-page-container {
     padding: 2rem;
@@ -10,18 +10,22 @@
     border-radius: 20px;
     padding: 2.5rem;
     margin-top: 1rem;
+    background: var(--base-card, rgba(15, 23, 42, 0.7));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--base-border, rgba(255, 255, 255, 0.1));
 }
 
 .form-header {
     margin-bottom: 2rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 1px solid var(--base-border, rgba(255, 255, 255, 0.1));
     padding-bottom: 1.5rem;
 }
 
 .form-title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--text-color, #1f2937);
+    color: var(--base-foreground, #f8fafc);
     margin-bottom: 0.5rem;
     display: flex;
     align-items: center;
@@ -29,7 +33,7 @@
 }
 
 .form-subtitle {
-    color: var(--text-muted, #6b7280);
+    color: var(--base-muted-foreground, #94a3b8);
     font-size: 0.875rem;
 }
 
@@ -48,31 +52,31 @@
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-color, #374151);
+    color: var(--base-foreground, #f8fafc);
     margin-bottom: 0.5rem;
 }
 
-/* Inputs con estilo glass */
+/* Inputs con estilo glass dark */
 .glass-input {
     width: 100%;
     padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--base-border, rgba(255, 255, 255, 0.1));
     border-radius: 10px;
     font-size: 0.9375rem;
     transition: all 0.2s;
-    color: #1f2937;
+    color: var(--base-foreground, #f8fafc);
 }
 
 .glass-input:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.8);
-    border-color: var(--primary-color, #3b82f6);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--base-primary, #7f3cff);
+    box-shadow: 0 0 0 4px rgba(127, 60, 255, 0.1);
 }
 
 .glass-input::placeholder {
-    color: #9ca3af;
+    color: var(--base-muted-foreground, #94a3b8);
 }
 
 /* Botones */
@@ -82,7 +86,7 @@
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid var(--base-border, rgba(255, 255, 255, 0.1));
 }
 
 .btn-glass {
@@ -95,38 +99,39 @@
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid var(--base-border, rgba(255, 255, 255, 0.1));
     text-decoration: none;
 }
 
 .btn-glass-primary {
-    background: var(--primary-color, #3b82f6);
+    background: var(--base-primary, #7f3cff);
     color: white;
+    border: none;
 }
 
 .btn-glass-primary:hover {
     filter: brightness(1.1);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 12px rgba(127, 60, 255, 0.3);
 }
 
 .btn-glass-secondary {
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--text-color, #374151);
+    background: var(--base-secondary, #1e293b);
+    color: var(--base-foreground, #f8fafc);
 }
 
 .btn-glass-secondary:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: #2d3748;
 }
 
 /* Errores del formulario */
 .form-error {
-    color: #dc2626;
+    color: #ef4444;
     font-size: 0.75rem;
     margin-top: 0.25rem;
 }
 
 .form-group.has-error .glass-input {
-    border-color: #f87171;
-    background: rgba(254, 242, 242, 0.5);
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
 }
