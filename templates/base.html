@@ -140,23 +140,7 @@
 
     <!-- BASE SCRIPTS: Scripts globales del dashboard -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    
-    <script>
-        // Base Dashboard Scripts - NO modificar desde templates hijos
-        function updateDateTime() {
-            const now = new Date();
-            const dateTimeString = now.toLocaleString('es-ES', { dateStyle: 'full', timeStyle: 'short' });
-            const dateElement = document.getElementById('datetime');
-            if (dateElement) {
-                dateElement.textContent = dateTimeString;
-            }
-        }
-
-        if (document.getElementById('datetime')) {
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-        }
-    </script>
+    <script src="{% static 'js/base_dashboard.js' %}"></script>
 
     <!-- PAGE SCRIPTS: Scripts específicos de cada página -->
     {% block extra_scripts %}{% endblock %}
