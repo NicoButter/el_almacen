@@ -79,7 +79,7 @@
                             <span class="page-chart-subtitle">Últimos 30 días</span>
                         </h3>
                         <div class="page-chart-placeholder">
-                            <canvas id="salesTrendChart" width="600" height="220" aria-label="Gráfico de tendencia de ventas"></canvas>
+                            <canvas id="salesTrendChart" aria-label="Gráfico de tendencia de ventas"></canvas>
                             {% if not sales_trend.labels %}
                             <div class="page-chart-empty">Sin datos suficientes en los últimos 30 días.</div>
                             {% endif %}
@@ -90,7 +90,7 @@
                             <span class="page-chart-subtitle">Ingresos últimos 30 días</span>
                         </h3>
                         <div class="page-chart-placeholder">
-                            <canvas id="topProductsChart" width="600" height="220" aria-label="Gráfico de productos más vendidos"></canvas>
+                            <canvas id="topProductsChart" aria-label="Gráfico de productos más vendidos"></canvas>
                             {% if not top_products.labels %}
                             <div class="page-chart-empty">Aún no hay ventas registradas para mostrar.</div>
                             {% endif %}

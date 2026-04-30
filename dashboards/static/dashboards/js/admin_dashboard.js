@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
                         x: {
@@ -55,6 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
                         x: {
