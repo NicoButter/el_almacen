@@ -229,6 +229,10 @@
     cursor: pointer;
 }
 
+.inline-form {
+    display: inline;
+}
+
 .edit-btn { color: #10b981; }
 .edit-btn:hover { background: rgba(16, 185, 129, 0.1); color: #34d399; }
 

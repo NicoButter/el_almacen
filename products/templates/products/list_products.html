@@ -118,22 +118,20 @@
                     </h3>
                     <div class="page-activity-feed">
                         <!-- Barra de búsqueda y filtro -->
-                        <div class="page-filter-section" style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 0.5rem; margin-bottom: 1rem;">
-                            <form method="GET" action="{% url 'listar_productos' %}" class="filter-form" style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                                <!-- Barra de búsqueda -->
-                                <div class="page-search-container" style="position: relative; flex: 1; min-width: 250px;">
-                                    <input type="text" name="search" value="{{ search_query }}" placeholder="Buscar productos por nombre..." style="width: 100%; padding: 0.5rem 2.5rem 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--foreground); font-size: 0.9rem;">
-                                    <button type="submit" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); border: none; background: none; color: var(--foreground); cursor: pointer;">
+                        <div class="page-filter-section">
+                            <form method="GET" action="{% url 'listar_productos' %}" class="filter-form">
+                                <div class="page-search-container">
+                                    <input type="text" name="search" value="{{ search_query }}" placeholder="Buscar productos por nombre...">
+                                    <button type="submit" class="search-submit-btn" aria-label="Buscar productos">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M21 21l-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
                                     </button>
                                 </div>
 
-                                <!-- Filtro de categoría -->
-                                <div class="category-filter" style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <label for="categoria" style="font-weight: 500; color: var(--foreground); white-space: nowrap;">Categoría:</label>
-                                    <select name="categoria" id="categoria" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 0.5rem; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--foreground);">
+                                <div class="category-filter">
+                                    <label for="categoria">Categoría:</label>
+                                    <select name="categoria" id="categoria" onchange="this.form.submit()">
                                         <option value="">Todas</option>
                                         {% for categoria in categorias %}
                                             <option value="{{ categoria.id }}" {% if categoria.id|stringformat:"s" == request.GET.categoria %}selected{% endif %}>
@@ -143,15 +141,13 @@
                                     </select>
                                 </div>
 
-                                <!-- Botón para limpiar filtros -->
                                 {% if search_query or request.GET.categoria %}
-                                    <a href="{% url 'listar_productos' %}" style="color: var(--app-accent); text-decoration: none; font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 0.5rem; background: rgba(255,255,255,0.05); transition: all 0.2s;">
-                                        <i class="fa-solid fa-xmark" style="margin-right: 0.25rem;"></i>Limpiar filtros
+                                    <a href="{% url 'listar_productos' %}" class="clear-filters-btn">
+                                        <i class="fa-solid fa-xmark"></i>Limpiar filtros
                                     </a>
                                 {% endif %}
 
-                                <!-- Botón para agregar producto -->
-                                <a href="{% url 'add_products' %}" class="add-product-btn" style="color: white; text-decoration: none; font-size: 0.9rem; font-weight: 600; padding: 0.75rem 1.5rem; border-radius: 0.75rem; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); border: none; box-shadow: 0 4px 12px rgba(34,197,94,0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem;">
+                                <a href="{% url 'add_products' %}" class="add-product-btn">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M12 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                                         <path d="M4 12h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -160,87 +156,87 @@
                                 </a>
                             </form>
                         </div>
-                        <!-- Tabla de Productos -->
-                        <div class="page-products-table" style="overflow-x: auto;">
-                            <table style="width: 100%; border-collapse: collapse;">
+                        <div class="page-products-table">
+                            <table class="products-data-table">
                                 <thead>
-                                    <tr style="background: rgba(255,255,255,0.05);">
-                                        {% if is_admin %}
-                                            <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Acciones</th>
-                                        {% endif %}
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Nombre</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Descripción</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Precio</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Stock</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Fraccionado</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Categoría</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">QR</th>
-                                        <th style="padding: 0.75rem; text-align: left; color: var(--foreground); font-weight: 600;">Imagen</th>
+                                    <tr>
+                                        <th>Acciones</th>
+                                        <th>Nombre</th>
+                                        <th>Descripción</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                        <th>Fraccionado</th>
+                                        <th>Categoría</th>
+                                        <th>QR</th>
+                                        <th>Imagen</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for producto in productos %}
-                                        <tr style="border-bottom: 1px solid var(--border);">
+                                        <tr>
                                             {% if is_admin %}
-                                                <td style="padding: 0.75rem;">
-                                                    <a href="{% url 'edit_products' producto.pk %}" style="color: var(--app-accent); margin-right: 0.5rem;">
+                                                <td>
+                                                    <div class="action-icons">
+                                                    <a href="{% url 'edit_products' producto.pk %}" class="action-edit" title="Editar">
                                                         <i class="fa-regular fa-pen-to-square"></i>
                                                     </a>
-                                                    <button type="button" style="border: none; background: none; padding: 0; color: #ef4444; margin-right: 0.5rem;" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.pk }}">
+                                                    <button type="button" class="action-delete" title="Eliminar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ producto.pk }}">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
-                                                    <a href="#" style="color: var(--neon-blue);" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                                                    <a href="#" class="action-info" title="Ver detalle" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
                                                         <i class="fa-solid fa-info-circle"></i>
                                                     </a>
+                                                    </div>
                                                 </td>
                                             {% else %}
-                                                <td style="padding: 0.75rem;">
-                                                    <a href="#" style="color: var(--neon-blue);" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
+                                                <td>
+                                                    <div class="action-icons">
+                                                    <a href="#" class="action-info" title="Ver detalle" data-bs-toggle="modal" data-bs-target="#detalleModal{{ producto.pk }}">
                                                         <i class="fa-solid fa-info-circle"></i>
                                                     </a>
+                                                    </div>
                                                 </td>
                                             {% endif %}
-                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.nombre }}</td>
-                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.descripcion }}</td>
-                                            <td style="padding: 0.75rem; color: var(--foreground);">${{ producto.precio_venta }}</td>
-                                            <td style="padding: 0.75rem; color: var(--foreground);">
+                                            <td>{{ producto.nombre }}</td>
+                                            <td class="description-cell">{{ producto.descripcion }}</td>
+                                            <td>${{ producto.precio_venta }}</td>
+                                            <td>
                                                 {% if producto.unidad_medida == 'unidad' %}
                                                     {{ producto.cantidad_stock|floatformat:0 }} uni
                                                 {% else %}
                                                     {{ producto.cantidad_stock }} kg
                                                 {% endif %}
                                             </td>
-                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
-                                            <td style="padding: 0.75rem; color: var(--foreground);">{{ producto.categoria.nombre }}</td>
-                                            <td style="padding: 0.75rem;">
-                                                <img src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}" style="max-width: 50px; max-height: 50px;">
+                                            <td>{{ producto.se_vende_fraccionado|yesno:"Sí,No" }}</td>
+                                            <td>{{ producto.categoria.nombre }}</td>
+                                            <td>
+                                                <img class="product-thumb" src="{{ producto.qr_code.url }}" alt="QR Producto {{ producto.nombre }}">
                                             </td>
-                                            <td style="padding: 0.75rem;">
-                                                <img src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}" style="max-width: 50px; max-height: 50px;">
+                                            <td>
+                                                <img class="product-thumb" src="{% if producto.imagen %}{{ producto.imagen.url }}{% else %}{% static 'products/images/no_image.jpeg' %}{% endif %}" alt="{{ producto.nombre }}">
                                             </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
                         </div>
-                        <!-- Paginación -->
-                        <div class="pagination" style="margin-top: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: var(--foreground);">
+                        <div class="pagination">
+                            <span class="page-info">
                                 Página {{ productos.number }} de {{ productos.paginator.num_pages }}
                             </span>
-                            <div>
+                            <div class="page-links">
                                 {% if productos.has_previous %}
-                                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.previous_page_number }}" style="color: var(--app-accent); margin-right: 1rem;">Anterior</a>
+                                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.previous_page_number }}">Anterior</a>
                                 {% endif %}
                                 {% for num in productos.paginator.page_range %}
                                     {% if productos.number == num %}
-                                        <span style="color: var(--foreground); font-weight: 600;">{{ num }}</span>
+                                        <span class="current">{{ num }}</span>
                                     {% elif num > productos.number|add:'-3' and num < productos.number|add:'3' %}
-                                        <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ num }}" style="color: var(--app-accent); margin: 0 0.25rem;">{{ num }}</a>
+                                        <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ num }}">{{ num }}</a>
                                     {% endif %}
                                 {% endfor %}
                                 {% if productos.has_next %}
-                                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.next_page_number }}" style="color: var(--app-accent); margin-left: 1rem;">Siguiente</a>
+                                    <a href="?{% if request.GET.categoria %}categoria={{ request.GET.categoria }}&{% endif %}page={{ productos.next_page_number }}">Siguiente</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -252,7 +248,7 @@
 {% for producto in productos %}
     <div class="modal fade" id="confirmDeleteModal{{ producto.pk }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ producto.pk }}" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="background: rgba(15,23,42,0.95); border: 1px solid var(--border); color: var(--foreground);">
+            <div class="modal-content product-modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="confirmDeleteModalLabel{{ producto.pk }}">Confirmar Eliminación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -262,7 +258,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <form action="{% url 'delete_product' producto.pk %}" method="post" style="display:inline;">
+                    <form action="{% url 'delete_product' producto.pk %}" method="post" class="inline-form">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Eliminar</button>
                     </form>
@@ -276,7 +272,7 @@
 {% for producto in productos %}
     <div class="modal fade" id="detalleModal{{ producto.pk }}" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="background: rgba(15,23,42,0.95); border: 1px solid var(--border); color: var(--foreground);">
+            <div class="modal-content product-modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="detalleModalLabel">Detalles del Producto: {{ producto.nombre }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
