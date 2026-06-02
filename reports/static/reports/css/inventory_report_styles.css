@@ -1,133 +1,115 @@
-/* Formulario */
 .filter-form {
-    max-width: 600px;
+    max-width: 680px;
     margin: 2rem auto;
-    background-color: #fff;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form-group {
+    border: 1px solid var(--base-border);
+    border-radius: var(--base-radius);
+    background: var(--base-surface);
+    box-shadow: var(--base-shadow);
+}
+
+.form-group {
     margin-bottom: 1rem;
-  }
-  
-  label {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+}
+
+label {
     display: block;
-    color: #333;
-  }
-  
-  .select-input,
-  .input-field {
+    margin-bottom: 0.5rem;
+    color: var(--base-foreground);
+    font-weight: 700;
+}
+
+.select-input,
+.input-field {
     width: 100%;
-    padding: 10px;
+    padding: 10px 12px;
     margin-top: 0.5rem;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  
-  .select-input:focus,
-  .input-field:focus {
+    border: 1px solid var(--base-border);
+    border-radius: 8px;
+    background: rgba(15,23,42,0.86);
+    color: var(--base-foreground);
+}
+
+.select-input:focus,
+.input-field:focus {
     outline: none;
-    border-color: #007bff;
-  }
-  
-  .btn-submit {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
+    border-color: var(--base-accent);
+    box-shadow: 0 0 0 3px rgba(110,231,183,0.14);
+}
+
+.btn-submit {
     width: 100%;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--base-primary), #2563eb);
+    color: #fff;
+    cursor: pointer;
     font-size: 16px;
-  }
-  
-  .btn-submit:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Tabla */
-  .inventory-table {
+    font-weight: 700;
+}
+
+.inventory-table {
     width: 100%;
     margin-top: 2rem;
+    border: 1px solid var(--base-border);
+    border-radius: var(--base-radius);
     border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .inventory-table th,
-  .inventory-table td {
+    overflow: hidden;
+    background: var(--base-surface);
+    box-shadow: var(--base-shadow);
+}
+
+.inventory-table th,
+.inventory-table td {
     padding: 12px;
+    border-bottom: 1px solid var(--base-border);
+    color: var(--base-foreground);
     text-align: left;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .inventory-table th {
-    background-color: #007bff;
-    color: #fff;
-  }
-  
-  .inventory-table tr:hover {
-    background-color: #f4f7fa;
-  }
-  
-  /* Botones */
-  .button-container {
+}
+
+.inventory-table th {
+    background: rgba(255,255,255,0.055);
+    color: var(--base-foreground-muted);
+    font-weight: 800;
+}
+
+.inventory-table tr:hover {
+    background: rgba(110,231,183,0.08);
+}
+
+.button-container {
     display: flex;
     justify-content: flex-end;
     margin-top: 2rem;
-  }
-  
-  .btn-pdf,
-  .btn-back {
-    background-color: #28a745;
-    color: #fff;
+}
+
+.btn-pdf,
+.btn-back {
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: 8px;
     margin-left: 10px;
+    color: #fff;
     text-decoration: none;
     font-size: 16px;
-  }
-  
-  .btn-pdf:hover {
-    background-color: #218838;
-  }
-  
-  .btn-back {
-    background-color: #ffc107;
-  }
-  
-  .btn-back:hover {
-    background-color: #e0a800;
-  }
-  
-  /* Responsividad */
-  @media (max-width: 768px) {
+    font-weight: 700;
+}
+
+.btn-pdf {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.btn-back {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+@media (max-width: 768px) {
     .filter-form {
-      padding: 15px;
+        padding: 15px;
     }
-  
-    .btn-submit {
-      font-size: 14px;
-    }
-  
+
     .inventory-table th,
     .inventory-table td {
-      padding: 8px;
+        padding: 8px;
     }
-  }
-  
-  @media (max-width: 480px) {
-    .inventory-table th,
-    .inventory-table td {
-      font-size: 14px;
-    }
-  
-    .btn-pdf,
-    .btn-back {
-      font-size: 14px;
-    }
-  }
+}

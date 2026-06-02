@@ -112,8 +112,8 @@
                                 <td class="actions-cell">
                                     {% if item.tiene_cuenta %}
                                         <button class="btn-cc btn-cc-delete" data-bs-toggle="modal" data-bs-target="#eliminarModal{{ item.cliente.pk }}">Eliminar</button>
-                                        <a href="{% url 'pagar_cuenta' item.cliente.pk %}" class="btn-cc btn-cc-pay">Pagar</a>
-                                        <a href="{% url 'agregar_saldo' item.cliente.pk %}" class="btn-cc btn-cc-balance">Agregar Saldo</a>
+                                        <a href="{% url 'pagar_cuenta' item.cuenta_id %}" class="btn-cc btn-cc-pay">Pagar</a>
+                                        <a href="{% url 'agregar_saldo' item.cuenta_id %}" class="btn-cc btn-cc-balance">Agregar Saldo</a>
                                     {% else %}
                                         <a href="{% url 'asignar_cuenta_corriente' item.cliente.pk %}" class="btn-cc btn-cc-assign">Asignar Cuenta</a>
                                     {% endif %}

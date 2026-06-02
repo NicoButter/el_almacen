@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from .models import Product, Categoria
 from .forms import ProductForm, CategoriaForm
 from dashboards.views import admin_required, cashier_required
@@ -14,6 +14,7 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib.units import inch
 from typing import cast
 from django.core.files import File
+from django.db.models import ProtectedError
 from django.db.models import Sum, Count
 from datetime import datetime
 
@@ -132,12 +133,12 @@ def agregar_producto(request):
 
 @admin_required
 def editar_producto(request, pk):
-    producto = Product.objects.get(pk=pk)
+    producto = get_object_or_404(Product, pk=pk)
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES, instance=producto)
         if form.is_valid():
             form.save()
-            return redirect('list_products')
+            return redirect('listar_productos')
     else:
         form = ProductForm(instance=producto)
     return render(request, 'products/edit_products.html', {
@@ -150,14 +151,21 @@ def editar_producto(request, pk):
 
 @admin_required
 def eliminar_producto(request, pk):
-    producto = Product.objects.get(pk=pk)
+    producto = get_object_or_404(Product, pk=pk)
 
     # Verificar si el usuario es administrador
     if not request.user.is_admin:
         return HttpResponseForbidden("No tienes permiso para eliminar productos.")
 
     if request.method == 'POST':
-        producto.delete()
+        try:
+            producto.delete()
+            messages.success(request, 'Producto eliminado correctamente.')
+        except ProtectedError:
+            messages.error(
+                request,
+                'No se puede eliminar este producto porque ya tiene ventas asociadas. Podés dejarlo sin stock o editarlo.'
+            )
         return redirect('listar_productos')
 
     return render(request, 'products/delete_product.html', {
@@ -274,12 +282,7 @@ def editar_categoria(request, categoria_id):
 
 def eliminar_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
-    # Primero, actualizamos los productos a "Sin categoría" antes de eliminarla
-    categoria_sin_categoria = Categoria.objects.get(nombre="Sin categoría")
-    productos = Product.objects.filter(categoria=categoria)
-    productos.update(categoria=categoria_sin_categoria)
-    
-    # Luego, eliminamos la categoría
+    Product.objects.filter(categoria=categoria).update(categoria=None)
     categoria.delete()
     messages.success(request, "Categoría eliminada con éxito.")
     return redirect('listar_categorias')  # Redirige al listado de categorías
@@ -374,4 +377,3 @@ def imprimir_qr(request):
             'productos': productos,
             'page_title': 'Imprimir QR de Productos'
         })
-

@@ -30,6 +30,16 @@
     --base-ring: #7f3cff;
     --base-glass-border: rgba(255,255,255,0.18);
     --base-radius: 12px;
+    --base-shadow: 0 16px 45px rgba(2,6,23,0.35);
+    --base-surface: rgba(15,23,42,0.78);
+    --base-surface-strong: rgba(15,23,42,0.94);
+    --base-foreground-muted: #cbd5e1;
+    --foreground: var(--base-foreground);
+    --foreground-muted: var(--base-muted-foreground);
+    --border: var(--base-border);
+    --app-accent: var(--base-accent);
+    --accent-info: #38bdf8;
+    --neon-blue: #38bdf8;
 }
 
 /* ==============================================
@@ -55,6 +65,109 @@ body.base-dashboard {
     background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
     color: var(--base-foreground);
     overflow-x: hidden;
+}
+
+body.base-dashboard a {
+    color: var(--base-accent);
+}
+
+body.base-dashboard a:hover {
+    color: #a7f3d0;
+}
+
+body.base-dashboard .card,
+body.base-dashboard .modal-content,
+body.base-dashboard .dropdown-menu,
+body.base-dashboard .popover,
+body.base-dashboard .toast,
+body.base-dashboard .list-group-item,
+body.base-dashboard .accordion-item {
+    background: var(--base-surface-strong);
+    color: var(--base-foreground);
+    border-color: var(--base-border);
+    box-shadow: var(--base-shadow);
+}
+
+body.base-dashboard .modal-header,
+body.base-dashboard .modal-footer,
+body.base-dashboard .card-header,
+body.base-dashboard .card-footer {
+    border-color: var(--base-border);
+}
+
+body.base-dashboard .btn-close {
+    filter: invert(1) grayscale(100%) brightness(180%);
+}
+
+body.base-dashboard .form-control,
+body.base-dashboard .form-select,
+body.base-dashboard .input-group-text,
+body.base-dashboard input,
+body.base-dashboard select,
+body.base-dashboard textarea {
+    background-color: rgba(15,23,42,0.85);
+    border-color: var(--base-border);
+    color: var(--base-foreground);
+}
+
+body.base-dashboard .form-control:focus,
+body.base-dashboard .form-select:focus,
+body.base-dashboard input:focus,
+body.base-dashboard select:focus,
+body.base-dashboard textarea:focus {
+    background-color: rgba(15,23,42,0.98);
+    border-color: var(--base-accent);
+    color: var(--base-foreground);
+    box-shadow: 0 0 0 0.2rem rgba(110,231,183,0.14);
+}
+
+body.base-dashboard input::placeholder,
+body.base-dashboard textarea::placeholder {
+    color: var(--base-muted-foreground);
+}
+
+body.base-dashboard .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--base-foreground);
+    --bs-table-border-color: var(--base-border);
+    --bs-table-striped-bg: rgba(255,255,255,0.035);
+    --bs-table-hover-bg: rgba(110,231,183,0.08);
+    color: var(--base-foreground);
+}
+
+body.base-dashboard .table th {
+    color: var(--base-foreground-muted);
+}
+
+body.base-dashboard .text-muted {
+    color: var(--base-muted-foreground) !important;
+}
+
+.base-logout-form {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(239,68,68,0.28);
+    border-radius: 8px;
+    background: rgba(239,68,68,0.1);
+    color: #f87171;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(239,68,68,0.16);
+    border-color: rgba(239,68,68,0.42);
+    transform: translateY(-1px);
 }
 
 /* ==============================================

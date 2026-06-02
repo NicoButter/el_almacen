@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from products.models import Product
 from accounts.models import Cliente
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
 class Venta(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True)
     fecha_venta = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
     productos = models.ManyToManyField(Product, through='DetalleVenta')
@@ -32,24 +32,22 @@ class Venta(models.Model):
     es_fiada = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Venta {self.pk} - {self.cliente.nombre}"
+        cliente = self.cliente.nombre if self.cliente else 'Cliente eliminado'
+        return f"Venta {self.pk} - {cliente}"
 
     def realizar_venta_fiada(self):
         """Método para realizar la venta, agregar el total a la cuenta corriente del cliente y marcar la venta como fiada."""
         if self.cuenta_corriente:  # Verificar si el cliente tiene una cuenta corriente
-            # Sumamos el total de la venta al saldo de la cuenta corriente
             self.cuenta_corriente.agregar_saldo(self.total)
-            
-            # Cambiar el estado de la venta a fiada
             self.es_fiada = True
-            self.save()  # Guardamos los cambios en el objeto Venta 
+            self.save(update_fields=['es_fiada'])
 
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
 class Ticket(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE, related_name='tickets', null=True, blank=True)
-    cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    cashier = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
     date = models.DateTimeField(auto_now_add=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
@@ -65,7 +63,7 @@ class Ticket(models.Model):
 
 class LineItem(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='line_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.DecimalField(max_digits=10, decimal_places=2)  # Cambiado a DecimalField para soportar kg
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -75,25 +73,26 @@ class LineItem(models.Model):
     def save(self, *args, **kwargs):
         # Los productos fraccionados llegan desde la terminal en gramos.
         cantidad_facturable = self.quantity / Decimal('1000') if self.product.se_vende_fraccionado else self.quantity
-        self.subtotal = cantidad_facturable * self.product.precio_venta
+        self.subtotal = (cantidad_facturable * self.product.precio_venta).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         super().save(*args, **kwargs)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
 class Pago(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='pagos')
-    ticket = models.ForeignKey(Ticket, null=True, on_delete=models.CASCADE, related_name='pagos')  # Agregar el campo ticket
+    cliente = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='pagos')
+    ticket = models.ForeignKey(Ticket, null=True, blank=True, on_delete=models.SET_NULL, related_name='pagos')
     fecha = models.DateTimeField(auto_now_add=True)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f'Pago de ${self.monto} - Cliente: {self.cliente.nombre} el {self.fecha.strftime("%d/%m/%Y")}'
+        cliente = self.cliente.nombre if self.cliente else 'Cliente eliminado'
+        return f'Pago de ${self.monto} - Cliente: {cliente} el {self.fecha.strftime("%d/%m/%Y")}'
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
 
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE)
-    producto = models.ForeignKey(Product, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Product, on_delete=models.PROTECT)
     cantidad = models.DecimalField(max_digits=10, decimal_places=2)  # Cambiado a DecimalField para soportar kg
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
@@ -103,7 +102,7 @@ class DetalleVenta(models.Model):
 
     def save(self, *args, **kwargs):
         cantidad_facturable = self.cantidad / Decimal('1000') if self.producto.se_vende_fraccionado else self.cantidad
-        self.total = cantidad_facturable * self.precio_unitario
+        self.total = (cantidad_facturable * self.precio_unitario).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
         super().save(*args, **kwargs)
     
 # ------------------------------------------------------------------------------------------------------------------------------------------

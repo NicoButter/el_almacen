@@ -1,22 +1,22 @@
 .page-title {
-    text-align: center;
     margin-top: 30px;
+    color: var(--base-foreground);
     font-size: 2rem;
-    color: #333;
-    font-weight: 600;
+    font-weight: 700;
+    text-align: center;
 }
 
-/* Filtros */
 .filters-form {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
-    max-width: 600px;
+    max-width: 680px;
     margin: 30px auto;
     padding: 20px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border: 1px solid var(--base-border);
+    border-radius: var(--base-radius);
+    background: var(--base-surface);
+    box-shadow: var(--base-shadow);
 }
 
 .filters-form .form-group {
@@ -25,100 +25,102 @@
 }
 
 .filters-form label {
-    font-size: 1rem;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    color: var(--base-foreground);
+    font-size: 0.95rem;
+    font-weight: 600;
 }
 
 .input-field {
-    padding: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--base-border);
+    border-radius: 8px;
+    background: rgba(15,23,42,0.86);
+    color: var(--base-foreground);
     font-size: 1rem;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .input-field:focus {
-    border-color: #66b3ff;
+    border-color: var(--base-accent);
+    box-shadow: 0 0 0 3px rgba(110,231,183,0.14);
     outline: none;
 }
 
-.btn-submit {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
+.btn-submit,
+.btn-generate-report {
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
+    color: white;
     font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s;
+    text-decoration: none;
+    transition: transform 0.2s ease, filter 0.2s ease;
 }
 
-.btn-submit:hover {
-    background-color: #0056b3;
+.btn-submit {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--base-primary), #2563eb);
 }
 
-/* Botón para generar reporte */
 .btn-generate-report {
     display: block;
     width: 100%;
-    text-align: center;
     margin-top: 20px;
     padding: 12px;
-    background-color: #28a745;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-size: 1rem;
+    text-align: center;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
 }
 
+.btn-submit:hover,
 .btn-generate-report:hover {
-    background-color: #218838;
+    transform: translateY(-1px);
+    filter: saturate(1.08);
 }
 
-/* Tabla de resumen */
 .sales-summary-table {
     width: 90%;
     max-width: 1000px;
     margin: 30px auto;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
     overflow: hidden;
+    border: 1px solid var(--base-border);
+    border-radius: var(--base-radius);
+    border-collapse: collapse;
+    background: var(--base-surface);
+    box-shadow: var(--base-shadow);
 }
 
 .sales-summary-table th,
 .sales-summary-table td {
     padding: 15px;
+    border-bottom: 1px solid var(--base-border);
+    color: var(--base-foreground);
     text-align: center;
-    border-bottom: 1px solid #ddd;
 }
 
 .sales-summary-table th {
-    background-color: #007bff;
-    color: white;
-}
-
-.sales-summary-table td {
-    background-color: #f9f9f9;
+    background: rgba(255,255,255,0.055);
+    color: var(--base-foreground-muted);
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
 .sales-summary-table tr:nth-child(even) td {
-    background-color: #f1f1f1;
+    background: rgba(255,255,255,0.035);
 }
 
-/* Gráfico */
 .chart-container {
     width: 100%;
     max-width: 800px;
     margin: 50px auto;
     padding: 20px;
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border: 1px solid var(--base-border);
+    border-radius: var(--base-radius);
+    background: var(--base-surface);
+    box-shadow: var(--base-shadow);
 }
 
-/* Estilos responsivos */
 @media (max-width: 768px) {
     .filters-form {
         grid-template-columns: 1fr;
@@ -133,10 +135,7 @@
         padding: 10px;
     }
 
-    .btn-submit {
-        width: 100%;
-    }
-
+    .btn-submit,
     .btn-generate-report {
         width: 100%;
     }

@@ -127,9 +127,9 @@
 }
 
 .readonly-input {
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    color: #333;
+    background-color: rgba(15,23,42,0.72);
+    border: 1px solid var(--base-border);
+    color: var(--base-foreground);
     font-weight: bold;
     cursor: not-allowed;
 }

@@ -54,7 +54,7 @@
                 {% for item in line_items %}
                 <tr>
                     <td>{{ item.product.nombre }}<br>
-                        <span style="font-size: 0.8em; color: #666;">
+                        <span class="ticket-item-note">
                             {% if item.product.se_vende_fraccionado %}
                                 Precio por kilo: ${{ item.product.precio_venta|floatformat:2 }}
                             {% else %}

@@ -3,22 +3,10 @@ from .models import CuentaCorriente
 from .forms import CuentaCorrienteForm
 from django.contrib import messages
 from accounts.models import Cliente
-from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-
-
-# -------------------------------------------------------------------------------------------------------------------
-
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import CuentaCorriente
-from .forms import CuentaCorrienteForm
-from django.contrib import messages
-from accounts.models import Cliente
-from django.contrib.auth.decorators import login_required
 from dashboards.views import admin_required, cashier_required
-from django.core.paginator import Paginator
-from django.db.models import Sum, Count
-from datetime import date, datetime
+from django.db.models import Sum
+from decimal import Decimal, InvalidOperation
 
 
 # -------------------------------------------------------------------------------------------------------------------
@@ -49,6 +37,7 @@ def gestion_cuentas_corrientes(request):
         clientes_con_estado.append({
             'cliente': cliente,
             'tiene_cuenta': cuenta_corriente is not None,
+            'cuenta_id': cuenta_corriente.pk if cuenta_corriente else None,
             'saldo': cuenta_corriente.saldo if cuenta_corriente else None,
         })
 
@@ -106,13 +95,13 @@ def editar_cuenta_corriente(request, pk):
 def agregar_saldo(request, cuenta_id):
     cuenta = get_object_or_404(CuentaCorriente, pk=cuenta_id)
     if request.method == 'POST':
-        monto = float(request.POST.get('monto'))
-        if monto > 0:
+        try:
+            monto = Decimal(str(request.POST.get('monto', '')))
             cuenta.agregar_saldo(monto)
             messages.success(request, 'Saldo agregado correctamente.')
             return redirect('gestion_cuentas_corrientes')
-        else:
-            messages.error(request, 'El monto debe ser positivo.')
+        except (InvalidOperation, ValueError):
+            messages.error(request, 'El monto debe ser positivo y válido.')
     return render(request, 'cuentas_corrientes/agregar_saldo.html', {
         'page_title': 'Agregar Saldo',
         'cuenta': cuenta
@@ -123,13 +112,12 @@ def agregar_saldo(request, cuenta_id):
 def pagar_cuenta(request, cuenta_id):
     cuenta = get_object_or_404(CuentaCorriente, pk=cuenta_id)
     if request.method == 'POST':
-        monto = float(request.POST.get('monto'))
-        if monto > 0 and monto <= cuenta.saldo:
-            cuenta.saldo -= monto
-            cuenta.save()
+        try:
+            monto = Decimal(str(request.POST.get('monto', '')))
+            cuenta.registrar_pago(monto)
             messages.success(request, 'Pago registrado correctamente.')
             return redirect('gestion_cuentas_corrientes')
-        else:
+        except (InvalidOperation, ValueError):
             messages.error(request, 'El monto debe ser positivo y no mayor al saldo disponible.')
     return render(request, 'cuentas_corrientes/pagar_cuenta.html', {
         'page_title': 'Pagar Cuenta',
@@ -151,7 +139,7 @@ def asignar_cuenta_corriente(request, cliente_id):
         if form.is_valid():
             cuenta_corriente = form.save(commit=False)
             cuenta_corriente.cliente = cliente
-            cuenta_corriente.saldo = 0  # Saldo inicial
+            cuenta_corriente.saldo = Decimal('0.00')  # Saldo inicial
             cuenta_corriente.save()
             messages.success(request, f'Cuenta corriente asignada a {cliente.nombre} correctamente.')
             return redirect('listar_clientes')
