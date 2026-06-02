@@ -3,8 +3,6 @@ python-decouple
 django-crispy-forms
 crispy-bootstrap5
 reportlab
-weasyprint
-qrcode
-psycopg[binary]
- qrcode==8.2
 weasyprint==68.1
+qrcode==8.2
+psycopg[binary]

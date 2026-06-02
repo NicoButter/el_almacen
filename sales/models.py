@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from products.models import Product
 from accounts.models import Cliente
+from decimal import Decimal
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -21,6 +22,7 @@ class Venta(models.Model):
         ('EFECTIVO', 'Efectivo'),
         ('TARJETA', 'Tarjeta'),
         ('CUENTA_CORRIENTE', 'Cuenta Corriente'),
+        ('QR', 'QR'),
         ('CREDITO', 'Crédito'),
         ('DEBITO', 'Débito'),
     ]
@@ -64,15 +66,16 @@ class Ticket(models.Model):
 class LineItem(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='line_items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)  # Cambiado a DecimalField para soportar kg
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f'{self.quantity} x {self.product.nombre}'
 
     def save(self, *args, **kwargs):
-        # Calcula el subtotal como cantidad * precio del producto
-        self.subtotal = self.quantity * self.product.precio_venta
+        # Los productos fraccionados llegan desde la terminal en gramos.
+        cantidad_facturable = self.quantity / Decimal('1000') if self.product.se_vende_fraccionado else self.quantity
+        self.subtotal = cantidad_facturable * self.product.precio_venta
         super().save(*args, **kwargs)
 
 # ------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,12 +94,17 @@ class Pago(models.Model):
 class DetalleVenta(models.Model):
     venta = models.ForeignKey(Venta, on_delete=models.CASCADE)
     producto = models.ForeignKey(Product, on_delete=models.CASCADE)
-    cantidad = models.PositiveIntegerField()
+    cantidad = models.DecimalField(max_digits=10, decimal_places=2)  # Cambiado a DecimalField para soportar kg
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f"{self.producto.nombre} x {self.cantidad}"
+
+    def save(self, *args, **kwargs):
+        cantidad_facturable = self.cantidad / Decimal('1000') if self.producto.se_vende_fraccionado else self.cantidad
+        self.total = cantidad_facturable * self.precio_unitario
+        super().save(*args, **kwargs)
     
 # ------------------------------------------------------------------------------------------------------------------------------------------
 

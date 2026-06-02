@@ -9,7 +9,7 @@ class LineItemForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['product'].queryset = Product.objects.filter(stock__gt=0)  # Mostrar solo productos con stock
+        self.fields['product'].queryset = Product.objects.filter(cantidad_stock__gt=0)  # Mostrar solo productos con stock
 
 class NewSaleForm(forms.ModelForm):
     items = forms.CharField(widget=forms.HiddenInput())  # Campo para almacenar los productos seleccionados

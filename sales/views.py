@@ -337,8 +337,8 @@ def realizar_venta(request):
 
             # Asegurarse de que total_compra es un número
             try:
-                total_compra = float(total_compra)
-            except ValueError:
+                total_compra = Decimal(str(total_compra))
+            except (InvalidOperation, ValueError, TypeError):
                 logger.error("El campo 'total' debe ser un número.")
                 return JsonResponse({
                     "success": False,
@@ -369,8 +369,70 @@ def realizar_venta(request):
                     }, status=400)
                 es_fiada = True
             
+            productos_normalizados = []
+            stock_requerido = {}
+
+            for item in productos_data:
+                product_id = item.get('id')
+                try:
+                    quantity = Decimal(str(item.get('cantidad')))
+                except (InvalidOperation, TypeError):
+                    return JsonResponse({
+                        "success": False,
+                        "message": "La cantidad de un producto no es válida."
+                    }, status=400)
+
+                if quantity <= 0:
+                    return JsonResponse({
+                        "success": False,
+                        "message": "La cantidad de los productos debe ser mayor a cero."
+                    }, status=400)
+
+                productos_normalizados.append({
+                    "product_id": product_id,
+                    "quantity": quantity,
+                })
+                stock_requerido.setdefault(product_id, Decimal('0'))
+
             # Iniciar transacción para asegurar consistencia
             with transaction.atomic():
+                products_by_id = {
+                    product.pk: product
+                    for product in Product.objects.select_for_update().filter(id__in=stock_requerido.keys())
+                }
+
+                if len(products_by_id) != len(stock_requerido):
+                    return JsonResponse({
+                        "success": False,
+                        "message": "Uno o más productos no existen."
+                    }, status=404)
+
+                for item in productos_normalizados:
+                    product = products_by_id[item["product_id"]]
+                    stock_delta = item["quantity"] / Decimal('1000') if product.se_vende_fraccionado else item["quantity"]
+                    stock_requerido[product.pk] += stock_delta
+
+                for product_id, cantidad_requerida in stock_requerido.items():
+                    product = products_by_id[product_id]
+                    if product.cantidad_stock < cantidad_requerida:
+                        unidad = "kg" if product.se_vende_fraccionado else "unidades"
+                        logger.warning(
+                            f"No hay suficiente stock para el producto '{product.nombre}'. "
+                            f"Disponible: {product.cantidad_stock} {unidad}"
+                        )
+                        return JsonResponse({
+                            "success": False,
+                            "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} {unidad}"
+                        }, status=400)
+
+                total_calculado = Decimal('0.00')
+                for item in productos_normalizados:
+                    product = products_by_id[item["product_id"]]
+                    cantidad_facturable = item["quantity"] / Decimal('1000') if product.se_vende_fraccionado else item["quantity"]
+                    total_calculado += cantidad_facturable * product.precio_venta
+
+                total_compra = total_calculado.quantize(Decimal('0.01'))
+
                 # Crear la venta
                 logger.debug(f"Creando venta para el cliente {cliente.nombre} (ID: {cliente.pk})")
 
@@ -387,41 +449,23 @@ def realizar_venta(request):
                 ticket = Ticket.objects.create(
                     venta=venta,
                     total=total_compra,
-                    cashier_id=request.user.id
+                    cashier_id=request.user.id,
+                    cliente=cliente,
                 )
 
                 logger.debug(f"Ticket creado para la venta ID: {venta.pk}, Ticket ID: {ticket.pk}")
 
                 # Procesar productos de la venta (detalles de la venta)
-                for item in productos_data:
-                    product_id = item.get('id')
-                    quantity = item.get('cantidad')  # Asegúrate de que la cantidad es un número entero
-                    product = get_object_or_404(Product, id=product_id)
+                for item in productos_normalizados:
+                    product = products_by_id[item["product_id"]]
+                    quantity = item["quantity"]
                     
                     logger.debug(f"Procesando producto: {product.nombre}, cantidad: {quantity}")
 
-                    quantity = Decimal(str(quantity))
+                    stock_delta = quantity / Decimal('1000') if product.se_vende_fraccionado else quantity
+                    product.actualizar_stock(stock_delta)
 
-                    # Validación y cálculo para productos fraccionados
-                    if product.se_vende_fraccionado:
-                        cantidad_kg = quantity / Decimal('1000')
-                        if product.cantidad_stock < cantidad_kg:
-                            logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg")
-                            return JsonResponse({
-                                "success": False,
-                                "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} kg"
-                            }, status=400)
-                        product.cantidad_stock -= cantidad_kg
-                    else:
-                        if product.cantidad_stock < quantity:
-                            logger.warning(f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades")
-                            return JsonResponse({
-                                "success": False,
-                                "message": f"No hay suficiente stock para el producto '{product.nombre}'. Disponible: {product.cantidad_stock} unidades"
-                            }, status=400)
-                        product.cantidad_stock -= quantity
-
-                    product.save()
+                    total_producto = (stock_delta * product.precio_venta).quantize(Decimal('0.01'))
 
                     # Crear el LineItem (detalle de la venta)
                     LineItem.objects.create(
@@ -429,20 +473,25 @@ def realizar_venta(request):
                         product=product,
                         quantity=quantity,
                     )
+                    DetalleVenta.objects.create(
+                        venta=venta,
+                        producto=product,
+                        cantidad=quantity,
+                        precio_unitario=product.precio_venta,
+                        total=total_producto,
+                    )
                     logger.debug(f"Detalle de venta creado para el producto '{product.nombre}'")
 
                 # Si la venta es fiada, actualizar el saldo de la cuenta corriente
                 if es_fiada:
                     # Asegurarse de que total_compra es un Decimal
-                    total_compra_decimal = Decimal(str(total_compra))
-                    
                     # Verificar que cuenta_corriente existe (debería existir si es_fiada=True)
                     if cuenta_corriente is None:
                         logger.error("Error interno: venta marcada como fiada pero sin cuenta corriente")
                         raise ValueError("Cuenta corriente requerida para venta fiada")
                     
                     # Actualizamos el saldo de la cuenta corriente
-                    cuenta_corriente.saldo += total_compra_decimal
+                    cuenta_corriente.saldo += total_compra
                     cuenta_corriente.save()
 
                     logger.debug(f"Saldo actualizado de la cuenta corriente para el cliente '{cliente.nombre}': {cuenta_corriente.saldo}")
